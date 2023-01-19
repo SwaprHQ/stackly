@@ -1,0 +1,62 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+node_modules
+.pnp
+.pnp.js
+
+# testing
+coverage
+
+# next.js
+.next/
+out/
+build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# local env files
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# turbo
+.turbo
+
+# foundry
+cache
+artifacts
+coverage*
+typechain
+typechain-types
+
+yarn-error.log
+
+/*.sol
+/interfaces/*.sol
+*.tgz
+.env*
+!.env.example
+
+.gas-snapshot*
+
+broadcast
+
+out
+
+# custom
+/packages/contracts/abis
+dist
+generated
+
+# subgraph
+subgraph.yaml

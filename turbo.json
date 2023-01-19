@@ -1,0 +1,31 @@
+{
+    "$schema": "https://turbo.build/schema.json",
+    "pipeline": {
+        "build": {
+            "dependsOn": ["^build"],
+            "outputs": ["dist/**"]
+        },
+        "test": {
+            "outputs": []
+        },
+        "lint": {
+            "outputs": []
+        },
+        "format": {
+            "outputs": []
+        },
+        "dev": {
+            "cache": false
+        }
+    },
+    "globalEnv": [
+        "NODE_ENV",
+        "SERVER_PORT",
+        "SIGNER_PRIVATE_KEY",
+        "SENTRY_DSN",
+        "MONGO_URI",
+        "MONGO_DEBUG",
+        "GNOSIS_RPC_ENDPOINT",
+        "ETHEREUM_RPC_ENDPOINT"
+    ]
+}

@@ -1,0 +1,30 @@
+{
+  "type": "module",
+  "name": "cow-dca-contracts",
+  "version": "0.1.0",
+  "private": true,
+  "license": "GPL-3.0-or-later",
+  "files": [
+    "abis/*.json",
+    ".addresses.json"
+  ],
+  "scripts": {
+    "lint": "forge fmt --check && prettier --check . !./src !./lib !./scripts !./tests !./.turbo !./abis !./out",
+    "format": "forge fmt && prettier --write . !./src !./lib !./scripts !./tests !./.turbo !./abis !./out",
+    "test": "forge test",
+    "test:coverage": "forge coverage",
+    "test:gasreport": "forge test --gas-report",
+    "snapshot": "forge snapshot"
+  },
+  "devDependencies": {
+    "@ethersproject/address": "^5.7.0",
+    "@ethersproject/contracts": "^5.7.0",
+    "@ethersproject/providers": "^5.7.2",
+    "@ethersproject/units": "^5.7.0",
+    "@ethersproject/wallet": "^5.7.0",
+    "chalk": "^5.1.2",
+    "commander": "^9.4.1",
+    "eslint-config-custom": "workspace:*",
+    "ganache": "^7.5.0"
+  }
+}
