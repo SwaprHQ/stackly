@@ -1,0 +1,40 @@
+type SubgraphStatus @entity {
+  "SubgraphStatus"
+  id: ID!
+  isInitialized: Boolean!
+  lastSnapshotBlock: BigInt!
+}
+
+type VaultFactory @entity {
+  "VaultFactory"
+  id: ID!
+  "VaultFactory address"
+  address: Bytes!
+  "Vault count"
+  vaultCount: Int!
+}
+
+#
+# Provides information about an ERC20 token
+#
+type Token @entity {
+  " Token address "
+  id: ID!
+  " Number of decimals the token uses "
+  decimals: Int!
+  " Human-readable name of the token "
+  name: String!
+  " Symbol of the token "
+  symbol: String!
+}
+
+type Vault @entity {
+  " Vault address "
+  id: ID!
+  "Vault owner"
+  owner: Bytes!
+  "Vault token"
+  token: Token!
+  createdAt: BigInt!
+  cancelledAt: BigInt
+}
