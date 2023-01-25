@@ -6,6 +6,7 @@
     "outDir": "./dist",
     "paths": {
       "tslib": ["./node_modules/tslib"]
-    }
+    },
+    "types": ["jest"]
   }
 }

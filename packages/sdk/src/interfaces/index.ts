@@ -29,13 +29,13 @@ export interface DollarCostAveragingOrder {
    */
   chainId: ChainId;
   /**
-   * Start date: when the first order will be placed.
+   * Start date: when the first order will be placed. This is a timestamp in seconds at UTC.
    */
-  startAt: Date;
+  startAt: number;
   /**
-   * End date: when the last order will be placed.
+   * End date: when the last order will be placed. This is a timestamp in seconds at UTC.
    */
-  endAt: Date;
+  endAt: number;
   /**
    * Frequency unit: how often the order will be placed.
    */
@@ -45,6 +45,14 @@ export interface DollarCostAveragingOrder {
    */
   frequencyInterval: DCAFrequencyInterval;
 }
+
+
+export type DollarCostAveragingOrderWithSignature = DollarCostAveragingOrder & {
+  /**
+   * A EIP712 signature for the order. This is used to verify that the order was created by the user.
+   */
+  signature: string;
+};
 
 
 export interface DollarCostAveragingOrderDocument extends DollarCostAveragingOrder {

@@ -3,12 +3,16 @@ import type { ContractReceipt } from '@ethersproject/contracts';
 import type { Provider } from '@ethersproject/abstract-provider';
 import type { Signer } from '@ethersproject/abstract-signer';
 
-import { VAULT_FACTORY_ADDRESS_LIST } from './constants';
+import {
+  VAULT_DRIVER_ADDRESS_LIST,
+  VAULT_FACTORY_ADDRESS_LIST,
+} from './constants';
 import { ChainId } from '../constants';
 import {
   VaultFactory__factory,
   Vault__factory,
   ERC20__factory,
+  VaultFactory,
 } from '../types/contracts';
 
 /**
@@ -90,7 +94,7 @@ export function getVaultInterface() {
   return Vault__factory.createInterface();
 }
 
-export function getERC20Interface(){
+export function getERC20Interface() {
   return ERC20__factory.createInterface();
 }
 
@@ -110,4 +114,74 @@ export function getVaultAddressFromTransactionReceipt(
   });
 
   return vaultAddress;
+}
+
+
+
+interface CreateVaultWithNonceParams {
+  vaultFactory: VaultFactory;
+  token: string;
+  owner: string;
+  nonce: number;
+  /**
+   * The driver to use for the vault. If not provided, the default driver will be used
+   */
+  driver?: string;
+}
+
+
+
+/**
+ * Creates a new vault using the vault factory
+ * @param param0
+ * @returns
+ */
+export async function createVaultWithNonce({
+  vaultFactory,
+  token,
+  owner,
+  nonce,
+  driver,
+}: CreateVaultWithNonceParams): Promise<{
+  vault?: string;
+  error ?: Error;
+  receipt: ContractReceipt;
+}> {
+  const rawChainId = (await vaultFactory.provider
+    .getNetwork()
+    .then((n) => n.chainId)) as number;
+  const chainId = rawChainId as ChainId;
+
+  driver = driver || VAULT_DRIVER_ADDRESS_LIST[chainId];
+
+  if (!driver || driver === AddressZero) {
+    throw new Error(`No driver found for chain ${chainId}`);
+  }
+
+  const initilizer = getVaultInterface().encodeFunctionData('initialize', [
+    owner,
+    driver,
+    token,
+  ]);
+
+  const createVaultWithNonceTx = await vaultFactory.createVaultWithNonce(
+    getVaultSingletonAddress(chainId),
+    initilizer,
+    nonce
+  );
+
+  const receipt = await createVaultWithNonceTx.wait();
+  const vault = getVaultAddressFromTransactionReceipt(receipt);
+
+  if (!vault) {
+    return {
+      error: new Error('Vault address not found in transaction receipt'),
+      receipt,
+    }
+  }
+
+  return {
+    vault,
+    receipt,
+  };
 }

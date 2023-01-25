@@ -12,6 +12,11 @@ export const VAULT_SINGLETON_ADDRESS_LIST: Record<ChainId, string> = {
   [ChainId.GNOSIS]: '0x6cE732Ee686C69Df898567034A45c0081649578d',
 };
 
+export const VAULT_DRIVER_ADDRESS_LIST: Record<ChainId, string> = {
+  [ChainId.ETHEREUM]: AddressZero,
+  [ChainId.GNOSIS]: '0xf17bbF8cE0e4b3FD216a659bb15199f877AaD6FD',
+};
+
 /**
  * DCA Frequency interval. How often the order will be placed.
  */
