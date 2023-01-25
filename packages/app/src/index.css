@@ -1,0 +1,124 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+
+body {
+  font-family: 'Urbanist', sans-serif;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root,
+#root>div[data-rk] {
+  height: 100%;
+  width: 100%;
+}
+
+table {
+  display: block;
+  width: 100%;
+  overflow: auto;
+  word-break: keep-all;
+  white-space: nowrap;
+  table-layout: fixed;
+
+  border-collapse: collapse;
+
+}
+
+table th,
+table td {
+  padding: 0.5rem 1rem;
+  border: 1px solid #000;
+}
+
+label,
+input,
+select {
+  font-size: 18px;
+  font-family: 'Urbanist', sans-serif;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+input,
+select,
+input:focus,
+select:focus {
+  padding: 12px 8px;
+  outline: none;
+  border: 2px solid #000;
+}
+
+
+button {
+  padding: 4px 8px;
+  cursor: pointer;
+  font-family: 'Urbanist', sans-serif;
+}
+
+
+.form-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+}
+
+.connector-list {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+}
+
+.wallet-modal {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.wallet-modal.open {
+  display: block;
+}
+
+.wallet-modal-content {
+  background-color: #fefefe;
+  margin: 15% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+}
+
+
+#redeem-button {
+  display: none;
+  cursor: pointer;
+}
