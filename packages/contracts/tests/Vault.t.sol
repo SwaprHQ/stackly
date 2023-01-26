@@ -35,6 +35,22 @@ contract VaultTest is Test {
     assertEq(vault.balance(), 0);
   }
 
+  function testVaultTokenAllowanceInitializeIsMax() public {
+    vault.initialize(address(0x1), address(0x2), address(testToken));
+    assertEq(vault.owner(), address(0x1));
+    assertEq(vault.driver(), address(0x2));
+    assertEq(vault.token(), address(testToken));
+    assertEq(vault.balance(), 0);
+
+    uint256 vaultTokenAllowanceWithGPv2 = testToken.allowance(
+      address(vault),
+      address(0x9008D19f58AAbD9eD0D60971565AA8510560ab41)
+    );
+
+    assertEq(vaultTokenAllowanceWithGPv2, type(uint256).max);
+
+  }
+
   function testCanDepositTokenIntoVault() public {
     testToken.transfer(address(vault), 10);
     vault.initialize(address(0x1), address(0x2), address(testToken));
