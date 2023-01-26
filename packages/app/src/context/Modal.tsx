@@ -4,9 +4,12 @@ import {
   useState,
   createContext,
   useContext,
+  Dispatch,
+  SetStateAction,
 } from 'react';
 
 export enum Modal {
+  VaultCreateAndDepositSteps = 'VaultCreateAndDepositSteps',
   VaultDeposit = 'VaultDeposit',
   Withdraw = 'Withdraw',
   Wallet = 'Wallet',
@@ -21,6 +24,7 @@ export interface IModalContext<ModalData = unknown> {
    * @returns
    */
   openModal: (modal: Modal, data?: ModalData) => void;
+  setModalData: Dispatch<SetStateAction<ModalData>>;
   closeModal: () => void;
   data: ModalData | null;
 }
@@ -29,6 +33,7 @@ export const ModalContext = createContext({
   modal: null,
   openModal: () => {},
   closeModal: () => {},
+  setModalData: () => {},
   data: null,
 } as IModalContext);
 
@@ -38,6 +43,10 @@ export function ModalProvider({ children }: PropsWithChildren) {
 
   const openModal = useCallback((modal: Modal, data?: unknown) => {
     setModal(modal);
+    setData(data);
+  }, []);
+
+  const setModalData = useCallback((data: unknown) => {
     setData(data);
   }, []);
 
@@ -52,6 +61,7 @@ export function ModalProvider({ children }: PropsWithChildren) {
         data,
         openModal,
         closeModal,
+        setModalData,
       }}
     >
       {children}

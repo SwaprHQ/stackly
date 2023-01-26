@@ -24,7 +24,12 @@ export function SelectBalanceButtonContainer({
       address: tokenAddress,
       functionName: 'balanceOf',
       args: [userAddress],
+      enabled: !!userAddress,
     });
+
+  if (userAddress === undefined) {
+    return <SelectBalanceButton type="button" disabled alignRight />;
+  }
 
   if (isUserSellTokenBalanceLoading || userTokenBalance === undefined) {
     return (

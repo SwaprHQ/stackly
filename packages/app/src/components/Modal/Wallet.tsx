@@ -3,7 +3,7 @@ import { useConnect } from 'wagmi';
 import { Modal, useModal } from '../../context/Modal';
 import {
   ModalBackdrop,
-  ModalContent,
+  ModalContentWithNoPadding,
   ModalHeader,
   ModalInnerWrapper,
   ModalOutterWrapper,
@@ -85,11 +85,4 @@ const ConnectorListBig = styled.div`
       background: #ffc900;
     }
   }
-`;
-
-const ModalContentWithNoPadding = styled(ModalContent)`
-  padding: 0;
-  align-items: stretch;
-  width: 100%;
-  border-bottom: 2px solid #000;
 `;

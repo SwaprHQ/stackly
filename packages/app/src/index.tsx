@@ -9,6 +9,7 @@ import { VaultsPage } from './pages/vaults';
 import { ModalProvider } from './context/Modal';
 import { WalletModal } from './components/Modal/Wallet';
 import { VaultDepositModal } from './components/Modal/VaultDeposit';
+import { CreateVaultStepsModal } from './components/Modal/CreateVaultSteps';
 
 const router = createBrowserRouter([
   {
@@ -31,6 +32,7 @@ root.render(
       <ModalProvider>
         <WalletModal />
         <VaultDepositModal />
+        <CreateVaultStepsModal />
         <RouterProvider router={router} />
       </ModalProvider>
     </WagmiConfig>

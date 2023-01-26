@@ -116,8 +116,6 @@ export function getVaultAddressFromTransactionReceipt(
   return vaultAddress;
 }
 
-
-
 interface CreateVaultWithNonceParams {
   vaultFactory: VaultFactory;
   token: string;
@@ -128,8 +126,6 @@ interface CreateVaultWithNonceParams {
    */
   driver?: string;
 }
-
-
 
 /**
  * Creates a new vault using the vault factory
@@ -142,11 +138,7 @@ export async function createVaultWithNonce({
   owner,
   nonce,
   driver,
-}: CreateVaultWithNonceParams): Promise<{
-  vault?: string;
-  error ?: Error;
-  receipt: ContractReceipt;
-}> {
+}: CreateVaultWithNonceParams) {
   const rawChainId = (await vaultFactory.provider
     .getNetwork()
     .then((n) => n.chainId)) as number;
@@ -170,18 +162,5 @@ export async function createVaultWithNonce({
     nonce
   );
 
-  const receipt = await createVaultWithNonceTx.wait();
-  const vault = getVaultAddressFromTransactionReceipt(receipt);
-
-  if (!vault) {
-    return {
-      error: new Error('Vault address not found in transaction receipt'),
-      receipt,
-    }
-  }
-
-  return {
-    vault,
-    receipt,
-  };
+  return createVaultWithNonceTx;
 }

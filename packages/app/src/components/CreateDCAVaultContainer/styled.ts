@@ -20,6 +20,6 @@ export const InnerContainer = styled.div`
 
 
 export const FormButtonGroup = styled(FormGroup)`
-  padding-top: 20px;
+  margin: 20px 0;
   align-items: center;
 `;

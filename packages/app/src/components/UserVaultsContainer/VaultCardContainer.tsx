@@ -23,8 +23,10 @@ export function VaultCardContainer({ vault }: { vault: SubgraphVault }) {
     abi: getVaultInterface().fragments,
     address: vault.id,
     functionName: 'balance',
-    enabled: false,
+    enabled: !!signer,
     watch: true,
+    cacheTime: 30_000,
+    staleTime: 30_000,
   });
 
   const onDepositHandler = () => {

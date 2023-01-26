@@ -48,6 +48,15 @@ export const ModalContent = styled(ModalSection)<{ minHeight?: string }>(props =
   min-height: ${props.minHeight || 'auto'};
 `);
 
+
+export const ModalContentWithNoPadding = styled(ModalContent)`
+  padding: 0;
+  align-items: stretch;
+  width: 100%;
+  border-bottom: 2px solid #000;
+`;
+
+
 export const Blackbox = styled.div`
   position: absolute;
   left: auto;
