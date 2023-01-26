@@ -1,6 +1,7 @@
 import { getVaultContract, getVaultInterface } from 'dca-sdk';
 import { BigNumber } from 'ethers';
 import { formatUnits, Fragment } from 'ethers/lib/utils.js';
+import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { useContractRead, useSigner } from 'wagmi';
 import { Modal, useModal } from '../../context/Modal';
@@ -56,6 +57,7 @@ export function VaultCardContainer({ vault }: { vault: SubgraphVault }) {
                   vault.token.symbol
                 }`}
           </Text>
+          <Link to={`/create?vault=${vault.id}`}>Create orders</Link>
         </CardInnerWrapper>
         <VaultButtons>
           <button

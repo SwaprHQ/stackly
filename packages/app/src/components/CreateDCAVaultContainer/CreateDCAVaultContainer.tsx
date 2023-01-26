@@ -34,6 +34,8 @@ import {
   VaultCreateAndDepositStepsModalProps,
   CreateVaultAndDeposiStep,
 } from '../Modal/CreateVaultSteps';
+import { SubgraphVault } from '../UserVaultsContainer/types';
+import { shortenAddress } from '../../utils';
 
 dayjs.extend(dayjsUTCPlugin);
 export const OrderInfo = styled.div`
@@ -49,7 +51,13 @@ export function findTokenByAddress(address: string) {
   );
 }
 
-export function CreateDCAVaultContainer() {
+export interface CreateDCAVaultContainerProps {
+  existingVault?: SubgraphVault;
+}
+
+export function CreateDCAVaultContainer({
+  existingVault,
+}: CreateDCAVaultContainerProps) {
   const account = useAccount();
   const { chain } = useNetwork();
   const { openModal, setModalData } =
@@ -59,7 +67,7 @@ export function CreateDCAVaultContainer() {
   const [endAt, setEndAt] = useState<Dayjs>(dayjs().add(25, 'h'));
   const [frequency] = useState<number>(1); // This is hardcoded for now
   const [frequencyInterval, setFrequencyInterval] =
-    useState<DCAFrequencyInterval>(DCAFrequencyInterval.DAY);
+    useState<DCAFrequencyInterval>(DCAFrequencyInterval.HOUR);
   const [sellTokenAmount, setSellTokenAmount] = useState<Amount<Token>>(
     new Amount(tokenOptions[0], '0')
   );
@@ -74,7 +82,6 @@ export function CreateDCAVaultContainer() {
     if (startAt.isBefore(dayjs())) {
       return setCreateVaultError(new Error('Start date must be in the future'));
     }
-
     // End date must be after start date
     if (endAt.isBefore(startAt)) {
       return setCreateVaultError(
@@ -218,7 +225,11 @@ export function CreateDCAVaultContainer() {
 
   return (
     <Container>
-      <ContainerTitle>Create a Vault and Order</ContainerTitle>
+      <ContainerTitle>
+        {existingVault && existingVault.id
+          ? `Create Order With Vault ${shortenAddress(existingVault.id)}`
+          : 'Create A Vault and Order'}
+      </ContainerTitle>
       <FlexContainer>
         <InnerContainer>
           <Card>
@@ -233,6 +244,7 @@ export function CreateDCAVaultContainer() {
                         setSellTokenAmount(
                           new Amount(sellTokenAmount.currency, nextSellAmount)
                         );
+                        setCreateVaultError(null);
                       }}
                     />
                     <select

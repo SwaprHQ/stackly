@@ -24,7 +24,7 @@ const API_BASE = 'http://localhost:4000'; //@todo: use env variable
  */
 export function postOrder(signedOrder: DollarCostAveragingOrderWithSignature){
   return fetch( `${API_BASE}/orders`, {
-    method: 'DELETE',
+    method: 'POST',
     body: JSON.stringify(signedOrder),
     headers: {
       'Content-Type': 'application/json',

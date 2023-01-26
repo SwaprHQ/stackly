@@ -3,15 +3,23 @@ import styled from 'styled-components';
 export const FOOTER_HEIGHT = '64px';
 
 export function Footer() {
-  return <FooterWrapper>Footer</FooterWrapper>;
+  return (
+    <FooterWrapper>
+      <FooterTitle>3AC Labs</FooterTitle>
+    </FooterWrapper>
+  );
 }
+
+const FooterTitle = styled.span`
+  font-size: 12px;
+  font-weight: bold;
+`;
 
 const FooterWrapper = styled.footer`
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 1rem;
-  font-size: 0.8rem;
   color: #000;
   height: ${FOOTER_HEIGHT};
 `;

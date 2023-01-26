@@ -15,7 +15,7 @@ export function UserVaultsContainer() {
       return;
     }
     getUserVaults(account.address as string).then((vaults) => {
-      setUserVaults(vaults);
+      setUserVaults(vaults.filter((vault) => vault.cancelledAt === null));
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [account.address]);
@@ -50,7 +50,6 @@ const VaultGridList = styled.div`
   gap: 24px;
   @media (min-width: 480px) {
     flex-direction: row;
-    justify-content: flex-start;
     flex-wrap: wrap;
   }
 `;
