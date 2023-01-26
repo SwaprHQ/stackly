@@ -11,76 +11,76 @@ import type {
   PopulatedTransaction,
   Signer,
   utils,
-} from "ethers";
+} from 'ethers';
 import type {
   FunctionFragment,
   Result,
   EventFragment,
-} from "@ethersproject/abi";
-import type { Listener, Provider } from "@ethersproject/providers";
+} from '@ethersproject/abi';
+import type { Listener, Provider } from '@ethersproject/providers';
 import type {
   TypedEventFilter,
   TypedEvent,
   TypedListener,
   OnEvent,
   PromiseOrValue,
-} from "./common";
+} from './common';
 
 export interface VaultInterface extends utils.Interface {
   functions: {
-    "balance()": FunctionFragment;
-    "cancel()": FunctionFragment;
-    "driver()": FunctionFragment;
-    "execute(bytes,bool)": FunctionFragment;
-    "initialize(address,address,address)": FunctionFragment;
-    "owner()": FunctionFragment;
-    "token()": FunctionFragment;
+    'balance()': FunctionFragment;
+    'cancel()': FunctionFragment;
+    'driver()': FunctionFragment;
+    'execute(bytes,bool)': FunctionFragment;
+    'initialize(address,address,address)': FunctionFragment;
+    'owner()': FunctionFragment;
+    'token()': FunctionFragment;
   };
 
   getFunction(
     nameOrSignatureOrTopic:
-      | "balance"
-      | "cancel"
-      | "driver"
-      | "execute"
-      | "initialize"
-      | "owner"
-      | "token"
+      | 'balance'
+      | 'cancel'
+      | 'driver'
+      | 'execute'
+      | 'initialize'
+      | 'owner'
+      | 'token'
   ): FunctionFragment;
 
-  encodeFunctionData(functionFragment: "balance", values?: undefined): string;
-  encodeFunctionData(functionFragment: "cancel", values?: undefined): string;
-  encodeFunctionData(functionFragment: "driver", values?: undefined): string;
+  encodeFunctionData(functionFragment: 'balance', values?: undefined): string;
+  encodeFunctionData(functionFragment: 'cancel', values?: undefined): string;
+  encodeFunctionData(functionFragment: 'driver', values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "execute",
+    functionFragment: 'execute',
     values: [PromiseOrValue<BytesLike>, PromiseOrValue<boolean>]
   ): string;
   encodeFunctionData(
-    functionFragment: "initialize",
+    functionFragment: 'initialize',
     values: [
       PromiseOrValue<string>,
       PromiseOrValue<string>,
       PromiseOrValue<string>
     ]
   ): string;
-  encodeFunctionData(functionFragment: "owner", values?: undefined): string;
-  encodeFunctionData(functionFragment: "token", values?: undefined): string;
+  encodeFunctionData(functionFragment: 'owner', values?: undefined): string;
+  encodeFunctionData(functionFragment: 'token', values?: undefined): string;
 
-  decodeFunctionResult(functionFragment: "balance", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "cancel", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "driver", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "execute", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "token", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'balance', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'cancel', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'driver', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'execute', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'initialize', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'owner', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'token', data: BytesLike): Result;
 
   events: {
-    "Cancelled(address)": EventFragment;
-    "Initialized(address,address,address)": EventFragment;
+    'Cancelled(address)': EventFragment;
+    'Initialized(address,address,address)': EventFragment;
   };
 
-  getEvent(nameOrSignatureOrTopic: "Cancelled"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "Initialized"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'Cancelled'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'Initialized'): EventFragment;
 }
 
 export interface CancelledEventObject {
@@ -206,12 +206,12 @@ export interface Vault extends BaseContract {
   };
 
   filters: {
-    "Cancelled(address)"(
+    'Cancelled(address)'(
       vault?: PromiseOrValue<string> | null
     ): CancelledEventFilter;
     Cancelled(vault?: PromiseOrValue<string> | null): CancelledEventFilter;
 
-    "Initialized(address,address,address)"(
+    'Initialized(address,address,address)'(
       vault?: PromiseOrValue<string> | null,
       owner?: null,
       token?: null

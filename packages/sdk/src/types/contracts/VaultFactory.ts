@@ -12,37 +12,37 @@ import type {
   PopulatedTransaction,
   Signer,
   utils,
-} from "ethers";
+} from 'ethers';
 import type {
   FunctionFragment,
   Result,
   EventFragment,
-} from "@ethersproject/abi";
-import type { Listener, Provider } from "@ethersproject/providers";
+} from '@ethersproject/abi';
+import type { Listener, Provider } from '@ethersproject/providers';
 import type {
   TypedEventFilter,
   TypedEvent,
   TypedListener,
   OnEvent,
   PromiseOrValue,
-} from "./common";
+} from './common';
 
 export interface VaultFactoryInterface extends utils.Interface {
   functions: {
-    "createVaultWithNonce(address,bytes,uint256)": FunctionFragment;
-    "getChainId()": FunctionFragment;
-    "vaultCreationCode()": FunctionFragment;
+    'createVaultWithNonce(address,bytes,uint256)': FunctionFragment;
+    'getChainId()': FunctionFragment;
+    'vaultCreationCode()': FunctionFragment;
   };
 
   getFunction(
     nameOrSignatureOrTopic:
-      | "createVaultWithNonce"
-      | "getChainId"
-      | "vaultCreationCode"
+      | 'createVaultWithNonce'
+      | 'getChainId'
+      | 'vaultCreationCode'
   ): FunctionFragment;
 
   encodeFunctionData(
-    functionFragment: "createVaultWithNonce",
+    functionFragment: 'createVaultWithNonce',
     values: [
       PromiseOrValue<string>,
       PromiseOrValue<BytesLike>,
@@ -50,29 +50,29 @@ export interface VaultFactoryInterface extends utils.Interface {
     ]
   ): string;
   encodeFunctionData(
-    functionFragment: "getChainId",
+    functionFragment: 'getChainId',
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "vaultCreationCode",
+    functionFragment: 'vaultCreationCode',
     values?: undefined
   ): string;
 
   decodeFunctionResult(
-    functionFragment: "createVaultWithNonce",
+    functionFragment: 'createVaultWithNonce',
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "getChainId", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'getChainId', data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "vaultCreationCode",
+    functionFragment: 'vaultCreationCode',
     data: BytesLike
   ): Result;
 
   events: {
-    "VaultCreated(address)": EventFragment;
+    'VaultCreated(address)': EventFragment;
   };
 
-  getEvent(nameOrSignatureOrTopic: "VaultCreated"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'VaultCreated'): EventFragment;
 }
 
 export interface VaultCreatedEventObject {
@@ -146,7 +146,7 @@ export interface VaultFactory extends BaseContract {
   };
 
   filters: {
-    "VaultCreated(address)"(
+    'VaultCreated(address)'(
       vault?: PromiseOrValue<string> | null
     ): VaultCreatedEventFilter;
     VaultCreated(

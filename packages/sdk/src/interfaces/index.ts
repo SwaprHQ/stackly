@@ -50,7 +50,6 @@ export interface DollarCostAveragingOrder {
   frequencyInterval: DCAFrequencyInterval;
 }
 
-
 export type DollarCostAveragingOrderWithSignature = DollarCostAveragingOrder & {
   /**
    * A EIP712 signature for the order. This is used to verify that the order was created by the user.
@@ -58,8 +57,8 @@ export type DollarCostAveragingOrderWithSignature = DollarCostAveragingOrder & {
   signature: string;
 };
 
-
-export interface DollarCostAveragingOrderDocument extends DollarCostAveragingOrder {
+export interface DollarCostAveragingOrderDocument
+  extends DollarCostAveragingOrder {
   /**
    * Order ID: unique identifier for the order.
    */

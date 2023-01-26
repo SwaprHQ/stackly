@@ -2,163 +2,163 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { Contract, Signer, utils } from "ethers";
-import type { Provider } from "@ethersproject/providers";
-import type { Vault, VaultInterface } from "../Vault";
+import { Contract, Signer, utils } from 'ethers';
+import type { Provider } from '@ethersproject/providers';
+import type { Vault, VaultInterface } from '../Vault';
 
 const _abi = [
   {
     inputs: [],
-    name: "AlreadyInitialized",
-    type: "error",
+    name: 'AlreadyInitialized',
+    type: 'error',
   },
   {
     inputs: [],
-    name: "NotDriver",
-    type: "error",
+    name: 'NotDriver',
+    type: 'error',
   },
   {
     inputs: [],
-    name: "NotOwner",
-    type: "error",
+    name: 'NotOwner',
+    type: 'error',
   },
   {
     anonymous: false,
     inputs: [
       {
         indexed: true,
-        internalType: "address",
-        name: "vault",
-        type: "address",
+        internalType: 'address',
+        name: 'vault',
+        type: 'address',
       },
     ],
-    name: "Cancelled",
-    type: "event",
+    name: 'Cancelled',
+    type: 'event',
   },
   {
     anonymous: false,
     inputs: [
       {
         indexed: true,
-        internalType: "address",
-        name: "vault",
-        type: "address",
+        internalType: 'address',
+        name: 'vault',
+        type: 'address',
       },
       {
         indexed: false,
-        internalType: "address",
-        name: "owner",
-        type: "address",
+        internalType: 'address',
+        name: 'owner',
+        type: 'address',
       },
       {
         indexed: false,
-        internalType: "address",
-        name: "token",
-        type: "address",
+        internalType: 'address',
+        name: 'token',
+        type: 'address',
       },
     ],
-    name: "Initialized",
-    type: "event",
+    name: 'Initialized',
+    type: 'event',
   },
   {
     inputs: [],
-    name: "balance",
+    name: 'balance',
     outputs: [
       {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
       },
     ],
-    stateMutability: "view",
-    type: "function",
+    stateMutability: 'view',
+    type: 'function',
   },
   {
     inputs: [],
-    name: "cancel",
+    name: 'cancel',
     outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
+    stateMutability: 'nonpayable',
+    type: 'function',
   },
   {
     inputs: [],
-    name: "driver",
+    name: 'driver',
     outputs: [
       {
-        internalType: "address",
-        name: "",
-        type: "address",
+        internalType: 'address',
+        name: '',
+        type: 'address',
       },
     ],
-    stateMutability: "view",
-    type: "function",
+    stateMutability: 'view',
+    type: 'function',
   },
   {
     inputs: [
       {
-        internalType: "bytes",
-        name: "orderUid",
-        type: "bytes",
+        internalType: 'bytes',
+        name: 'orderUid',
+        type: 'bytes',
       },
       {
-        internalType: "bool",
-        name: "signed",
-        type: "bool",
+        internalType: 'bool',
+        name: 'signed',
+        type: 'bool',
       },
     ],
-    name: "execute",
+    name: 'execute',
     outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
+    stateMutability: 'nonpayable',
+    type: 'function',
   },
   {
     inputs: [
       {
-        internalType: "address",
-        name: "_owner",
-        type: "address",
+        internalType: 'address',
+        name: '_owner',
+        type: 'address',
       },
       {
-        internalType: "address",
-        name: "_driver",
-        type: "address",
+        internalType: 'address',
+        name: '_driver',
+        type: 'address',
       },
       {
-        internalType: "address",
-        name: "_token",
-        type: "address",
+        internalType: 'address',
+        name: '_token',
+        type: 'address',
       },
     ],
-    name: "initialize",
+    name: 'initialize',
     outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
+    stateMutability: 'nonpayable',
+    type: 'function',
   },
   {
     inputs: [],
-    name: "owner",
+    name: 'owner',
     outputs: [
       {
-        internalType: "address",
-        name: "",
-        type: "address",
+        internalType: 'address',
+        name: '',
+        type: 'address',
       },
     ],
-    stateMutability: "view",
-    type: "function",
+    stateMutability: 'view',
+    type: 'function',
   },
   {
     inputs: [],
-    name: "token",
+    name: 'token',
     outputs: [
       {
-        internalType: "address",
-        name: "",
-        type: "address",
+        internalType: 'address',
+        name: '',
+        type: 'address',
       },
     ],
-    stateMutability: "view",
-    type: "function",
+    stateMutability: 'view',
+    type: 'function',
   },
 ] as const;
 
