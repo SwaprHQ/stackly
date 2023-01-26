@@ -13,6 +13,10 @@ export interface DollarCostAveragingOrder {
    */
   vault: string;
   /**
+   * Recipient address: where the funds will be sent.
+   */
+  recipient: string;
+  /**
    * Sell token: what token will be sold.
    */
   sellToken: string;

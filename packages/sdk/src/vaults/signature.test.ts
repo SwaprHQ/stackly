@@ -15,6 +15,7 @@ describe('Signature Functions', () => {
       frequency: 1,
       chainId: 1,
       vault: '0x6b175474e89094c44da98b954eedeac495271d0f',
+      recipient: '0x6b175474e89094c44da98b954eedeac495271d0f',
     };
     const signature = await signOrder(order, signer as any);
     const actualSignerAddress = await getOrderSigner(order, signature);

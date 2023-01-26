@@ -16,6 +16,7 @@ export function toTypedDataV3(order: DollarCostAveragingOrder) {
     types: {
       Order: [
         { name: 'vault', type: 'address' },
+        { name: 'recipient', type: 'address'},
         { name: 'sellToken', type: 'address' },
         { name: 'buyToken', type: 'address' },
         { name: 'sellAmount', type: 'uint256' },
@@ -28,6 +29,7 @@ export function toTypedDataV3(order: DollarCostAveragingOrder) {
     primaryType: 'Order',
     value: {
       vault: order.vault,
+      recipient: order.recipient,
       sellToken: order.sellToken,
       buyToken: order.buyToken,
       sellAmount: order.sellAmount,
