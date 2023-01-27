@@ -1,0 +1,39 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": ".",
+    "emitDecoratorMetadata": true,
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "lib": ["DOM", "ES2021", "ES6"],
+    "module": "ES2020",
+    "moduleResolution": "Node",
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "outDir": "./build",
+    "removeComments": true,
+    "resolveJsonModule": true,
+    "rootDir": "./src",
+    "skipLibCheck": true,
+    "sourceMap": false,
+    "strictFunctionTypes": true,
+    "strictNullChecks": true,
+    "target": "ES2021"
+  },
+  "exclude": [
+    "node_modules",
+    "jest",
+    "docker",
+    "data",
+    "bin",
+    ".yalc",
+    "./src/**/*.spec.ts",
+    "./src/**/*.test.ts"
+  ],
+  "include": ["./src/**/*.ts"]
+}
