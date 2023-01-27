@@ -80,7 +80,7 @@ export const ModalBackdrop = styled.div`
   background: rgba(0, 0, 0, 0);
   backdrop-filter: blur(6px);
   overflow-y: hidden;
-  z-index: 999;
+  z-index: 1002;
   /** Inner layout */
   display: flex;
   align-items: center;
