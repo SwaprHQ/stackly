@@ -1,5 +1,12 @@
 import dayjs from 'dayjs';
-import { ClientSession, Document, LeanDocument, model, ObjectId, Schema } from 'mongoose';
+import {
+  ClientSession,
+  Document,
+  LeanDocument,
+  model,
+  ObjectId,
+  Schema,
+} from 'mongoose';
 import { DollarCostAveragingOrderDocument } from './DollarCostAveragingOrder';
 import dayjsIsBetweenPlugin from 'dayjs/plugin/isBetween';
 
@@ -65,8 +72,7 @@ export const dcaExeuctionOrderSchema = new Schema<DCAExeuctionOrderDocument>(
     },
     providerData: {
       type: Schema.Types.Mixed,
-
-    }
+    },
   },
   {
     timestamps: true,
