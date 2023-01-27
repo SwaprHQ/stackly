@@ -28,7 +28,7 @@ jobs:
       - name: Install dependencies
         run: pnpm i
       - name: Prepare subgraph packages
-        run: cd packages/subgraph && pnpm run prepare:mainnet
+        run: pnpm --filter=packages/subgraph prepare:mainnet
       - name: Build
         run: pnpm build
       - name: Lint
