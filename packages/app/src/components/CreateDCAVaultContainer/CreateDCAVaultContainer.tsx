@@ -22,7 +22,7 @@ import { NumberInput } from '../form/NumberInput';
 import { InputGroup } from '../form';
 
 import dayjsUTCPlugin from 'dayjs/plugin/utc';
-import { useAccount, useNetwork, useSigner } from 'wagmi';
+import { useAccount, useNetwork, useSigner, useSwitchNetwork } from 'wagmi';
 import { Card, CardInnerWrapper } from '../Card';
 import { Container, ContainerTitle } from '../Container';
 import { ShadowButton } from '../form/FormButton';
@@ -53,13 +53,44 @@ export function findTokenByAddress(address: string) {
 
 export interface CreateDCAVaultContainerProps {
   existingVault?: SubgraphVault;
+  existingVaultBalance?: Amount<Token>;
+}
+
+function WalletConnectButton() {
+  const account = useAccount();
+  const { openModal } = useModal();
+  const { chains, chain } = useNetwork();
+  const { switchNetworkAsync } = useSwitchNetwork();
+  const isNetworkSupported = chains.find((c) => c.id === chain?.id);
+
+  if (account.isConnected && !isNetworkSupported) {
+    return (
+      <ShadowButton
+        type="button"
+        onClick={() => switchNetworkAsync?.(ChainId.GNOSIS)}
+      >
+        Switch Network
+      </ShadowButton>
+    );
+  }
+
+  return (
+    <ShadowButton
+      type="button"
+      onClick={() => openModal(Modal.Wallet)}
+      title="Connect Wallet"
+    >
+      Connect Wallet
+    </ShadowButton>
+  );
 }
 
 export function CreateDCAVaultContainer({
   existingVault,
+  existingVaultBalance,
 }: CreateDCAVaultContainerProps) {
   const account = useAccount();
-  const { chain } = useNetwork();
+  const { chain, chains } = useNetwork();
   const { openModal, setModalData } =
     useModal<VaultCreateAndDepositStepsModalProps>();
   const { data: signer } = useSigner();
@@ -69,11 +100,15 @@ export function CreateDCAVaultContainer({
   const [frequencyInterval, setFrequencyInterval] =
     useState<DCAFrequencyInterval>(DCAFrequencyInterval.HOUR);
   const [sellTokenAmount, setSellTokenAmount] = useState<Amount<Token>>(
-    new Amount(tokenOptions[0], '0')
+    existingVaultBalance || new Amount(tokenOptions[0], '0')
   );
   const [buyToken, setBuyToken] = useState<Token>(WETH[ChainId.GNOSIS]);
   const [createVaultError, setCreateVaultError] = useState<Error | null>(null);
-  const [vaultAddress, setVaultAddress] = useState<string | null>(null);
+  const [vaultAddress, setVaultAddress] = useState<string | null>(
+    existingVault?.id || null
+  );
+
+  const isNetworkSupported = !!chains.find((c) => c.id === chain?.id);
 
   const onCreateOrderHandler = async () => {
     setCreateVaultError(null);
@@ -102,61 +137,67 @@ export function CreateDCAVaultContainer({
     }
 
     const chainId = chain?.id as ChainId;
-
+    const isVaultCreated = !!vaultAddress;
+    let vault = vaultAddress ? vaultAddress : undefined;
     // Open the modal with initial required data
     openModal(Modal.VaultCreateAndDepositSteps, {
       chainId,
-      stepsCompleted: [],
+      stepsCompleted:
+        isVaultCreated && existingVaultBalance
+          ? [CreateVaultAndDeposiStep.DEPOSIT_TOKEN]
+          : [],
       tokenSymbol: sellTokenAmount.currency.symbol,
       tokenDepositAmount: parseFloat(sellTokenAmount.toFixed(3)),
     });
 
-    const vaultFactory = getVaultFactory(
-      getVaultFactoryAddress(ChainId.GNOSIS),
-      signer as any
-    );
+    // Create a new vault if one doesn't exist
+    if (!isVaultCreated) {
+      const vaultFactory = getVaultFactory(
+        getVaultFactoryAddress(ChainId.GNOSIS),
+        signer as any
+      );
 
-    const createVaultTransaction = await createVaultWithNonce({
-      // chainId is inferred from the vaultFactory provider to find the singleton/mastercopy to use
-      vaultFactory,
-      nonce: dayjs().unix(),
-      token: sellTokenAmount.currency.address,
-      owner: account.address as string,
-    });
+      const createVaultTransaction = await createVaultWithNonce({
+        // chainId is inferred from the vaultFactory provider to find the singleton/mastercopy to use
+        vaultFactory,
+        nonce: dayjs().unix(),
+        token: sellTokenAmount.currency.address,
+        owner: account.address as string,
+      });
 
-    setModalData((prev) => ({
-      ...prev,
-      createVaultTransaction,
-    }));
+      setModalData((prev) => ({
+        ...prev,
+        createVaultTransaction,
+      }));
 
-    const createVaultReceipt = await createVaultTransaction.wait();
+      const createVaultReceipt = await createVaultTransaction.wait();
 
-    if (!createVaultReceipt.status) {
-      setCreateVaultError(new Error('Could not create vault'));
-      return;
+      if (!createVaultReceipt.status) {
+        setCreateVaultError(new Error('Could not create vault'));
+        return;
+      }
+
+      vault = getVaultAddressFromTransactionReceipt(createVaultReceipt);
+
+      if (!vault) {
+        setCreateVaultError(new Error('Could not create vault'));
+        return;
+      }
+
+      setVaultAddress(vault);
+      setModalData((prev) => ({
+        ...prev,
+        stepsCompleted: [CreateVaultAndDeposiStep.CREATE_VAULT],
+        createVaultReceipt,
+        vault,
+        isDepositingToken: true,
+      }));
     }
-
-    const vault = getVaultAddressFromTransactionReceipt(createVaultReceipt);
-
-    if (!vault) {
-      setCreateVaultError(new Error('Could not create vault'));
-      return;
-    }
-
-    setVaultAddress(vault);
-    setModalData((prev) => ({
-      ...prev,
-      stepsCompleted: [CreateVaultAndDeposiStep.CREATE_VAULT],
-      createVaultReceipt,
-      vault,
-      isDepositingToken: true,
-    }));
-
     // Deposit the sell token amount into the vault
     const depositTx = await getERC20Contract(
       sellTokenAmount.currency.address,
       signer
-    ).transfer(vault, sellTokenAmount.toRawAmount());
+    ).transfer(vault as string, sellTokenAmount.toRawAmount());
 
     setModalData((prev) => ({
       ...prev,
@@ -189,7 +230,7 @@ export function CreateDCAVaultContainer({
       endAt: endAt.utc().unix(), // UTC time
       frequency,
       frequencyInterval,
-      vault,
+      vault: vault as string,
       recipient: account.address as string,
       chainId,
     };
@@ -349,7 +390,7 @@ export function CreateDCAVaultContainer({
                   </select>
                 </FormGroup>
                 <FormButtonGroup>
-                  {account.isConnected ? (
+                  {account.isConnected && isNetworkSupported ? (
                     <ShadowButton
                       type="button"
                       onClick={onCreateOrderHandler}
@@ -359,13 +400,7 @@ export function CreateDCAVaultContainer({
                       Create
                     </ShadowButton>
                   ) : (
-                    <ShadowButton
-                      type="button"
-                      onClick={() => openModal(Modal.Wallet)}
-                      title="Connect Wallet"
-                    >
-                      Connect Wallet
-                    </ShadowButton>
+                    <WalletConnectButton />
                   )}
                 </FormButtonGroup>
               </form>

@@ -1,3 +1,4 @@
+import { ChainId } from 'dca-sdk';
 import styled from 'styled-components';
 import { useConnect } from 'wagmi';
 import { Modal, useModal } from '../../context/Modal';
@@ -33,7 +34,10 @@ export function WalletModal() {
                   disabled={!connector.ready}
                   key={connector.id}
                   onClick={async () => {
-                    await connectAsync({ connector });
+                    await connectAsync({
+                      connector,
+                      chainId: ChainId.GNOSIS,
+                    });
                     closeModal();
                   }}
                 >

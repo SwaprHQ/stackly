@@ -1,7 +1,7 @@
 import { useAccount, useProvider, useSignMessage } from 'wagmi';
 
 import { cancelOrder } from '../../api';
-import { WalletConnectButton } from '../ConnectButton';
+import { WalletConnectButton } from '../Header/ConnectButton';
 import { getVaultContract } from 'dca-sdk';
 
 import { DollarCostAveragingOrder } from 'dca-sdk';

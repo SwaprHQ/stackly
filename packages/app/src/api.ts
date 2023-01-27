@@ -1,5 +1,6 @@
-import { DollarCostAveragingOrderWithSignature } from "dca-sdk";
+import { DollarCostAveragingOrderWithSignature } from 'dca-sdk';
 
+export const API_SERVIEC_BASE_URL = process.env.REACT_APP_API_SERVIEC_BASE_URL || 'http://localhost:4000';
 
 export function cancelOrder(orderId: string, signature: string): Promise<void> {
   const body = {
@@ -15,15 +16,13 @@ export function cancelOrder(orderId: string, signature: string): Promise<void> {
   }).then((res) => res.json());
 }
 
-const API_BASE = 'http://localhost:4000'; //@todo: use env variable
-
 /**
  * Post an order to the API
  * @param signedOrder
  * @returns
  */
-export function postOrder(signedOrder: DollarCostAveragingOrderWithSignature){
-  return fetch( `${API_BASE}/orders`, {
+export function postOrder(signedOrder: DollarCostAveragingOrderWithSignature) {
+  return fetch(`${API_SERVIEC_BASE_URL}/orders`, {
     method: 'POST',
     body: JSON.stringify(signedOrder),
     headers: {

@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import { WalletConnectButton } from '../ConnectButton';
+import { WalletConnectButton } from './ConnectButton';
 
 export const HEADER_HEIGHT = '64px';
 
@@ -33,11 +33,18 @@ const WalletConnectButtonContainer = styled.div`
     padding: 20px;
     font-weight: bold;
     text-transform: uppercase;
-    border-left: 2px solid #000;
+    border-top: 2px solid #000;
     font-size: 16px;
     &:hover {
       background: #ffc900;
       color: #000;
+    }
+  }
+  @media (min-width: 480px) {
+    & > button {
+      border-top: 0;
+      border-left: 2px solid #000;
+      padding: 0 20px;
     }
   }
 `;
@@ -50,28 +57,41 @@ const HeaderTitleContainer = styled.div`
 `;
 
 const HeaderFrame = styled.header`
-  display: flex;
-  align-items: stretch;
-  justify-content: space-between;
-  /** padding: 0 16px; */
-  gap: 16px;
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  height: ${HEADER_HEIGHT};
-  border-bottom: 2px solid #000;
+  height: 100%;
+  width: 280px;
   background: #fff;
-  z-index: 100;
+  z-index: 1000;
+  border-right: 2px solid #000;
+  display: flex;
+  align-items: stretch;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 16px;
+  @media (min-width: 480px) {
+    height: ${HEADER_HEIGHT};
+    width: 100%;
+    flex-direction: row;
+    border-right: 0;
+    border-bottom: 2px solid #000;
+  }
 `;
 
 const Nav = styled.nav`
   display: flex;
   flex: 1;
   align-items: center;
+  flex-direction: column;
   justify-content: start;
   gap: 16px;
   width: 100%;
+
+  @media (min-width: 480px) {
+    flex-direction: row;
+  }
 
   & > a {
     text-decoration: none;
