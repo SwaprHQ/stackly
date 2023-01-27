@@ -6,6 +6,7 @@
   "contributors": [],
   "scripts": {
     "build": "turbo run build",
+    "build:app": "turbo run build --filter=dca-sdk --filter=dca-app",
     "test": "turbo run test",
     "dev": "turbo run dev --parallel",
     "lint": "turbo run lint",
@@ -14,12 +15,12 @@
     "husky": "husky install"
   },
   "devDependencies": {
-    "@commitlint/cli": "^17.0.3",
-    "@commitlint/config-conventional": "^17.0.3",
-    "husky": "^8.0.1",
-    "eslint-config-custom": "workspace:*",
-    "prettier": "^2.8.0",
-    "turbo": "^1.6.3"
+    "@commitlint/cli": "^17.4.2",
+    "@commitlint/config-conventional": "^17.4.2",
+    "eslint-config-custom": "workspace:0.0.0",
+    "husky": "^8.0.3",
+    "prettier": "^2.8.3",
+    "turbo": "^1.7.0"
   },
   "engines": {
     "node": ">=16.0.0"

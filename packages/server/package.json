@@ -9,8 +9,8 @@
     "test": "jest",
     "build": "pnpm clean && tsc",
     "dev": "cross-env DEBUG=*,-nodemon:*,-eslint:*,-eslintrc:*,-typescript-eslint:*,-nodemon,-follow-redirects nodemon -x node --experimental-specifier-resolution=node --loader ts-node/esm src/index.ts",
-    "lint": "prettier --check . !./dist !./.turbo && eslint \"./**!(dist|.turbo)/*+(.tsx|.ts)\"",
-    "format": "prettier --write . !./dist !./.turbo && eslint --fix \"./**!(dist|.turbo)/*+(.tsx|.ts)\"",
+    "lint": "prettier --check . !./dist !./build !./coverage !./.turbo && eslint \"./**!(dist|.turbo)/*+(.tsx|.ts)\"",
+    "format": "prettier --write . !./dist !./build !./coverage !./.turbo && eslint --fix \"./**!(dist|.turbo)/*+(.tsx|.ts)\"",
     "start": "node dist/index.js"
   },
   "keywords": [],

@@ -1,4 +1,5 @@
 {
   "root": true,
-  "extends": ["custom"]
+  "extends": ["custom"],
+  "ignorePatterns": ["node_modules/", "dist/", "build/", "coverage/"]
 }
