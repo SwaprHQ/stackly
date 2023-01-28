@@ -36,6 +36,7 @@ import {
 } from '../Modal/CreateVaultSteps';
 import { SubgraphVault } from '../UserVaultsContainer/types';
 import { shortenAddress } from '../../utils';
+import { FrequencyIntervalSelect, TokenSelect } from './TokenSelect';
 
 dayjs.extend(dayjsUTCPlugin);
 export const OrderInfo = styled.div`
@@ -288,28 +289,14 @@ export function CreateDCAVaultContainer({
                         setCreateVaultError(null);
                       }}
                     />
-                    <select
-                      value={sellTokenAmount.currency.address}
-                      onChange={(nextTokenAddress) => {
-                        const nextSellToken = findTokenByAddress(
-                          nextTokenAddress.target.value
+                    <TokenSelect
+                      value={sellTokenAmount.currency as Token}
+                      onChange={(nextSellToken) => {
+                        setSellTokenAmount(
+                          new Amount(nextSellToken, sellTokenAmount.toString())
                         );
-                        if (nextSellToken !== undefined) {
-                          setSellTokenAmount(
-                            new Amount(
-                              nextSellToken,
-                              sellTokenAmount.toString()
-                            )
-                          );
-                        }
                       }}
-                    >
-                      {tokenOptions.map((option) => (
-                        <option value={option.address} key={option.address}>
-                          {option.symbol}
-                        </option>
-                      ))}
-                    </select>
+                    />
                   </InputGroup>
                   <SelectBalanceButtonContainer
                     tokenAddress={sellTokenAmount.currency.address}
@@ -375,19 +362,12 @@ export function CreateDCAVaultContainer({
                 </FormGroup>
                 <FormGroup>
                   <label>Buy {buyToken.symbol} every</label>
-                  <select
+                  <FrequencyIntervalSelect
                     value={frequencyInterval}
-                    onChange={(e) => {
-                      setFrequencyInterval(
-                        e.target.value as DCAFrequencyInterval
-                      );
+                    onChange={(nextFrequencyInterval) => {
+                      setFrequencyInterval(nextFrequencyInterval);
                     }}
-                  >
-                    <option value={DCAFrequencyInterval.HOUR}>hour</option>
-                    <option value={DCAFrequencyInterval.DAY}>day</option>
-                    <option value={DCAFrequencyInterval.WEEK}>week</option>
-                    <option value={DCAFrequencyInterval.MONTH}>month</option>
-                  </select>
+                  />
                 </FormGroup>
                 <FormButtonGroup>
                   {account.isConnected && isNetworkSupported ? (
