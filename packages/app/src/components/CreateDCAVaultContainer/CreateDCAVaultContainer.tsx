@@ -278,7 +278,7 @@ export function CreateDCAVaultContainer({
             <CardInnerWrapper>
               <form>
                 <FormGroup>
-                  <label>From {sellTokenAmount.currency.symbol}</label>
+                  <label>From</label>
                   <InputGroup>
                     <NumberInput
                       value={sellTokenAmount.toString()}
@@ -313,24 +313,20 @@ export function CreateDCAVaultContainer({
                   />
                 </FormGroup>
                 <FormGroup>
-                  <label>To {buyToken.symbol}</label>
-                  <select
-                    value={buyToken.address}
-                    onChange={(nextTokenAddress) => {
-                      const nextBuyToken = findTokenByAddress(
-                        nextTokenAddress.target.value
-                      );
-                      if (nextBuyToken !== undefined) {
-                        setBuyToken(nextBuyToken);
+                  <label>To</label>
+                  <TokenSelect
+                    value={buyToken}
+                    onChange={(nextBuyToken) => {
+                      // Prevent the user from selecting the same token for buy and sell
+                      if (
+                        nextBuyToken.address ===
+                        sellTokenAmount.currency.address
+                      ) {
+                        return;
                       }
+                      setBuyToken(nextBuyToken);
                     }}
-                  >
-                    {tokenOptions.map((option) => (
-                      <option value={option.address} key={option.address}>
-                        {option.symbol}
-                      </option>
-                    ))}
-                  </select>
+                  />
                 </FormGroup>
                 <FormGroup>
                   <label>Start At</label>

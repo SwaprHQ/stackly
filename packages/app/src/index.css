@@ -65,15 +65,36 @@ select:focus {
   padding: 12px 8px;
   outline: none;
   border: 2px solid #000;
+  width: 100%;
 }
 
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
 
 button {
   padding: 4px 8px;
   cursor: pointer;
   font-family: 'Urbanist', sans-serif;
+  user-select: none;
 }
 
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+  font-family: 'Urbanist', sans-serif;
+}
 
 .form-container {
   display: flex;

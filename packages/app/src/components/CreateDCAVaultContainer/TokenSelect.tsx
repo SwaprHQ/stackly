@@ -54,6 +54,10 @@ export function getStyles<T>() {
       cursor: 'pointer',
       fontWeight: 'bold',
     }),
+    menuList: (provided) => ({
+      ...provided,
+      maxHeight: '90px',
+    }),
   } as StylesConfig<T>;
 }
 

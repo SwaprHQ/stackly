@@ -13,6 +13,7 @@ export function NumberInput({ onChange, ...props }: NumberInputProps) {
   return (
     <StyledInput
       {...props}
+      onWheel={(e) => e.currentTarget.blur()}
       type="number"
       pattern="^-?[0-9]\d*\.?\d*$"
       onChange={(e) => {
