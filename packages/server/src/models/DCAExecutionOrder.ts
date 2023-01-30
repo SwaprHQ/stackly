@@ -12,14 +12,14 @@ import dayjsIsBetweenPlugin from 'dayjs/plugin/isBetween';
 
 dayjs.extend(dayjsIsBetweenPlugin);
 
-export enum DCAExeuctionOrderStatus {
+export enum DCAExecutionOrderStatus {
   PENDING = 'pending',
   EXECUTING = 'executing', // describes the state of the order being executed on-chain or with the COW protocol
   EXECUTED = 'executed',
   FAILED = 'failed',
 }
 
-export type DCAExeuctionOrderDocument = LeanDocument<{
+export type DCAExecutionOrderDocument = LeanDocument<{
   /**
    * The date and time to execute the order
    */
@@ -35,23 +35,23 @@ export type DCAExeuctionOrderDocument = LeanDocument<{
   /**
    * The status of the execution order
    */
-  status: DCAExeuctionOrderStatus;
+  status: DCAExecutionOrderStatus;
   /**
    * The provider data of the execution order
    */
   providerData: Record<string, unknown>;
 }>;
 
-export interface DCAExeuctionOrderDocument_OrderPopulated
+export interface DCAExecutionOrderDocument_OrderPopulated
   extends Document,
-    Omit<DCAExeuctionOrderDocument, 'order'> {
+    Omit<DCAExecutionOrderDocument, 'order'> {
   /**
    * The order of which this execution order is a part of
    */
   order: DollarCostAveragingOrderDocument;
 }
 
-export const dcaExeuctionOrderSchema = new Schema<DCAExeuctionOrderDocument>(
+export const dcaExecutionOrderSchema = new Schema<DCAExecutionOrderDocument>(
   {
     executeAt: {
       type: Date,
@@ -67,8 +67,8 @@ export const dcaExeuctionOrderSchema = new Schema<DCAExeuctionOrderDocument>(
     },
     status: {
       type: String,
-      enum: Object.values(DCAExeuctionOrderStatus),
-      default: DCAExeuctionOrderStatus.PENDING,
+      enum: Object.values(DCAExecutionOrderStatus),
+      default: DCAExecutionOrderStatus.PENDING,
     },
     providerData: {
       type: Schema.Types.Mixed,
@@ -79,19 +79,19 @@ export const dcaExeuctionOrderSchema = new Schema<DCAExeuctionOrderDocument>(
   }
 );
 
-export const DCAExeuctionOrderModel = model<DCAExeuctionOrderDocument>(
-  'DCAExeuctionOrder',
-  dcaExeuctionOrderSchema
+export const DCAExecutionOrderModel = model<DCAExecutionOrderDocument>(
+  'DCAExecutionOrder',
+  dcaExecutionOrderSchema
 );
 
 export async function createDollarCostAveragingExecutionOrder(
   {
     executeAt,
     executeAmount,
-  }: Pick<DCAExeuctionOrderDocument, 'executeAt' | 'executeAmount'>,
+  }: Pick<DCAExecutionOrderDocument, 'executeAt' | 'executeAmount'>,
   order: DollarCostAveragingOrderDocument & { _id: ObjectId },
   session: ClientSession
-): Promise<DCAExeuctionOrderDocument> {
+): Promise<DCAExecutionOrderDocument> {
   if (!order._id || !order.startAt || !order.endAt) {
     throw new Error(
       `order must have an _id, startAt, and endAt to create an execution order`
@@ -113,7 +113,7 @@ export async function createDollarCostAveragingExecutionOrder(
     );
   }
 
-  return await new DCAExeuctionOrderModel({
+  return await new DCAExecutionOrderModel({
     executeAt,
     executeAmount,
     order: order._id,

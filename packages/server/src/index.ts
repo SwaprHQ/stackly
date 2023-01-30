@@ -8,12 +8,12 @@ if (!production) {
 
 import { HandlerDecorations, Server } from '@hapi/hapi';
 import chalk from 'chalk';
-import Mongoose from 'mongoose';
 import Joi from 'joi';
 import * as inert from '@hapi/inert';
 import * as vision from '@hapi/vision';
 import hapiSwagger, { RegisterOptions } from 'hapi-swagger';
 import { join } from 'path';
+import mongoose from 'mongoose';
 import {
   handleCreateOrder,
   createOrderRequestDTO,
@@ -29,12 +29,12 @@ const mongoDebug = getEnv('MONGO_DEBUG') === 'true';
 const serverPort = getRequiredEnv('SERVER_PORT');
 
 const main = async () => {
-  Mongoose.connection.on('error', (error) => {
+  mongoose.connection.on('error', (error) => {
     console.error(error);
     process.exit(100);
   });
-  await Mongoose.connect(mongoUri, {});
-  Mongoose.set('debug', mongoDebug);
+  await mongoose.connect(mongoUri, {});
+  mongoose.set('debug', mongoDebug);
 
   // await startAgenda();
 

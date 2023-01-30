@@ -15,10 +15,7 @@ import { getProvider } from '../web3';
 
 import dayjs from 'dayjs';
 import dayjsUTCPlugin from 'dayjs/plugin/utc';
-import {
-  createDollarCostAveragingExecutionOrder,
-  DCAExeuctionOrderModel,
-} from '../models/DCAExecutionOrder';
+import { createDollarCostAveragingExecutionOrder } from '../models/DCAExecutionOrder';
 import mongoose, { ClientSession } from 'mongoose';
 
 dayjs.extend(dayjsUTCPlugin);
@@ -71,18 +68,20 @@ export async function handleCreateOrder(
     );
 
     // Calculate the amount to buy per order
+    const sellAmountPerExecutionBigInt =
+      BigInt(order.sellAmount) / BigInt(buyOrders === 0 ? 1 : buyOrders);
     const sellAmountPerExecution = parseUnits(
-      order.sellAmount,
+      sellAmountPerExecutionBigInt.toString(),
       vaultTokenDecimals
-    ).div(buyOrders === 0 ? 1 : buyOrders);
-
+    ).toString();
     session = await mongoose.startSession();
     session.startTransaction();
 
     // Create main order
     const dcaOrderDocument = await new DollarCostAveragingOrderModel({
       chainId: order.chainId,
-      vault: order.vault,
+      vault: order.vault.toLowerCase(),
+      vaultOwner: vaultOwner.toLowerCase(),
       sellToken: order.sellToken.toLowerCase(),
       buyToken: order.buyToken.toLowerCase(),
       sellAmount: order.sellAmount,
@@ -92,6 +91,7 @@ export async function handleCreateOrder(
       frequencyInterval: order.frequencyInterval,
       recipient: order.recipient.toLowerCase(),
       signature,
+      averagePrice: '0',
     }).save({
       session,
     });
@@ -119,7 +119,7 @@ export async function handleCreateOrder(
       await createDollarCostAveragingExecutionOrder(
         {
           executeAt: executeAt.toDate(),
-          executeAmount: sellAmountPerExecution.toString(),
+          executeAmount: sellAmountPerExecution,
         },
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         dcaOrderDocument as any,
@@ -128,10 +128,16 @@ export async function handleCreateOrder(
     }
 
     // End mongoose session
-    // await session.commitTransaction();
+    await session.commitTransaction();
     await session.endSession();
 
-    return response.response().code(201);
+    return response
+      .response(
+        dcaOrderDocument.toJSON({
+          flattenMaps: true,
+        })
+      )
+      .code(201);
   } catch (error) {
     console.error(error);
     if (error.isBoom) {

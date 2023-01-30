@@ -1,8 +1,8 @@
 import { badRequest } from '@hapi/boom';
-import { Request, ResponseToolkit } from '@hapi/hapi';
+import { Request } from '@hapi/hapi';
 import Joi from 'joi';
-import { DollarCostAveragingOrderModel } from '../models/DollarCostAveragingOrder';
 import { ChainId } from 'dca-sdk';
+import { DollarCostAveragingOrderModel } from '../models/DollarCostAveragingOrder';
 
 interface IGetVaultOrdersRequest extends Request {
   query: {
@@ -12,14 +12,14 @@ interface IGetVaultOrdersRequest extends Request {
   };
 }
 
-export async function handleGetVaultOrders(
-  request: IGetVaultOrdersRequest,
-  response: ResponseToolkit
-) {
+export async function handleGetVaultOrders(request: IGetVaultOrdersRequest) {
   try {
     const { chainId, owner, vault } = request.query;
 
-    const query = DollarCostAveragingOrderModel.find({ chainId });
+    const query = DollarCostAveragingOrderModel.find({ chainId }).populate(
+      'executions'
+    );
+
     if (owner) {
       query.where('vaultOwner').equals(owner.toLowerCase());
     }
@@ -28,9 +28,11 @@ export async function handleGetVaultOrders(
       query.where('vault').equals(vault.toLowerCase());
     }
 
-    const orders = await query.exec();
+    const orders = (await query.exec()).map((order) => order.toJSON());
 
-    return response.response(orders);
+    return {
+      data: orders,
+    };
   } catch (error) {
     console.error(error);
     if (error.isBoom) {

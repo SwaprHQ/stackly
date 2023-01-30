@@ -1,5 +1,5 @@
 import { isAddress } from '@ethersproject/address';
-import { LeanDocument, model, Schema } from 'mongoose';
+import { model, Schema } from 'mongoose';
 import {
   ChainId,
   DCAFrequencyInterval,
@@ -8,16 +8,31 @@ import {
 import dayjs from 'dayjs';
 
 import dayjsUTCPlugin from 'dayjs/plugin/utc';
+import { DCAExecutionOrderDocument } from './DCAExecutionOrder';
 
 dayjs.extend(dayjsUTCPlugin);
 
 export interface DollarCostAveragingOrderDocument
-  extends LeanDocument<Omit<DollarCostAveragingOrder, 'startAt' | 'endAt'>> {
+  extends Omit<DollarCostAveragingOrder, 'startAt' | 'endAt'> {
   startAt: Date;
   endAt: Date;
   createdAt: Date;
   updatedAt: Date;
   vaultOwner: string;
+  /**
+   * The average price of the order.
+   */
+  averagePrice: string;
+  /**
+   * The executions of the order.
+   * @type {DCAExecutionOrderDocument[]}
+   */
+  executions: string[];
+}
+
+export interface DollarCostAveragingOrderDocument_Populated
+  extends Omit<DollarCostAveragingOrderDocument, 'executions'> {
+  executions: DCAExecutionOrderDocument[];
 }
 
 export const dollarCostAveragingOrderSchema =
@@ -78,6 +93,17 @@ export const dollarCostAveragingOrderSchema =
         type: Date,
         required: true,
       },
+      averagePrice: {
+        type: String,
+        required: true,
+        default: '0', // Set the default value to 0
+      },
+      executions: [
+        {
+          type: Schema.Types.ObjectId,
+          ref: 'DCAExecutionOrder',
+        },
+      ],
     },
     {
       timestamps: true,

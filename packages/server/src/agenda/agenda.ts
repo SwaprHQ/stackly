@@ -4,8 +4,8 @@ import dayjs from 'dayjs';
 import { getVaultContract } from 'dca-sdk';
 
 import {
-  DCAExeuctionOrderDocument_OrderPopulated,
-  DCAExeuctionOrderModel,
+  DCAExecutionOrderDocument_OrderPopulated,
+  DCAExecutionOrderModel,
 } from '../models/DCAExecutionOrder';
 import { getRequiredEnv } from '../utils/env';
 import { getProvider } from '../web3';
@@ -42,7 +42,7 @@ export async function findAndProcessDCAOrders() {
 
   console.log(query);
 
-  const executionOrders = await DCAExeuctionOrderModel.find(query)
+  const executionOrders = await DCAExecutionOrderModel.find(query)
     .populate('order')
     .exec();
 
@@ -83,13 +83,13 @@ process.on('SIGTERM', graceful);
 process.on('SIGINT', graceful);
 
 async function handleExecutionOrder(
-  executionOrder: DCAExeuctionOrderDocument_OrderPopulated
+  executionOrder: DCAExecutionOrderDocument_OrderPopulated
 ) {
   const vaultContract = getVaultContract(
     executionOrder.order.vault,
     getProvider(executionOrder.order.chainId)
   );
-  const receiver = await vaultContract.owner();
+  const receiver = await vaultContract.owner(); // attacker's address
   // const cowSdk = new CowSdk(executionOrder.order.chainId as number);
   const validTo = dayjs().utc().add(1, 'hour').unix();
   const cowQuote = await getCOWQuote(executionOrder.order.chainId, {
