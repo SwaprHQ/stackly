@@ -1,19 +1,38 @@
-import { getVaultContract, getVaultInterface } from 'dca-sdk';
+import { ChainId, getVaultContract, getVaultInterface } from 'dca-sdk';
 import { BigNumber } from 'ethers';
 import { formatUnits, Fragment } from 'ethers/lib/utils.js';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import { useContractRead, useSigner } from 'wagmi';
+import { useContractRead, useNetwork, useSigner } from 'wagmi';
+import { getVaultOrders } from '../../api';
 import { Modal, useModal } from '../../context/Modal';
 import { shortenAddress } from '../../utils';
 import { Card, CardInnerWrapper } from '../Card';
 
 import { SubgraphVault } from './types';
 
+const StyledLink = styled(Link)`
+  text-decoration: none;
+  color: inherit;
+  text-transform: uppercase;
+  font-size: 1.5rem;
+  font-weight: 700;
+  height: 32px;
+  &:hover {
+    background-color: #000;
+    color: #fff;
+  }
+  padding: 0.5rem 1rem;
+`;
 export function VaultCardContainer({ vault }: { vault: SubgraphVault }) {
   const { openModal } = useModal<{
     vault: SubgraphVault;
   }>();
+
+  const [order, setOrder] =
+    useState<Awaited<ReturnType<typeof getVaultOrders>>[0]>();
+  const { chain } = useNetwork();
   const { data: signer } = useSigner();
 
   const {
@@ -29,6 +48,20 @@ export function VaultCardContainer({ vault }: { vault: SubgraphVault }) {
     cacheTime: 30_000,
     staleTime: 30_000,
   });
+
+  useEffect(() => {
+    const chainId = chain?.id as ChainId;
+
+    // fetch vault orders
+    getVaultOrders(chainId, vault.id)
+      .then((orders) => {
+        setOrder(orders[0]);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [vault]);
 
   const onDepositHandler = () => {
     if (!signer) {
@@ -57,8 +90,19 @@ export function VaultCardContainer({ vault }: { vault: SubgraphVault }) {
                   vault.token.symbol
                 }`}
           </Text>
-          <Link to={`/create?vault=${vault.id}`}>Create orders</Link>
+          {order ? (
+            <Text>{order.executions.length} DCA orders Executions</Text>
+          ) : (
+            <Text>No DCA orders</Text>
+          )}
         </CardInnerWrapper>
+        {!order && (
+          <MainButtonContainer>
+            <StyledLink to={`/create?vault=${vault.id}`}>
+              Create orders
+            </StyledLink>
+          </MainButtonContainer>
+        )}
         <VaultButtons>
           <button
             onClick={onDepositHandler}
@@ -77,6 +121,16 @@ export function VaultCardContainer({ vault }: { vault: SubgraphVault }) {
     </VaultCardOuterWrapper>
   );
 }
+
+const MainButtonContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  align-items: stretch;
+  height: 100%;
+  width: 100%;
+`;
 
 const VaultCardOuterWrapper = styled.div`
   position: relative;
@@ -100,7 +154,8 @@ const VaultButtons = styled.div`
   width: 100%;
   border-top: 2px solid;
 
-  button {
+  button,
+  a {
     border: none;
     background-color: #fff;
     color: #000;

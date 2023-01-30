@@ -1,6 +1,6 @@
 import { SubgraphVault } from '../UserVaultsContainer/types';
 
-interface CreateOrderFromExistingVaultContainer {
+interface CreateOrderFromExistingVaultContainerProps {
   vault: SubgraphVault;
 }
 
@@ -11,7 +11,7 @@ interface CreateOrderFromExistingVaultContainer {
  */
 export function CreateOrderFromExistingVaultContainer({
   vault,
-}: CreateOrderFromExistingVaultContainer) {
+}: CreateOrderFromExistingVaultContainerProps) {
   return (
     <div>
       <h1>Create Order From Vault</h1>

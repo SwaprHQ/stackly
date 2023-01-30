@@ -96,49 +96,57 @@ export function CreateVaultStepsModal() {
             <h2>Create New {tokenSymbol} Vault</h2>
           </ModalHeader>
           <ModalContentWithNoPadding>
-            <Step
-              href={createVaultTransactionLink}
-              isSuccess={isVaultCreated}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {isVaultCreated ? (
-                <div>Created Vault {shortenAddress(vault)}</div>
-              ) : createVaultTransaction ? (
-                <div>Creating Vault</div>
-              ) : (
-                <div>Creating Vault</div>
-              )}
-            </Step>
-            <Step
-              href={depositTokenTransactionLink}
-              isSuccess={isTokenDeposited}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {isTokenDeposited ? (
-                <div>
-                  Deposited {tokenDepositAmount} {tokenSymbol} into the vault
-                </div>
-              ) : depositTokenTransaction ? (
-                <div>
-                  Depositing {tokenDepositAmount} {tokenSymbol} into the vault
-                </div>
-              ) : (
-                <div>
-                  Deposit {tokenDepositAmount} {tokenSymbol} into the vault
-                </div>
-              )}
-            </Step>
-            <Step isSuccess={isOrderCreated}>
-              {isOrderCreated ? (
-                <div>Order created</div>
-              ) : isCreatingOrder ? (
-                <div>Creating order</div>
-              ) : (
-                <div>Create order</div>
-              )}
-            </Step>
+            {isVaultCreated ? (
+              <Step
+                href={createVaultTransactionLink}
+                isSuccess={true}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Created Vault {shortenAddress(vault)}
+              </Step>
+            ) : createVaultTransaction ? (
+              <Step
+                href={createVaultTransactionLink}
+                isBusy={true}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Creating Vault
+              </Step>
+            ) : (
+              <Step isBusy={true}>Creating Vault</Step>
+            )}
+            {isTokenDeposited ? (
+              <Step
+                href={depositTokenTransactionLink}
+                isSuccess={true}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Deposited {tokenDepositAmount} {tokenSymbol} into the vault
+              </Step>
+            ) : depositTokenTransaction ? (
+              <Step
+                href={depositTokenTransactionLink}
+                isBusy={true}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Depositing {tokenDepositAmount} {tokenSymbol} into the vault
+              </Step>
+            ) : (
+              <Step>
+                Deposit {tokenDepositAmount} {tokenSymbol} into the vault
+              </Step>
+            )}
+            {isOrderCreated ? (
+              <Step isSuccess={isOrderCreated}>Order created</Step>
+            ) : isCreatingOrder ? (
+              <Step isBusy={true}>Creating Order</Step>
+            ) : (
+              <Step>Create order</Step>
+            )}
           </ModalContentWithNoPadding>
         </ModalInnerWrapper>
       </ModalOutterWrapper>
@@ -148,6 +156,7 @@ export function CreateVaultStepsModal() {
 
 const Step = styled.a<{
   isSuccess?: boolean;
+  isBusy?: boolean;
 }>(
   (props) => `
   display: flex;
@@ -164,22 +173,14 @@ const Step = styled.a<{
   text-transform: uppercase;
   text-decoration: none;
   color: #000;
-
   &:not(:last-child) {
     border-bottom: 2px solid #000;
   }
-  &:hover {
-    background: #ffc900;
-  }
-
+  ${props.isBusy ? 'background: #ffc900; &:hover { background: #ffc900; }' : ''}
   ${
-    props.isSuccess &&
-    `
-    background: #1dff72;
-    &:hover {
-      background: #1dff72;
-    }
-    `
+    props.isSuccess
+      ? 'background: #1dff72; &:hover { background: #1dff72; }'
+      : ''
   }
   `
 );

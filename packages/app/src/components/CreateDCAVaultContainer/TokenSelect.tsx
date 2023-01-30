@@ -109,9 +109,7 @@ export function FrequencyIntervalSelect({
 }: FrequencyIntervalSelectProps) {
   return (
     <Select
-      value={
-        frequencyIntervalOptions.find((option) => option.value === value) as any
-      }
+      value={frequencyIntervalOptions.find((option) => option.value === value)}
       options={frequencyIntervalOptions}
       getOptionLabel={(option) => option.label}
       getOptionValue={(option) => option.value}
@@ -119,9 +117,14 @@ export function FrequencyIntervalSelect({
         DropdownIndicator: () => null,
         IndicatorSeparator: () => null,
       }}
-      styles={getStyles<DCAFrequencyInterval>()}
+      styles={getStyles<{
+        label: string;
+        value: DCAFrequencyInterval;
+      }>()}
       isMulti={false}
-      onChange={(option) => onChange(option as DCAFrequencyInterval)}
+      onChange={(option) => {
+        option && onChange(option.value as DCAFrequencyInterval);
+      }}
     />
   );
 }
