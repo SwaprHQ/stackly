@@ -19,7 +19,7 @@ export enum DCAExecutionOrderStatus {
   FAILED = 'failed',
 }
 
-export type DCAExecutionOrderDocument = LeanDocument<{
+export interface DCAExecutionOrderDocument extends Document {
   /**
    * The date and time to execute the order
    */
@@ -40,11 +40,10 @@ export type DCAExecutionOrderDocument = LeanDocument<{
    * The provider data of the execution order
    */
   providerData: Record<string, unknown>;
-}>;
+}
 
 export interface DCAExecutionOrderDocument_OrderPopulated
-  extends Document,
-    Omit<DCAExecutionOrderDocument, 'order'> {
+  extends Omit<DCAExecutionOrderDocument, 'order'> {
   /**
    * The order of which this execution order is a part of
    */

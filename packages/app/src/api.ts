@@ -41,9 +41,18 @@ export function postOrder(signedOrder: DollarCostAveragingOrderWithSignature) {
 export function getVaultOrders(chainId: ChainId, vaultAddress: string): Promise<(DollarCostAveragingOrderDocument & {
   executions: any[];
 })[]> {
-  return fetch(`${API_SERVIEC_BASE_URL}/orders?chainId=${chainId}&vault=${vaultAddress.toLowerCase()}`, {
+
+  const params = new URLSearchParams();
+
+  params.append('chainId', chainId.toString());
+  params.append('vault', vaultAddress.toLowerCase());
+  params.append('fields', 'id,chainId,vault,vaultOwner,amount,token,period,executions,createdAt')
+
+  return fetch(`${API_SERVIEC_BASE_URL}/orders?${
+    params.toString()
+  }`, {
     headers: {
       'Content-Type': 'application/json',
     },
-  }).then((res) => res.json());
+  }).then((res) => res.json()).then((res) => res.data);
 }

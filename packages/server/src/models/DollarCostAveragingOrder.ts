@@ -1,5 +1,5 @@
 import { isAddress } from '@ethersproject/address';
-import { model, Schema } from 'mongoose';
+import { Document, model, Schema } from 'mongoose';
 import {
   ChainId,
   DCAFrequencyInterval,
@@ -13,7 +13,7 @@ import { DCAExecutionOrderDocument } from './DCAExecutionOrder';
 dayjs.extend(dayjsUTCPlugin);
 
 export interface DollarCostAveragingOrderDocument
-  extends Omit<DollarCostAveragingOrder, 'startAt' | 'endAt'> {
+  extends Document, Omit<DollarCostAveragingOrder, 'startAt' | 'endAt'> {
   startAt: Date;
   endAt: Date;
   createdAt: Date;
@@ -35,107 +35,108 @@ export interface DollarCostAveragingOrderDocument_Populated
   executions: DCAExecutionOrderDocument[];
 }
 
-export const dollarCostAveragingOrderSchema =
-  new Schema<DollarCostAveragingOrderDocument>(
-    {
-      vault: {
-        type: String,
-        required: true,
-        validate: isAddress,
-      },
-      vaultOwner: {
-        type: String,
-        required: true,
-        validate: isAddress,
-      },
-      recipient: {
-        type: String,
-        required: true,
-        validate: isAddress,
-      },
-      sellToken: {
-        type: String,
-        required: true,
-        validate: isAddress,
-      },
-      buyToken: {
-        type: String,
-        required: true,
-        validate: isAddress,
-      },
-      sellAmount: {
-        type: String,
-        required: true,
-      },
-      chainId: {
-        type: Number,
-        required: true,
-        enum: ChainId,
-      },
-      frequency: {
-        type: Number,
-        required: true,
-        validate: {
-          validator: (value: number) => value > 0,
-          message: `frequency must be greater than 0`,
-        },
-      },
-      frequencyInterval: {
-        type: String,
-        required: true,
-        enum: DCAFrequencyInterval,
-      },
-      startAt: {
-        type: Date,
-        required: true,
-      },
-      endAt: {
-        type: Date,
-        required: true,
-      },
-      averagePrice: {
-        type: String,
-        required: true,
-        default: '0', // Set the default value to 0
-      },
-      executions: [
-        {
-          type: Schema.Types.ObjectId,
-          ref: 'DCAExecutionOrder',
-        },
-      ],
+export const dollarCostAveragingOrderSchema = new Schema<
+  DollarCostAveragingOrderDocument
+>(
+  {
+    vault: {
+      type: String,
+      required: true,
+      validate: isAddress,
     },
-    {
-      timestamps: true,
+    vaultOwner: {
+      type: String,
+      required: true,
+      validate: isAddress,
+    },
+    recipient: {
+      type: String,
+      required: true,
+      validate: isAddress,
+    },
+    sellToken: {
+      type: String,
+      required: true,
+      validate: isAddress,
+    },
+    buyToken: {
+      type: String,
+      required: true,
+      validate: isAddress,
+    },
+    sellAmount: {
+      type: String,
+      required: true,
+    },
+    chainId: {
+      type: Number,
+      required: true,
+      enum: ChainId,
+    },
+    frequency: {
+      type: Number,
+      required: true,
+      validate: {
+        validator: (value: number) => value > 0,
+        message: `frequency must be greater than 0`,
+      },
+    },
+    frequencyInterval: {
+      type: String,
+      required: true,
+      enum: DCAFrequencyInterval,
+    },
+    startAt: {
+      type: Date,
+      required: true,
+    },
+    endAt: {
+      type: Date,
+      required: true,
+    },
+    averagePrice: {
+      type: String,
+      required: true,
+      default: '0', // Set the default value to 0
+    },
+    executions: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'DCAExecutionOrder',
+      },
+    ],
+  },
+  {
+    timestamps: true,
+  }
+)
+  // .index({
+  //   vault: 1,
+  //   buyToken: 1,
+  // }, {
+  //   unique: true,
+  // })
+  .pre('save', function (next) {
+    const now = dayjs.utc();
+    const startAt = dayjs(this.startAt).utc();
+    const endAt = dayjs(this.endAt).utc();
+
+    if (startAt.isBefore(now)) {
+      throw new Error('startAt must be in the future');
     }
-  )
-    // .index({
-    //   vault: 1,
-    //   buyToken: 1,
-    // }, {
-    //   unique: true,
-    // })
-    .pre('save', function (next) {
-      const now = dayjs.utc();
-      const startAt = dayjs(this.startAt).utc();
-      const endAt = dayjs(this.endAt).utc();
 
-      if (startAt.isBefore(now)) {
-        throw new Error('startAt must be in the future');
-      }
+    if (endAt.isBefore(startAt)) {
+      throw new Error('endAt must be after startAt');
+    }
 
-      if (endAt.isBefore(startAt)) {
-        throw new Error('endAt must be after startAt');
-      }
+    next();
+  });
 
-      next();
-    });
+export const modelName = 'DollarCostAveragingOrder';
 
-export const DollarCostAveragingOrderModel =
-  model<DollarCostAveragingOrderDocument>(
-    'DollarCostAveragingOrder',
-    dollarCostAveragingOrderSchema
-  );
+export const DollarCostAveragingOrderModel = model<
+  DollarCostAveragingOrderDocument
+>(modelName, dollarCostAveragingOrderSchema);
 
 // 1674765595 payload
 // 1674765

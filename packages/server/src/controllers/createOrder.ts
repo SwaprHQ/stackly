@@ -1,7 +1,7 @@
 import { badRequest } from '@hapi/boom';
 import { Request, ResponseToolkit } from '@hapi/hapi';
 import Joi from 'joi';
-import { parseUnits } from '@ethersproject/units';
+import { formatUnits, parseUnits } from '@ethersproject/units';
 import { DollarCostAveragingOrderModel } from '../models/DollarCostAveragingOrder';
 import {
   ChainId,
@@ -68,12 +68,15 @@ export async function handleCreateOrder(
     );
 
     // Calculate the amount to buy per order
-    const sellAmountPerExecutionBigInt =
-      BigInt(order.sellAmount) / BigInt(buyOrders === 0 ? 1 : buyOrders);
+    const sellAmountPerExecutionFloat =
+      parseFloat(formatUnits(order.sellAmount, vaultTokenDecimals)) /
+      (buyOrders === 0 ? 1 : buyOrders);
+
     const sellAmountPerExecution = parseUnits(
-      sellAmountPerExecutionBigInt.toString(),
+      sellAmountPerExecutionFloat.toString(),
       vaultTokenDecimals
     ).toString();
+    // Start a transaction
     session = await mongoose.startSession();
     session.startTransaction();
 
@@ -92,13 +95,6 @@ export async function handleCreateOrder(
       recipient: order.recipient.toLowerCase(),
       signature,
       averagePrice: '0',
-    }).save({
-      session,
-    });
-
-    console.log({
-      startAt: startAt.format('YYYY-MM-DD HH:mm:ss'),
-      endAt: endAt.format('YYYY-MM-DD HH:mm:ss'),
     });
 
     // Create execution orders
@@ -116,7 +112,7 @@ export async function handleCreateOrder(
       if (i === buyOrders - 1) {
         executeAt = executeAt.subtract(1, 'minute');
       }
-      await createDollarCostAveragingExecutionOrder(
+      const executionOrderDocument = await createDollarCostAveragingExecutionOrder(
         {
           executeAt: executeAt.toDate(),
           executeAmount: sellAmountPerExecution,
@@ -125,7 +121,13 @@ export async function handleCreateOrder(
         dcaOrderDocument as any,
         session
       );
+
+      dcaOrderDocument.executions.push(executionOrderDocument._id);
     }
+
+    await dcaOrderDocument.save({
+      session,
+    });
 
     // End mongoose session
     await session.commitTransaction();
@@ -147,35 +149,36 @@ export async function handleCreateOrder(
   }
 }
 
-export const createOrderRequestDTO =
-  Joi.object<DollarCostAveragingOrderWithSignature>({
-    sellToken: Joi.string()
-      .required()
-      .description('The token to sell. Also, deposited into the vault'),
-    sellAmount: Joi.string()
-      .required()
-      .description('Sell amount. Also, deposited into the vault'),
-    signature: Joi.string()
-      .required()
-      .description('The signature of the order. Signed by the vault owner'),
-    buyToken: Joi.string().required().description('The token to buy'),
-    vault: Joi.string().required().description('The vault to buy from'),
-    frequency: Joi.number()
-      .required()
-      .description('The frequency of the order; number of orders per interval'),
-    frequencyInterval: Joi.string()
-      .allow(
-        DCAFrequencyInterval.HOUR,
-        DCAFrequencyInterval.DAY,
-        DCAFrequencyInterval.WEEK,
-        DCAFrequencyInterval.MONTH
-      )
-      .description('The frequency interval of the order'),
-    startAt: Joi.number().required().description('The start date of the order'),
-    endAt: Joi.number().required().description('The end date of the order'),
-    chainId: Joi.number()
-      .required()
-      .allow(ChainId.ETHEREUM, ChainId.GNOSIS)
-      .description('The chain id of the order'),
-    recipient: Joi.string(),
-  }).label('CreateOrderRequestDTO');
+export const createOrderRequestDTO = Joi.object<
+  DollarCostAveragingOrderWithSignature
+>({
+  sellToken: Joi.string()
+    .required()
+    .description('The token to sell. Also, deposited into the vault'),
+  sellAmount: Joi.string()
+    .required()
+    .description('Sell amount. Also, deposited into the vault'),
+  signature: Joi.string()
+    .required()
+    .description('The signature of the order. Signed by the vault owner'),
+  buyToken: Joi.string().required().description('The token to buy'),
+  vault: Joi.string().required().description('The vault to buy from'),
+  frequency: Joi.number()
+    .required()
+    .description('The frequency of the order; number of orders per interval'),
+  frequencyInterval: Joi.string()
+    .allow(
+      DCAFrequencyInterval.HOUR,
+      DCAFrequencyInterval.DAY,
+      DCAFrequencyInterval.WEEK,
+      DCAFrequencyInterval.MONTH
+    )
+    .description('The frequency interval of the order'),
+  startAt: Joi.number().required().description('The start date of the order'),
+  endAt: Joi.number().required().description('The end date of the order'),
+  chainId: Joi.number()
+    .required()
+    .allow(ChainId.ETHEREUM, ChainId.GNOSIS)
+    .description('The chain id of the order'),
+  recipient: Joi.string(),
+}).label('CreateOrderRequestDTO');
