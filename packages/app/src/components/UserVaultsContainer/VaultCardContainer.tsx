@@ -12,19 +12,6 @@ import { Card, CardInnerWrapper } from '../Card';
 
 import { SubgraphVault } from './types';
 
-const StyledLink = styled(Link)`
-  text-decoration: none;
-  color: inherit;
-  text-transform: uppercase;
-  font-size: 1.5rem;
-  font-weight: 700;
-  height: 32px;
-  &:hover {
-    background-color: #000;
-    color: #fff;
-  }
-  padding: 0.5rem 1rem;
-`;
 export function VaultCardContainer({ vault }: { vault: SubgraphVault }) {
   const { openModal } = useModal<{
     vault: SubgraphVault;
@@ -80,7 +67,7 @@ export function VaultCardContainer({ vault }: { vault: SubgraphVault }) {
 
   return (
     <VaultCardOuterWrapper>
-      <Card>
+      <VaultCard>
         <CardInnerWrapper>
           <h2>{shortenAddress(vault.id)}</h2>
           <Text>
@@ -91,19 +78,13 @@ export function VaultCardContainer({ vault }: { vault: SubgraphVault }) {
                 }`}
           </Text>
           {order ? (
-            <Text>{order.executions.length} DCA orders Executions</Text>
+            <Text>{order?.executions?.length} DCA orders Executions</Text>
           ) : (
             <Text>No DCA orders</Text>
           )}
         </CardInnerWrapper>
-        {!order && (
-          <MainButtonContainer>
-            <StyledLink to={`/create?vault=${vault.id}`}>
-              Create orders
-            </StyledLink>
-          </MainButtonContainer>
-        )}
         <VaultButtons>
+          {!order && <Link to={`/create?vault=${vault.id}`}>Create</Link>}
           <button
             onClick={onDepositHandler}
             title={`Add more ${vault.token.symbol}`}
@@ -117,24 +98,21 @@ export function VaultCardContainer({ vault }: { vault: SubgraphVault }) {
             Cancel
           </button>
         </VaultButtons>
-      </Card>
+      </VaultCard>
     </VaultCardOuterWrapper>
   );
 }
 
-const MainButtonContainer = styled.div`
+const VaultCard = styled(Card)`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  align-items: center;
-  align-items: stretch;
-  height: 100%;
-  width: 100%;
+  min-height: 240px;
 `;
 
 const VaultCardOuterWrapper = styled.div`
   position: relative;
-  max-width: 400px;
+  max-width: 500px;
   width: 100%;
   height: 100%;
 `;
@@ -156,6 +134,8 @@ const VaultButtons = styled.div`
 
   button,
   a {
+    text-decoration: none;
+    text-align: center;
     border: none;
     background-color: #fff;
     color: #000;
@@ -164,25 +144,14 @@ const VaultButtons = styled.div`
     text-transform: uppercase;
     flex: 1;
     padding: 12px 4px;
-
     &:hover {
       background-color: #000;
+      text-decoration: none;
       color: #fff;
-    }
-
-    &:first-child {
-      border-bottom: 2px solid;
     }
   }
 
   @media (min-width: 480px) {
     flex-direction: row;
-
-    button {
-      &:first-child {
-        border-bottom: none;
-        border-right: 2px solid;
-      }
-    }
   }
 `;
