@@ -4,3 +4,4 @@ oz/=packages/contracts/lib/openzeppelin-contracts/contracts/
 src/=packages/contracts/src/
 tests/=packages/contracts/tests/
 solmate/=packages/contracts/lib/solmate/src
+date/=packages/contracts/lib/BokkyPooBahsDateTimeLibrary/contracts

@@ -9,3 +9,6 @@
 [submodule "packages/contracts/lib/solmate"]
 	path = packages/contracts/lib/solmate
 	url = https://github.com/transmissions11/solmate
+[submodule "packages/contracts/lib/BokkyPooBahsDateTimeLibrary"]
+	path = packages/contracts/lib/BokkyPooBahsDateTimeLibrary
+	url = https://github.com/bokkypoobah/BokkyPooBahsDateTimeLibrary

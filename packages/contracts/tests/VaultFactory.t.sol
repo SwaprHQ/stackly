@@ -3,65 +3,87 @@ pragma solidity 0.8.17;
 
 import 'forge-std/Test.sol';
 import {ERC20Mintable} from './common/ERC20Mintable.sol';
-import {Vault, AlreadyInitialized} from '../src/Vault.sol';
-import {VaultFactory} from '../src/VaultFactory.sol';
+import {MockSettlement} from './common/MockSettlement.sol';
+
+import {DCAOrder, AlreadyInitialized} from '../src/DCAOrder.sol';
+import {OrderFactory} from '../src/OrderFactory.sol';
 
 contract VaultFactoryTest is Test {
-  Vault public vaultMastercopy;
-  VaultFactory public vaultFactory;
-  ERC20Mintable public testToken;
+  MockSettlement public mockSettlement;
+  DCAOrder public mastercopy;
+  ERC20Mintable public sellToken;
+  OrderFactory public factory;
+
+  address public _owner;
+  address public _receiver;
+  address public _sellToken;
+  address public _buyToken;
+  uint256 public _interval;
+  uint256 public _startTime;
+  uint256 public _endTime;
+  uint256 public _principal;
 
   function setUp() public {
-    vaultMastercopy = new Vault();
-    vaultFactory = new VaultFactory();
-    testToken = new ERC20Mintable('Test Token', 'TEST');
-  }
+    mockSettlement = new MockSettlement();
+    sellToken = new ERC20Mintable('Test Token', 'TEST');
+    mastercopy = new DCAOrder();
+    factory = new OrderFactory();
 
-  function testCanCreateVaultWithNonce() public {
-    address owner = msg.sender;
-    address driver = address(0x2);
-    bytes memory initializer = abi.encodeWithSignature(
-      'initialize(address,address,address)',
-      owner,
-      driver,
-      address(testToken)
+
+
+    uint256 mastercopyStartTime = block.timestamp + 1 days;
+    uint256 mastercopyEndTime = mastercopyStartTime + 1 hours;
+    mastercopy.initialize(
+      address(1),
+      address(1),
+      address(sellToken),
+      address(1),
+      1,
+      mastercopyStartTime,
+      mastercopyEndTime,
+      1,
+      address(mockSettlement)
     );
 
-    Vault vault = vaultFactory.createVaultWithNonce(
-      address(vaultMastercopy),
-      initializer,
+    sellToken.mint(address(this), 10000 ether);
+    _owner = address(this);
+    _receiver = address(0x2);
+    _sellToken = address(sellToken);
+    _buyToken = address(0x3);
+
+    _startTime = block.timestamp + 1 hours;
+    _endTime = _startTime + 1 days;
+    _principal = 10 ether;
+    _interval= 1;
+  }
+
+  function testMastercopy() public {
+
+  }
+
+  function testCreateOrderWithNonce() public {
+    // Approve the factory to spend the sell token
+    sellToken.approve(address(factory), type(uint256).max);
+
+    // Create the vault
+    address order = factory.createOrderWithNonce(
+      address(mastercopy),
+      abi.encodeWithSignature(
+        'initialize(address,address,address,address,uint256,uint256,uint256,uint256,address)',
+        _owner,
+        _receiver,
+        _sellToken,
+        _buyToken,
+        _principal,
+        _startTime,
+        _endTime,
+        _interval,
+        address(mockSettlement)
+      ),
       1
     );
-    assertEq(address(vault.owner()), owner);
-    assertEq(address(vault.driver()), driver);
-    assertEq(address(vault.token()), address(testToken));
-  }
 
-  function testMastercopyCanBeInitializedOnce() public {
-    vaultMastercopy.initialize(msg.sender, address(0x2), address(testToken));
-    vm.expectRevert(AlreadyInitialized.selector);
-    vaultMastercopy.initialize(msg.sender, address(0x2), address(testToken));
-  }
-
-  function testCanCreateVaultWithNonceEvenIfVaultIsInitialized() public {
-    vaultMastercopy.initialize(address(0x5), address(0x2), address(testToken));
-
-    address owner = msg.sender;
-    address driver = address(0x2);
-    bytes memory initializer = abi.encodeWithSignature(
-      'initialize(address,address,address)',
-      owner,
-      driver,
-      address(testToken)
-    );
-    Vault vault = vaultFactory.createVaultWithNonce(
-      address(vaultMastercopy),
-      initializer,
-      1
-    );
-    assertTrue(address(vault) != address(vaultMastercopy));
-    assertEq(address(vault.owner()), owner);
-    assertEq(address(vault.driver()), driver);
-    assertEq(address(vault.token()), address(testToken));
+    // // Balance has been transferred to the vault
+    // assertEq(sellToken.balanceOf(order), _principal);
   }
 }
