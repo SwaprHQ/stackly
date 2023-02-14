@@ -14,7 +14,8 @@
     "test": "forge test",
     "test:coverage": "forge coverage",
     "test:gasreport": "forge test --gas-report",
-    "snapshot": "forge snapshot"
+    "snapshot": "forge snapshot",
+    "export:abis": "node ./bin/export-abis.js"
   },
   "devDependencies": {
     "@ethersproject/address": "^5.7.0",
