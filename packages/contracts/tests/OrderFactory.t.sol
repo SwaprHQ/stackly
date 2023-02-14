@@ -8,7 +8,7 @@ import {MockSettlement} from './common/MockSettlement.sol';
 import {DCAOrder, AlreadyInitialized} from '../src/DCAOrder.sol';
 import {OrderFactory} from '../src/OrderFactory.sol';
 
-contract VaultFactoryTest is Test {
+contract OrderFactoryTest is Test {
   MockSettlement public mockSettlement;
   DCAOrder public mastercopy;
   ERC20Mintable public sellToken;
