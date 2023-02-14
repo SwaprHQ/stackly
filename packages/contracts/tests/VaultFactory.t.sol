@@ -84,6 +84,6 @@ contract VaultFactoryTest is Test {
     );
 
     // // Balance has been transferred to the vault
-    // assertEq(sellToken.balanceOf(order), _principal);
+    assertEq(sellToken.balanceOf(order), _principal);
   }
 }

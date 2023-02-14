@@ -32,16 +32,18 @@ contract OrderFactory {
   /// @param _singleton Address of singleton contract. Must be deployed at the time of execution.
   /// @param initializer Payload for a message call to be sent to a new order contract.
   /// @param saltNonce Nonce that will be used to generate the salt to calculate the address of the new order contract.
-  function createOrderWithNonce(address _singleton, bytes memory initializer, uint256 saltNonce)
+  function createOrderWithNonce(address _singleton, bytes calldata initializer, uint256 saltNonce)
     public
     returns (address order)
   {
     // Deploy a new order
     order = createProxy(_singleton, initializer, saltNonce);
+
     // Extract the principal from the initializer
     (,, address _sellToken,, uint256 _principal,,,,) =
-      abi.decode(initializer, (address, address, address, address, uint256, uint256, uint256, uint256, address));
+      abi.decode(initializer[4:], (address, address, address, address, uint256, uint256, uint256, uint256, address));
     emit OrderCreated(order);
+
     // Transfer the principal to the order
     IERC20(_sellToken).transferFrom(msg.sender, order, _principal);
   }
