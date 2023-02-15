@@ -26,8 +26,12 @@ export function handleDCAOrderInitialized(event: Initialized): void {
   order.owner =orderContract.owner();
   order.sellToken = createOrReturnTokenEntity(orderContract.sellToken()).id;
   order.buyToken = createOrReturnTokenEntity(orderContract.buyToken()).id;
+  order.receiver = orderContract.receiver();
+  order.principal = orderContract.principal();
   order.endTime = orderContract.endTime().toI32();
   order.startTime = orderContract.startTime().toI32();
+  order.orderSlots = orderContract.orderSlots();
+  order.interval = orderContract.interval();
   order.save();
 }
 

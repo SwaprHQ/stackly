@@ -40,7 +40,7 @@ type DCAOrder @entity {
   "Buy token address"
   buyToken: Token!
   "Total execution slots (orders)"
-  totalSlots: Int!
+  orderSlots: [BigInt!]
   "Initial DCA principal"
   principal: BigInt!
   createdAt: BigInt!

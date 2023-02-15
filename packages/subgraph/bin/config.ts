@@ -9,13 +9,13 @@ export const config: Record<
 > = {
   xdai: {
     orderFactory: {
-      address: '0x49ba0d56f7323B102bCb7a1A1b24D17FE4fF6F25',
-      startBlock: 26116896,
+      address: '0x6fee18b2d1373304246bf7fdf734a4c539cc8566',
+      startBlock: 26488660,
     },
   },
   mainnet: {
     orderFactory: {
-      address: '0x49ba0d56f7323B102bCb7a1A1b24D17FE4fF6F25', // TODO: update this
+      address: '0x6fee18b2d1373304246bf7fdf734a4c539cc8566', // TODO: update this
       startBlock: 16816896,
     },
   },
