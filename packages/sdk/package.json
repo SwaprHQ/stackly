@@ -13,7 +13,7 @@
   "scripts": {
     "lint": "prettier --check . !./dist !./.turbo && eslint \"./**!(dist|.turbo)/*+(.tsx|.ts)\"",
     "format": "prettier --write . !./dist !./.turbo && eslint --fix \"./**!(dist|.turbo)/*+(.tsx|.ts)\"",
-    "typechain": "typechain --target ethers-v5 --out-dir ./src/types/contracts \"./abis/**/*.json\"",
+    "typechain": "typechain --target ethers-v5 --out-dir ./src/types/contracts \"../contracts/abis/**/*.json\"",
     "clean": "rimraf ./dist",
     "build": "pnpm clean && tsc",
     "test": "jest",

@@ -4,28 +4,28 @@ import type { Provider } from '@ethersproject/abstract-provider';
 import type { Signer } from '@ethersproject/abstract-signer';
 
 import {
-  VAULT_DRIVER_ADDRESS_LIST,
-  VAULT_FACTORY_ADDRESS_LIST,
+  getCOWProtocolSettlementAddress,
+  getDCAOrderSingletonAddress,
 } from './constants';
 import { ChainId } from '../constants';
 import {
-  VaultFactory__factory,
-  Vault__factory,
+  OrderFactory__factory,
+  DCAOrder__factory,
   ERC20__factory,
-  VaultFactory,
+  OrderFactory,
 } from '../types/contracts';
 
 /**
- * Creates a contract instance for a vault
- * @param vaultAddress
+ * Creates a contract instance for a DCA order
+ * @param proxyAddress
  * @param provider
  * @returns
  */
-export function getVaultContract(
-  vaultAddress: string,
+export function getDCAOrderContract(
+  proxyAddress: string,
   signerOrProvider: Provider | Signer
 ) {
-  return Vault__factory.connect(vaultAddress, signerOrProvider);
+  return DCAOrder__factory.connect(proxyAddress, signerOrProvider);
 }
 
 /**
@@ -42,125 +42,118 @@ export function getERC20Contract(
 }
 
 /**
- * Returns the address of the vault factory for a given chain id
- * @param chainId The chain id
- * @returns
- */
-export function getVaultFactoryAddress(chainId: ChainId): string {
-  const address = VAULT_FACTORY_ADDRESS_LIST[chainId];
-  if (address === AddressZero) {
-    throw new Error(`Vault factory is not deployed on chain ${chainId}`);
-  }
-
-  return address;
-}
-
-/**
- * Gets the address of the vault singleton for a given chain id
- * @param chainId The chain id
- * @returns
- */
-export function getVaultSingletonAddress(chainId: ChainId): string {
-  const address = VAULT_FACTORY_ADDRESS_LIST[chainId];
-  if (address === AddressZero) {
-    throw new Error(`Vault singleton is not deployed on chain ${chainId}`);
-  }
-
-  return address;
-}
-
-/**
  *
  * @param address
  * @param provider
  * @returns
  */
-export function getVaultFactory(
+export function getOrderFactory(
   address: string,
   signerOrProvider: Provider | Signer
 ) {
   if (address === AddressZero) {
-    throw new Error(`Zero address is not a valid vault factory address`);
+    throw new Error(`Zero address is not a valid order factory address`);
   }
 
-  return VaultFactory__factory.connect(address, signerOrProvider);
+  return OrderFactory__factory.connect(address, signerOrProvider);
 }
 
-export function getVaultFactoryInterface() {
-  return VaultFactory__factory.createInterface();
+export function getOrderFactoryInterface() {
+  return OrderFactory__factory.createInterface();
 }
 
-export function getVaultInterface() {
-  return Vault__factory.createInterface();
+export function getDCAOrderInterface() {
+  return DCAOrder__factory.createInterface();
 }
 
 export function getERC20Interface() {
   return ERC20__factory.createInterface();
 }
 
-export function getVaultAddressFromTransactionReceipt(
+export function getorderAddressFromTransactionReceipt(
   receipt: ContractReceipt
 ) {
-  const vaultFactoryInterface = getVaultFactoryInterface();
-
-  let vaultAddress: undefined | string;
+  const orderFactoryInterface = getOrderFactoryInterface();
+  let prxoyAddress: undefined | string;
 
   receipt.events?.forEach((event) => {
     if (
-      event.event === vaultFactoryInterface.events['VaultCreated(address)'].name
+      event.event === orderFactoryInterface.events['OrderCreated(address)'].name
     ) {
-      vaultAddress = event.args?.vault;
+      prxoyAddress = event.args?.[0];
     }
   });
 
-  return vaultAddress;
+  return prxoyAddress;
 }
 
-interface CreateVaultWithNonceParams {
-  vaultFactory: VaultFactory;
-  token: string;
+interface CreateorderWithNonceInitializeParams {
+  receiver: string;
+  sellToken: string;
+  buyToken: string;
+  principal: string;
+  startTime: number;
+  endTime: number;
+  interval: number;
   owner: string;
   nonce: number;
-  /**
-   * The driver to use for the vault. If not provided, the default driver will be used
-   */
-  driver?: string;
 }
 
 /**
- * Creates a new vault using the vault factory
+ * Creates a DCA order with a given nonce
+ * @param orderFactory The order factory contract
  * @param param0
  * @returns
  */
-export async function createVaultWithNonce({
-  vaultFactory,
-  token,
-  owner,
-  nonce,
-  driver,
-}: CreateVaultWithNonceParams) {
-  const rawChainId = (await vaultFactory.provider
+export async function createDCAOrderWithNonce(
+  orderFactory: OrderFactory,
+  {
+    owner,
+    receiver,
+    sellToken,
+    buyToken,
+    principal,
+    startTime,
+    endTime,
+    interval,
+    nonce,
+  }: CreateorderWithNonceInitializeParams
+) {
+  const rawChainId = (await orderFactory.provider
     .getNetwork()
     .then((n) => n.chainId)) as number;
   const chainId = rawChainId as ChainId;
 
-  driver = driver || VAULT_DRIVER_ADDRESS_LIST[chainId];
-
-  if (!driver || driver === AddressZero) {
-    throw new Error(`No driver found for chain ${chainId}`);
+  if (chainId !== ChainId.ETHEREUM && chainId !== ChainId.GNOSIS) {
+    throw new Error(`Chain id ${chainId} is not supported`);
   }
 
-  const initilizer = getVaultInterface().encodeFunctionData('initialize', [
+  const singleton = getDCAOrderSingletonAddress(chainId);
+  const settlementContract = getCOWProtocolSettlementAddress(chainId);
+
+  const initializer = getDCAOrderInterface().encodeFunctionData('initialize', [
     owner,
-    driver,
-    token,
+    receiver,
+    sellToken,
+    buyToken,
+    principal,
+    startTime,
+    endTime,
+    interval,
+    settlementContract,
   ]);
 
-  const createVaultWithNonceTx = await vaultFactory.createVaultWithNonce(
-    getVaultSingletonAddress(chainId),
-    initilizer,
+  console.log({
+    singleton,
+    initializer,
+    nonce,
+  });
+
+  const createTx = await orderFactory.createOrderWithNonce(
+    singleton,
+    initializer,
     nonce
   );
 
-  return createVaultWithNonceTx;
+  return createTx;
 }

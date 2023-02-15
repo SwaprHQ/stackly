@@ -112,15 +112,16 @@ export async function handleCreateOrder(
       if (i === buyOrders - 1) {
         executeAt = executeAt.subtract(1, 'minute');
       }
-      const executionOrderDocument = await createDollarCostAveragingExecutionOrder(
-        {
-          executeAt: executeAt.toDate(),
-          executeAmount: sellAmountPerExecution,
-        },
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        dcaOrderDocument as any,
-        session
-      );
+      const executionOrderDocument =
+        await createDollarCostAveragingExecutionOrder(
+          {
+            executeAt: executeAt.toDate(),
+            executeAmount: sellAmountPerExecution,
+          },
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          dcaOrderDocument as any,
+          session
+        );
 
       dcaOrderDocument.executions.push(executionOrderDocument._id);
     }
@@ -149,36 +150,35 @@ export async function handleCreateOrder(
   }
 }
 
-export const createOrderRequestDTO = Joi.object<
-  DollarCostAveragingOrderWithSignature
->({
-  sellToken: Joi.string()
-    .required()
-    .description('The token to sell. Also, deposited into the vault'),
-  sellAmount: Joi.string()
-    .required()
-    .description('Sell amount. Also, deposited into the vault'),
-  signature: Joi.string()
-    .required()
-    .description('The signature of the order. Signed by the vault owner'),
-  buyToken: Joi.string().required().description('The token to buy'),
-  vault: Joi.string().required().description('The vault to buy from'),
-  frequency: Joi.number()
-    .required()
-    .description('The frequency of the order; number of orders per interval'),
-  frequencyInterval: Joi.string()
-    .allow(
-      DCAFrequencyInterval.HOUR,
-      DCAFrequencyInterval.DAY,
-      DCAFrequencyInterval.WEEK,
-      DCAFrequencyInterval.MONTH
-    )
-    .description('The frequency interval of the order'),
-  startAt: Joi.number().required().description('The start date of the order'),
-  endAt: Joi.number().required().description('The end date of the order'),
-  chainId: Joi.number()
-    .required()
-    .allow(ChainId.ETHEREUM, ChainId.GNOSIS)
-    .description('The chain id of the order'),
-  recipient: Joi.string(),
-}).label('CreateOrderRequestDTO');
+export const createOrderRequestDTO =
+  Joi.object<DollarCostAveragingOrderWithSignature>({
+    sellToken: Joi.string()
+      .required()
+      .description('The token to sell. Also, deposited into the vault'),
+    sellAmount: Joi.string()
+      .required()
+      .description('Sell amount. Also, deposited into the vault'),
+    signature: Joi.string()
+      .required()
+      .description('The signature of the order. Signed by the vault owner'),
+    buyToken: Joi.string().required().description('The token to buy'),
+    vault: Joi.string().required().description('The vault to buy from'),
+    frequency: Joi.number()
+      .required()
+      .description('The frequency of the order; number of orders per interval'),
+    frequencyInterval: Joi.string()
+      .allow(
+        DCAFrequencyInterval.HOUR,
+        DCAFrequencyInterval.DAY,
+        DCAFrequencyInterval.WEEK,
+        DCAFrequencyInterval.MONTH
+      )
+      .description('The frequency interval of the order'),
+    startAt: Joi.number().required().description('The start date of the order'),
+    endAt: Joi.number().required().description('The end date of the order'),
+    chainId: Joi.number()
+      .required()
+      .allow(ChainId.ETHEREUM, ChainId.GNOSIS)
+      .description('The chain id of the order'),
+    recipient: Joi.string(),
+  }).label('CreateOrderRequestDTO');

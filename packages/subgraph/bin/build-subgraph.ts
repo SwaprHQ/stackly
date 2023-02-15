@@ -1,4 +1,4 @@
-import { writeFile } from 'fs/promises';
+import { writeFile, } from 'fs/promises';
 import { stringify as yamlStringify } from 'yaml';
 
 import { config } from './config';
@@ -19,30 +19,30 @@ async function main() {
     },
     dataSources: [
       {
-        name: 'VaultFactory',
+        name: 'OrderFactory',
         kind: 'ethereum/contract',
         network,
         source: {
-          address: config[network].vaultFactory.address,
-          startBlock: config[network].vaultFactory.startBlock,
-          abi: 'VaultFactory',
+          address: config[network].orderFactory.address,
+          startBlock: config[network].orderFactory.startBlock,
+          abi: 'OrderFactory',
         },
         mapping: {
           kind: 'ethereum/events',
           apiVersion: '0.0.6',
           language: 'wasm/assemblyscript',
           file: './src/mappings/factory.ts',
-          entities: ['VaultFactory'],
+          entities: ['OrderFactory'],
           abis: [
             {
-              name: 'VaultFactory',
-              file: './abis/VaultFactory.json',
+              name: 'OrderFactory',
+              file: './abis/OrderFactory.json',
             },
           ],
           eventHandlers: [
             {
-              event: 'VaultCreated(indexed address)',
-              handler: 'handleVaultCreated',
+              event: 'OrderCreated(indexed address)',
+              handler: 'handleDCAOrderCreated',
             },
           ],
         },
@@ -50,22 +50,22 @@ async function main() {
     ],
     templates: [
       {
-        name: 'Vault',
+        name: 'DCAOrder',
         kind: 'ethereum/contract',
         network,
         source: {
-          abi: 'Vault',
+          abi: 'DCAOrder',
         },
         mapping: {
           kind: 'ethereum/events',
           apiVersion: '0.0.6',
           language: 'wasm/assemblyscript',
-          file: './src/mappings/vault.ts',
-          entities: ['Vault', 'Token'],
+          file: './src/mappings/order.ts',
+          entities: ['Order', 'Token'],
           abis: [
             {
-              name: 'Vault',
-              file: './abis/Vault.json',
+              name: 'DCAOrder',
+              file: './abis/DCAOrder.json',
             },
             {
               name: 'ERC20',
@@ -74,12 +74,12 @@ async function main() {
           ],
           eventHandlers: [
             {
-              event: 'Initialized(indexed address,address,address)',
-              handler: 'handleVaultInitialized',
+              event: 'Initialized(indexed address)',
+              handler: 'handleDCAOrderInitialized',
             },
             {
               event: 'Cancelled(indexed address)',
-              handler: 'handleVaultCancelled',
+              handler: 'handleDCAOrderCancelled',
             },
           ],
         },

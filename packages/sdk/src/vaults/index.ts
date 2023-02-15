@@ -1,4 +1,4 @@
 export * from './constants';
 export * from './factory';
-export { getUserVaults, getVault } from './vaults';
+export { getOrder, getUserOrders } from './subgraph';
 export { signOrder, getOrderSigner } from './signature';

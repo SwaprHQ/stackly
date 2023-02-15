@@ -6,4 +6,6 @@ interface IGPv2Settlement {
     ///
     /// @param orderUid The unique identifier of the order to pre-sign.
     function setPreSignature(bytes calldata orderUid, bool signed) external;
+    function vaultRelayer() external view returns (address);
+    function domainSeparator() external view returns (bytes32);
 }

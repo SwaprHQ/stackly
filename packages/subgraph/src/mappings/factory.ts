@@ -1,22 +1,21 @@
-import { VaultCreated } from '../../generated/VaultFactory/VaultFactory';
-import { Vault as VaultTemplate } from '../../generated/templates';
-import { VaultFactory } from '../../generated/schema'
+import { OrderCreated } from '../../generated/OrderFactory/OrderFactory';
+import { DCAOrder as DCAOrderTemplate } from '../../generated/templates';
+import { OrderFactory } from '../../generated/schema'
 
 // This handler is called by block handlers
-export function handleVaultCreated(event: VaultCreated): void {
+export function handleDCAOrderCreated(event: OrderCreated): void {
 
-  let vaultFactory = VaultFactory.load('1');
+  let orderFactory = OrderFactory.load('1');
 
-  if (vaultFactory === null) {
-    vaultFactory = new VaultFactory('1');
-    vaultFactory.address = event.address;
-    vaultFactory.vaultCount =  0;
+  if (orderFactory === null) {
+    orderFactory = new OrderFactory('1');
+    orderFactory.address = event.address;
+    orderFactory.orderCount =  0;
   }
 
-  vaultFactory.vaultCount = vaultFactory.vaultCount + 1;
-  vaultFactory.save();
+  orderFactory.orderCount = orderFactory.orderCount + 1;
+  orderFactory.save();
 
-  const vaultAddress = event.params.vault;
   // Create a new Vault entity
-  VaultTemplate.create(vaultAddress);
+  DCAOrderTemplate.create(event.params.order);
 }

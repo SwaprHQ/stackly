@@ -12,82 +12,62 @@ import type {
   PopulatedTransaction,
   Signer,
   utils,
-} from 'ethers';
+} from "ethers";
 import type {
   FunctionFragment,
   Result,
   EventFragment,
-} from '@ethersproject/abi';
-import type { Listener, Provider } from '@ethersproject/providers';
+} from "@ethersproject/abi";
+import type { Listener, Provider } from "@ethersproject/providers";
 import type {
   TypedEventFilter,
   TypedEvent,
   TypedListener,
   OnEvent,
   PromiseOrValue,
-} from './common';
+} from "./common";
 
-export interface VaultFactoryInterface extends utils.Interface {
+export interface OrderFactoryInterface extends utils.Interface {
   functions: {
-    'createVaultWithNonce(address,bytes,uint256)': FunctionFragment;
-    'getChainId()': FunctionFragment;
-    'vaultCreationCode()': FunctionFragment;
+    "createOrderWithNonce(address,bytes,uint256)": FunctionFragment;
   };
 
-  getFunction(
-    nameOrSignatureOrTopic:
-      | 'createVaultWithNonce'
-      | 'getChainId'
-      | 'vaultCreationCode'
-  ): FunctionFragment;
+  getFunction(nameOrSignatureOrTopic: "createOrderWithNonce"): FunctionFragment;
 
   encodeFunctionData(
-    functionFragment: 'createVaultWithNonce',
+    functionFragment: "createOrderWithNonce",
     values: [
       PromiseOrValue<string>,
       PromiseOrValue<BytesLike>,
       PromiseOrValue<BigNumberish>
     ]
   ): string;
-  encodeFunctionData(
-    functionFragment: 'getChainId',
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: 'vaultCreationCode',
-    values?: undefined
-  ): string;
 
   decodeFunctionResult(
-    functionFragment: 'createVaultWithNonce',
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: 'getChainId', data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: 'vaultCreationCode',
+    functionFragment: "createOrderWithNonce",
     data: BytesLike
   ): Result;
 
   events: {
-    'VaultCreated(address)': EventFragment;
+    "OrderCreated(address)": EventFragment;
   };
 
-  getEvent(nameOrSignatureOrTopic: 'VaultCreated'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "OrderCreated"): EventFragment;
 }
 
-export interface VaultCreatedEventObject {
-  vault: string;
+export interface OrderCreatedEventObject {
+  order: string;
 }
-export type VaultCreatedEvent = TypedEvent<[string], VaultCreatedEventObject>;
+export type OrderCreatedEvent = TypedEvent<[string], OrderCreatedEventObject>;
 
-export type VaultCreatedEventFilter = TypedEventFilter<VaultCreatedEvent>;
+export type OrderCreatedEventFilter = TypedEventFilter<OrderCreatedEvent>;
 
-export interface VaultFactory extends BaseContract {
+export interface OrderFactory extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
 
-  interface: VaultFactoryInterface;
+  interface: OrderFactoryInterface;
 
   queryFilter<TEvent extends TypedEvent>(
     event: TypedEventFilter<TEvent>,
@@ -109,74 +89,54 @@ export interface VaultFactory extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
-    createVaultWithNonce(
+    createOrderWithNonce(
       _singleton: PromiseOrValue<string>,
       initializer: PromiseOrValue<BytesLike>,
       saltNonce: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
-
-    getChainId(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    vaultCreationCode(overrides?: CallOverrides): Promise<[string]>;
   };
 
-  createVaultWithNonce(
+  createOrderWithNonce(
     _singleton: PromiseOrValue<string>,
     initializer: PromiseOrValue<BytesLike>,
     saltNonce: PromiseOrValue<BigNumberish>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
-  getChainId(overrides?: CallOverrides): Promise<BigNumber>;
-
-  vaultCreationCode(overrides?: CallOverrides): Promise<string>;
-
   callStatic: {
-    createVaultWithNonce(
+    createOrderWithNonce(
       _singleton: PromiseOrValue<string>,
       initializer: PromiseOrValue<BytesLike>,
       saltNonce: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<string>;
-
-    getChainId(overrides?: CallOverrides): Promise<BigNumber>;
-
-    vaultCreationCode(overrides?: CallOverrides): Promise<string>;
   };
 
   filters: {
-    'VaultCreated(address)'(
-      vault?: PromiseOrValue<string> | null
-    ): VaultCreatedEventFilter;
-    VaultCreated(
-      vault?: PromiseOrValue<string> | null
-    ): VaultCreatedEventFilter;
+    "OrderCreated(address)"(
+      order?: PromiseOrValue<string> | null
+    ): OrderCreatedEventFilter;
+    OrderCreated(
+      order?: PromiseOrValue<string> | null
+    ): OrderCreatedEventFilter;
   };
 
   estimateGas: {
-    createVaultWithNonce(
+    createOrderWithNonce(
       _singleton: PromiseOrValue<string>,
       initializer: PromiseOrValue<BytesLike>,
       saltNonce: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
-
-    getChainId(overrides?: CallOverrides): Promise<BigNumber>;
-
-    vaultCreationCode(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
-    createVaultWithNonce(
+    createOrderWithNonce(
       _singleton: PromiseOrValue<string>,
       initializer: PromiseOrValue<BytesLike>,
       saltNonce: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
-
-    getChainId(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    vaultCreationCode(overrides?: CallOverrides): Promise<PopulatedTransaction>;
   };
 }

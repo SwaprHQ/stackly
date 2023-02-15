@@ -5,13 +5,13 @@ type SubgraphStatus @entity {
   lastSnapshotBlock: BigInt!
 }
 
-type VaultFactory @entity {
-  "VaultFactory"
+type OrderFactory @entity {
+  "OrderFactory"
   id: ID!
-  "VaultFactory address"
+  "OrderFactory address"
   address: Bytes!
-  "Vault count"
-  vaultCount: Int!
+  "Order count"
+  orderCount: Int!
 }
 
 #
@@ -28,13 +28,27 @@ type Token @entity {
   symbol: String!
 }
 
-type Vault @entity {
-  " Vault address "
+type DCAOrder @entity {
+  "Order address"
   id: ID!
-  "Vault owner"
+  "Order owner"
   owner: Bytes!
-  "Vault token"
-  token: Token!
+  "Order receiver"
+  receiver: Bytes!
+  "Sell token address"
+  sellToken: Token!
+  "Buy token address"
+  buyToken: Token!
+  "Total execution slots (orders)"
+  totalSlots: Int!
+  "Initial DCA principal"
+  principal: BigInt!
   createdAt: BigInt!
   cancelledAt: BigInt
+  "start time"
+  startTime: Int!
+  "end time"
+  endTime: Int!
+  "time interval in hours"
+  interval: BigInt!
 }

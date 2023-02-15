@@ -3,6 +3,8 @@ src = 'packages/contracts/src'
 test = 'packages/contracts/tests'
 libs = ['packages/contracts/lib']
 out = 'packages/contracts/out'
+optimizer = true
+solc_version = '0.8.17'
 
 [fmt]
-line_length = 80
+tab_width = 2
