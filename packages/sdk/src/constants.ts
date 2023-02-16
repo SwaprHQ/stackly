@@ -1,6 +1,3 @@
-import { Interface } from '@ethersproject/abi';
-import { ERC20_ABI } from './abis/erc20';
-
 export enum ChainId {
   ETHEREUM = 1,
   GNOSIS = 100,
@@ -17,4 +14,3 @@ export const NATIVE_TOKEN_ADDRESS =
  */
 export const MULTICALL_ADDRESS = '0xca11bde05977b3631167028862be2a173976ca11';
 
-export const ERC20_INTERFACE = new Interface(ERC20_ABI);
