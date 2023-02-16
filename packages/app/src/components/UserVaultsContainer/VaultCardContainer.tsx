@@ -1,99 +1,82 @@
-import { ChainId, getVaultContract, getVaultInterface } from 'dca-sdk';
+import { getDCAOrderContract, getERC20Interface } from 'dca-sdk';
 import { BigNumber } from 'ethers';
 import { formatUnits, Fragment } from 'ethers/lib/utils.js';
-import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect } from 'react';
 import styled from 'styled-components';
 import { useContractRead, useNetwork, useSigner } from 'wagmi';
-import { getVaultOrders } from '../../api';
 import { Modal, useModal } from '../../context/Modal';
-import { shortenAddress } from '../../utils';
+import { CancelOrderModalProps } from '../../components/Modal/CancelOrder';
+
+import { getExplorerLink } from '../../utils';
 import { Card, CardInnerWrapper } from '../Card';
+import { SubgraphOrder } from './types';
 
-import { SubgraphVault } from './types';
-
-export function VaultCardContainer({ vault }: { vault: SubgraphVault }) {
-  const { openModal } = useModal<{
-    vault: SubgraphVault;
-  }>();
-
-  const [order, setOrder] =
-    useState<Awaited<ReturnType<typeof getVaultOrders>>[0]>();
+export function VaultCardContainer({ order }: { order: SubgraphOrder }) {
   const { chain } = useNetwork();
-  const { data: signer } = useSigner();
 
-  const {
-    isLoading: isLoadingVaultBalance,
-    data: vaultBalance,
-    refetch: refetchVaultBalance,
-  } = useContractRead<readonly Fragment[], 'balance', BigNumber>({
-    abi: getVaultInterface().fragments,
-    address: vault.id,
-    functionName: 'balance',
-    enabled: !!signer,
-    watch: true,
-    cacheTime: 30_000,
-    staleTime: 30_000,
-  });
+  const { openModal } = useModal<CancelOrderModalProps>();
+  const { data: signer } = useSigner();
+  const { isLoading: isLoadingVaultBalance, data: vaultBalance } =
+    useContractRead<readonly Fragment[], 'balanceOf', BigNumber>({
+      abi: getERC20Interface().fragments,
+      address: order.sellToken.id,
+      functionName: 'balanceOf',
+      enabled: !!signer,
+      watch: true,
+      cacheTime: 30_000,
+      staleTime: 30_000,
+      args: [order.id],
+    });
 
   useEffect(() => {
-    const chainId = chain?.id as ChainId;
+    if (!signer) {
+      return;
+    }
 
-    // fetch vault orders
-    getVaultOrders(chainId, vault.id)
-      .then((orders) => {
-        setOrder(orders[0]);
+    const orderContract = getDCAOrderContract(order.id, signer);
+
+    orderContract
+      .slotSellAmount()
+      .then((slotSellAmount) => {
+        console.log({
+          slotSellAmount,
+        });
       })
-      .catch((error) => {
-        console.error(error);
+      .catch((err) => {
+        console.log('slotSellAmount err', err);
       });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [vault]);
-
-  const onDepositHandler = () => {
-    if (!signer) {
-      return;
-    }
-    openModal(Modal.VaultDeposit, { vault });
-  };
-  const onWithdrawHandler = async () => {
-    if (!signer) {
-      return;
-    }
-    const cancelTx = await getVaultContract(vault.id, signer).cancel();
-    await cancelTx.wait();
-    await refetchVaultBalance();
-  };
+  }, [signer, order.id]);
 
   return (
     <VaultCardOuterWrapper>
       <VaultCard>
         <CardInnerWrapper>
-          <h2>{shortenAddress(vault.id)}</h2>
+          <OrderTitle
+            href={getExplorerLink(chain?.id || 1, order.id, 'address')}
+            target="_blank"
+            rel="noreferrer"
+          >
+            <h2>{order.id.slice(2, 8)}</h2>
+          </OrderTitle>
           <Text>
             {isLoadingVaultBalance || vaultBalance === undefined
               ? 'Loading...'
-              : `${formatUnits(vaultBalance, vault.token.decimals)} ${
-                  vault.token.symbol
+              : `${formatUnits(vaultBalance, order.sellToken.decimals)} ${
+                  order.sellToken.symbol
                 }`}
           </Text>
-          {order ? (
-            <Text>{order?.executions?.length} DCA orders Executions</Text>
-          ) : (
-            <Text>No DCA orders</Text>
-          )}
+          <Text>{order.orderSlots.length} Stacks</Text>
         </CardInnerWrapper>
         <VaultButtons>
-          {!order && <Link to={`/create?vault=${vault.id}`}>Create</Link>}
           <button
-            onClick={onDepositHandler}
-            title={`Add more ${vault.token.symbol}`}
-          >
-            Deposit
-          </button>
-          <button
-            onClick={onWithdrawHandler}
-            title={`Withdraw remaining USDC ${vault.token.symbol} from this vault and cancel the DCA order`}
+            onClick={() =>
+              openModal(Modal.CancelOrder, {
+                chainId: chain?.id as any,
+                signer: signer as any,
+                orderId: order.id,
+              })
+            }
+            title={`Withdraw remaining USDC ${order.sellToken.symbol} from this vault and cancel the DCA order`}
           >
             Cancel
           </button>
@@ -153,5 +136,16 @@ const VaultButtons = styled.div`
 
   @media (min-width: 480px) {
     flex-direction: row;
+  }
+`;
+
+const OrderTitle = styled.a`
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: #000;
+  &:hover {
+    text-decoration: underline;
   }
 `;

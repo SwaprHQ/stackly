@@ -5,11 +5,11 @@ import './index.css';
 import { WagmiConfig } from 'wagmi';
 import { wagmiClient } from './provider/wagmi';
 import IndexPage from './pages';
-import VaultsPage from './pages/vaults';
+import OrdersPage from './pages/orders';
 import { ModalProvider } from './context/Modal';
 import { WalletModal } from './components/Modal/Wallet';
-import { VaultDepositModal } from './components/Modal/VaultDeposit';
 import { CreateVaultStepsModal } from './components/Modal/CreateVaultSteps';
+import { CancelOrderModal } from './components/Modal/CancelOrder';
 
 const router = createBrowserRouter([
   {
@@ -21,8 +21,8 @@ const router = createBrowserRouter([
     element: <IndexPage />,
   },
   {
-    path: '/vaults',
-    element: <VaultsPage />,
+    path: '/orders',
+    element: <OrdersPage />,
   },
 ]);
 
@@ -35,7 +35,7 @@ root.render(
     <WagmiConfig client={wagmiClient}>
       <ModalProvider>
         <WalletModal />
-        <VaultDepositModal />
+        <CancelOrderModal />
         <CreateVaultStepsModal />
         <RouterProvider router={router} />
       </ModalProvider>

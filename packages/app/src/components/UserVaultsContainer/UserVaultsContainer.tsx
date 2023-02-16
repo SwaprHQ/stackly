@@ -1,22 +1,33 @@
 import { useEffect, useState } from 'react';
-import { useAccount } from 'wagmi';
-import { getUserVaults } from 'dca-sdk';
+import { useAccount, useNetwork } from 'wagmi';
+import { getUserOrders, getSubgraphEndpoint } from 'dca-sdk';
 import styled from 'styled-components';
 import { Container, ContainerTitle } from '../Container';
 import { VaultCardContainer } from './VaultCardContainer';
-import { SubgraphVault } from './types';
+import { SubgraphOrder } from './types';
+import { GraphQLClient } from 'graphql-request';
 
 export function UserVaultsContainer() {
+  const { chain } = useNetwork();
+
   const account = useAccount();
-  const [userVaults, setUserVaults] = useState<SubgraphVault[]>([]);
+  const [userOrders, setUserOrders] = useState<SubgraphOrder[]>([]);
 
   useEffect(() => {
-    if (!account) {
+    if (!account.isConnected || chain?.unsupported) {
       return;
     }
-    getUserVaults(account.address as string).then((vaults) => {
-      setUserVaults(vaults.filter((vault) => vault.cancelledAt === null));
-    });
+
+    try {
+      getUserOrders(
+        new GraphQLClient(getSubgraphEndpoint(chain?.id ?? 1)),
+        account.address as string
+      ).then((vaults) => {
+        setUserOrders(vaults.filter((vault) => vault.cancelledAt === null));
+      });
+    } catch (e) {
+      console.error(e);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [account.address]);
 
@@ -30,12 +41,12 @@ export function UserVaultsContainer() {
 
   return (
     <Container>
-      <ContainerTitle>Your Vaults</ContainerTitle>
+      <ContainerTitle>Your Stacks</ContainerTitle>
       <VaultGridList>
-        {userVaults.map((vault) => (
+        {userOrders.map((order) => (
           <VaultCardContainer
-            key={`${vault.id}-${vault.token.id}`}
-            vault={vault}
+            key={`${order.id}-${order.sellToken.id}-${order.buyToken.id}`}
+            order={order}
           />
         ))}
       </VaultGridList>

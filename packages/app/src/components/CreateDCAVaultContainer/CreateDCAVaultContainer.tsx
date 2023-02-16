@@ -1,5 +1,6 @@
 import dayjs, { Dayjs } from 'dayjs';
-import { useState } from 'react';
+import { BigNumber, constants } from 'ethers';
+import { useEffect, useState } from 'react';
 import {
   USDC,
   Token,
@@ -8,13 +9,11 @@ import {
   WXDAI,
   WETH,
   DCAFrequencyInterval,
-  getVaultFactory,
-  getVaultFactoryAddress,
+  getOrderFactory,
+  getOrderFactoryAddress,
+  createDCAOrderWithNonce,
+  getorderAddressFromTransactionReceipt,
   getERC20Contract,
-  createVaultWithNonce,
-  DollarCostAveragingOrder,
-  signOrder,
-  getVaultAddressFromTransactionReceipt,
 } from 'dca-sdk';
 import { FormGroup } from '../form/FormGroup';
 import { FlexContainer, FormButtonGroup, InnerContainer } from './styled';
@@ -29,13 +28,10 @@ import { ShadowButton } from '../form/FormButton';
 import { Modal, useModal } from '../../context/Modal';
 import styled from 'styled-components';
 import { SelectBalanceButtonContainer } from '../SelectBalanceButtonContainer';
-import { postOrder } from '../../api';
 import {
   VaultCreateAndDepositStepsModalProps,
-  CreateVaultAndDeposiStep,
+  CreateVaultAndDepositStep,
 } from '../Modal/CreateVaultSteps';
-import { SubgraphVault } from '../UserVaultsContainer/types';
-import { shortenAddress } from '../../utils';
 import { FrequencyIntervalSelect, TokenSelect } from './TokenSelect';
 
 dayjs.extend(dayjsUTCPlugin);
@@ -52,9 +48,19 @@ export function findTokenByAddress(address: string) {
   );
 }
 
-export interface CreateDCAVaultContainerProps {
-  existingVault?: SubgraphVault;
-  existingVaultBalance?: Amount<Token>;
+export function getFrequencyIntervalInHours(interval: DCAFrequencyInterval) {
+  switch (interval) {
+    case DCAFrequencyInterval.HOUR:
+      return 1;
+    case DCAFrequencyInterval.DAY:
+      return 24;
+    case DCAFrequencyInterval.WEEK:
+      return 24 * 7;
+    case DCAFrequencyInterval.MONTH:
+      return 24 * 30;
+    default:
+      return 1;
+  }
 }
 
 function WalletConnectButton() {
@@ -86,10 +92,7 @@ function WalletConnectButton() {
   );
 }
 
-export function CreateDCAVaultContainer({
-  existingVault,
-  existingVaultBalance,
-}: CreateDCAVaultContainerProps) {
+export function CreateDCAVaultContainer() {
   const account = useAccount();
   const { chain, chains } = useNetwork();
   const { openModal, setModalData } =
@@ -97,17 +100,33 @@ export function CreateDCAVaultContainer({
   const { data: signer } = useSigner();
   const [startAt, setStartAt] = useState<Dayjs>(dayjs().add(1, 'h'));
   const [endAt, setEndAt] = useState<Dayjs>(dayjs().add(25, 'h'));
-  const [frequency] = useState<number>(1); // This is hardcoded for now
+  const [hourInterval, setHourInterval] = useState<number>(1);
   const [frequencyInterval, setFrequencyInterval] =
     useState<DCAFrequencyInterval>(DCAFrequencyInterval.HOUR);
   const [sellTokenAmount, setSellTokenAmount] = useState<Amount<Token>>(
-    existingVaultBalance || new Amount(tokenOptions[0], '0')
+    new Amount(tokenOptions[0], '0')
   );
   const [buyToken, setBuyToken] = useState<Token>(WETH[ChainId.GNOSIS]);
   const [createVaultError, setCreateVaultError] = useState<Error | null>(null);
-  const [vaultAddress, setVaultAddress] = useState<string | null>(
-    existingVault?.id || null
-  );
+  const [receiver] = useState<string | null>(null);
+  const [allowance, setAllowance] = useState<BigNumber | null>(null);
+
+  useEffect(() => {
+    if (!signer || !account.address || !sellTokenAmount.currency.address) {
+      return;
+    }
+
+    let factoryAddress;
+    try {
+      factoryAddress = getOrderFactoryAddress(chain?.id as ChainId);
+    } catch (e) {
+      return;
+    }
+
+    getERC20Contract(sellTokenAmount.currency.address, signer)
+      .allowance(account.address, factoryAddress)
+      .then(setAllowance);
+  }, [signer, account.address, sellTokenAmount.currency.address, chain?.id]);
 
   const isNetworkSupported = !!chains.find((c) => c.id === chain?.id);
 
@@ -138,140 +157,113 @@ export function CreateDCAVaultContainer({
     }
 
     const chainId = chain?.id as ChainId;
-    const isVaultCreated = !!vaultAddress;
-    let vault = vaultAddress ? vaultAddress : undefined;
+    let orderProxy: undefined | string;
     // Open the modal with initial required data
     openModal(Modal.VaultCreateAndDepositSteps, {
       chainId,
-      stepsCompleted:
-        isVaultCreated && existingVaultBalance
-          ? [CreateVaultAndDeposiStep.DEPOSIT_TOKEN]
-          : [],
+      stepsCompleted: [],
       tokenSymbol: sellTokenAmount.currency.symbol,
       tokenDepositAmount: parseFloat(sellTokenAmount.toFixed(3)),
     });
 
-    // Create a new vault if one doesn't exist
-    if (!isVaultCreated) {
-      const vaultFactory = getVaultFactory(
-        getVaultFactoryAddress(ChainId.GNOSIS),
-        signer as any
-      );
-
-      const createVaultTransaction = await createVaultWithNonce({
-        // chainId is inferred from the vaultFactory provider to find the singleton/mastercopy to use
-        vaultFactory,
-        nonce: dayjs().unix(),
-        token: sellTokenAmount.currency.address,
-        owner: account.address as string,
-      });
-
-      setModalData((prev) => ({
-        ...prev,
-        createVaultTransaction,
-      }));
-
-      const createVaultReceipt = await createVaultTransaction.wait();
-
-      if (!createVaultReceipt.status) {
-        setCreateVaultError(new Error('Could not create vault'));
-        return;
-      }
-
-      vault = getVaultAddressFromTransactionReceipt(createVaultReceipt);
-
-      if (!vault) {
-        setCreateVaultError(new Error('Could not create vault'));
-        return;
-      }
-
-      setVaultAddress(vault);
-      setModalData((prev) => ({
-        ...prev,
-        stepsCompleted: [CreateVaultAndDeposiStep.CREATE_VAULT],
-        createVaultReceipt,
-        vault,
-        isDepositingToken: true,
-      }));
-    }
-    // Deposit the sell token amount into the vault
-    const depositTx = await getERC20Contract(
+    const sellTokenContract = getERC20Contract(
       sellTokenAmount.currency.address,
       signer
-    ).transfer(vault as string, sellTokenAmount.toRawAmount());
+    );
+
+    // Skip to next step if allowance is sufficient
+    if (allowance && allowance.gt(sellTokenAmount.toRawAmount())) {
+      setModalData((prev) => ({
+        ...prev,
+        stepsCompleted: [CreateVaultAndDepositStep.APPROVE_FACTORY],
+        approveFactoryReceipt: {} as any,
+      }));
+    } else {
+      // Approve factory to spend sell token
+      const approveFactoryTransaction = await sellTokenContract.approve(
+        getOrderFactoryAddress(chainId),
+        constants.MaxUint256
+      );
+
+      setModalData((prev) => ({
+        ...prev,
+        approveFactoryTransaction,
+      }));
+
+      const approveFactoryReceipt = await approveFactoryTransaction.wait();
+
+      setModalData((prev) => ({
+        ...prev,
+        stepsCompleted: [CreateVaultAndDepositStep.APPROVE_FACTORY],
+        approveFactoryReceipt,
+      }));
+    }
+    // Create a new vault if one doesn't exist
+    const orderFactory = getOrderFactory(
+      getOrderFactoryAddress(chainId),
+      signer
+    );
+
+    const initParams: Parameters<typeof createDCAOrderWithNonce>['1'] = {
+      nonce: dayjs().unix(),
+      // dca order params
+      owner: account.address as string,
+      receiver: receiver ?? (account.address as string), // TODO: add receiver
+      sellToken: sellTokenAmount.currency.address,
+      buyToken: buyToken.address,
+      principal: sellTokenAmount.toRawAmount().toString(),
+      startTime: startAt.utc().unix(),
+      endTime: endAt.utc().unix(),
+      interval: hourInterval,
+    };
+
+    console.log(initParams);
+
+    const createOrderTransaction = await createDCAOrderWithNonce(
+      orderFactory,
+      initParams
+    );
 
     setModalData((prev) => ({
       ...prev,
-      depositTokenTransaction: depositTx,
+      createOrderTransaction,
     }));
 
-    const depositTokenReceipt = await depositTx.wait();
-    if (!depositTokenReceipt.status) {
-      setCreateVaultError(new Error('Could not deposit sell token amount'));
+    const createOrderReceipt = await createOrderTransaction.wait();
+
+    if (!createOrderReceipt.status) {
+      setCreateVaultError(new Error('Could not create vault'));
+      return;
+    }
+
+    orderProxy = getorderAddressFromTransactionReceipt(createOrderReceipt);
+
+    if (!orderProxy) {
+      setCreateVaultError(new Error('Could not create vault'));
       return;
     }
 
     setModalData((prev) => ({
       ...prev,
       stepsCompleted: [
-        CreateVaultAndDeposiStep.CREATE_VAULT,
-        CreateVaultAndDeposiStep.DEPOSIT_TOKEN,
+        ...prev.stepsCompleted,
+        CreateVaultAndDepositStep.CREATE_ORDER,
       ],
-      depositTokenReceipt,
-      isCreatingOrder: true,
-    }));
-
-    // Create a DCA order for the vault and sign it
-    // This will be sent to the server to be executed
-    const order: DollarCostAveragingOrder = {
-      sellToken: sellTokenAmount.currency.address,
-      buyToken: buyToken.address,
-      sellAmount: sellTokenAmount.toRawAmount().toString(),
-      startAt: startAt.utc().unix(), // UTC time
-      endAt: endAt.utc().unix(), // UTC time
-      frequency,
-      frequencyInterval,
-      vault: vault as string,
-      recipient: account.address as string,
-      chainId,
-    };
-
-    const signature = await signOrder(order, signer as any);
-    const orderWithSignature = {
-      ...order,
-      signature,
-    };
-    // Send the order to the server to be executed
-    await postOrder(orderWithSignature);
-
-    setModalData((prev) => ({
-      ...prev,
-      stepsCompleted: [
-        CreateVaultAndDeposiStep.CREATE_VAULT,
-        CreateVaultAndDeposiStep.DEPOSIT_TOKEN,
-        CreateVaultAndDeposiStep.CREATE_ORDER,
-      ],
-      isCreatingOrder: false,
+      createOrderReceipt,
+      orderProxy,
       isOrderCreated: true,
     }));
   };
 
   // Calculate the number of buy orders
-  const buyOrders = Math.ceil(
-    endAt.diff(startAt, frequencyInterval) / frequency
-  );
-
+  const buyOrders = Math.ceil(endAt.diff(startAt, 'hours') / hourInterval);
   const buyAmountPerOrder = sellTokenAmount.div(
     buyOrders === 0 ? 1 : buyOrders
   );
 
   return (
     <Container>
-      <ContainerTitle>
-        {existingVault && existingVault.id
-          ? `Create Order With Vault ${shortenAddress(existingVault.id)}`
-          : 'Create A Vault and Order'}
-      </ContainerTitle>
+      <ContainerTitle>Create Order</ContainerTitle>
       <FlexContainer>
         <InnerContainer>
           <Card>
@@ -361,7 +353,11 @@ export function CreateDCAVaultContainer({
                   <FrequencyIntervalSelect
                     value={frequencyInterval}
                     onChange={(nextFrequencyInterval) => {
+                      const nextHourInterval = getFrequencyIntervalInHours(
+                        nextFrequencyInterval
+                      );
                       setFrequencyInterval(nextFrequencyInterval);
+                      setHourInterval(nextHourInterval);
                     }}
                   />
                 </FormGroup>
@@ -385,18 +381,13 @@ export function CreateDCAVaultContainer({
                   <p>
                     Buying {buyAmountPerOrder.toFixed(2)}{' '}
                     {sellTokenAmount.currency.symbol} worth of {buyToken.symbol}{' '}
-                    every {frequencyInterval}
+                    every {frequencyInterval} for {buyOrders} times
                   </p>
                 </OrderInfo>
               )}
               {createVaultError && (
                 <div>
                   <p>{createVaultError.message}</p>
-                </div>
-              )}
-              {vaultAddress && (
-                <div>
-                  <p>Vault Address: {vaultAddress}</p>
                 </div>
               )}
             </CardInnerWrapper>

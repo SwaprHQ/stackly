@@ -1,3 +1,3 @@
-import type { getUserVaults } from "dca-sdk";
+import type { getUserOrders } from "dca-sdk";
 
-export type SubgraphVault = Awaited<ReturnType<typeof getUserVaults>>[0];
+export type SubgraphOrder = Awaited<ReturnType<typeof getUserOrders>>[0];

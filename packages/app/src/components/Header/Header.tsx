@@ -15,7 +15,7 @@ function NavMenuItems() {
       </HeaderTitleContainer>
       <Nav>
         <Link to="/">Home</Link>
-        <Link to="/vaults">Your Vaults</Link>
+        <Link to="/orders">Your Orders</Link>
       </Nav>
       <WalletConnectButtonContainer>
         <WalletConnectButton />

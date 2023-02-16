@@ -11,6 +11,7 @@ import {
 export enum Modal {
   VaultCreateAndDepositSteps = 'VaultCreateAndDepositSteps',
   VaultDeposit = 'VaultDeposit',
+  CancelOrder = 'CancelOrder',
   Withdraw = 'Withdraw',
   Wallet = 'Wallet',
 }

@@ -16,6 +16,11 @@ export const ModalHeader = styled(ModalSection)`
   background: #ff90e8;
 `;
 
+export const ModalTitle = styled.h2`
+  margin: 0;
+  text-transform: uppercase;
+`;
+
 export const ModalFooter = styled(ModalSection)`
   align-items: center;
   justify-content: center;
@@ -98,3 +103,40 @@ export const ModalOutterWrapper = styled.div<{ maxWidth?: string }>(  props => `
   justify-content: center;
   gap: 12px;
 `);
+
+export const Step = styled.a<{
+  isSuccess?: boolean;
+  isBusy?: boolean;
+}>(
+  (props) => `
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: 0 20px;
+  text-align: center;
+  padding: 20px;
+  font-size: 20px;
+  font-weight: bold;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: #000;
+  &:not(:last-child) {
+    border-bottom: 2px solid #000;
+  }
+  ${props.isBusy ? 'background: #ffc900; &:hover { background: #ffc900; }' : ''}
+  ${
+    props.isSuccess
+      ? 'background: #1dff72; &:hover { background: #1dff72; }'
+      : ''
+  }
+  `
+);
+
+export const Text = styled.p`
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 12px;
+`;
