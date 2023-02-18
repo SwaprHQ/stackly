@@ -13,7 +13,8 @@ import {
   DCAOrder__factory,
   ERC20__factory,
   OrderFactory,
-} from '../types/contracts';
+  Multicall__factory
+} from '../generated/contracts';
 
 /**
  * Creates a contract instance for a DCA order
@@ -143,12 +144,6 @@ export async function createDCAOrderWithNonce(
     settlementContract,
   ]);
 
-  console.log({
-    singleton,
-    initializer,
-    nonce,
-  });
-
   const createTx = await orderFactory.createOrderWithNonce(
     singleton,
     initializer,
@@ -156,4 +151,19 @@ export async function createDCAOrderWithNonce(
   );
 
   return createTx;
+}
+
+
+
+export const MULTICALL_ADDRESS = '0xcA11bde05977b3631167028862bE2a173976CA11'
+
+/**
+ * Returns a contract instance for the Multicall contract
+ * @param signerOrProvider
+ * @returns
+ */
+export function getMulticallContract(
+  signerOrProvider: Provider | Signer
+) {
+  return Multicall__factory.connect(MULTICALL_ADDRESS, signerOrProvider);
 }

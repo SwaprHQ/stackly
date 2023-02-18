@@ -1,0 +1,44 @@
+[
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "order",
+        "type": "address"
+      }
+    ],
+    "name": "OrderCreated",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_singleton",
+        "type": "address"
+      },
+      {
+        "internalType": "bytes",
+        "name": "initializer",
+        "type": "bytes"
+      },
+      {
+        "internalType": "uint256",
+        "name": "saltNonce",
+        "type": "uint256"
+      }
+    ],
+    "name": "createOrderWithNonce",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "order",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]
