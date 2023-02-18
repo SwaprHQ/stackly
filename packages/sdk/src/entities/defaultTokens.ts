@@ -1,51 +1,6 @@
-import { Currency } from '../currency';
-import { enforce } from '../../utils/invariant';
-import { ChainId } from '../../constants';
-
-export class Token extends Currency {
-  public constructor(
-    public readonly chainId: ChainId,
-    public readonly address: string,
-    decimals: number,
-    symbol: string
-  ) {
-    super(address, symbol, decimals);
-  }
-
-  public static getNativeWrapper(chainId: ChainId) {
-    const wrapper: Record<ChainId, Token> = {
-      [ChainId.ETHEREUM]: WETH[ChainId.ETHEREUM],
-      [ChainId.GNOSIS]: WXDAI,
-    };
-    return wrapper[chainId];
-  }
-
-  public equals(other: Token): boolean {
-    return (
-      this === other ||
-      (this.chainId === other.chainId && this.address === other.address)
-    );
-  }
-
-  public sort(other: Token): [Token, Token] {
-    enforce(this.chainId === other.chainId, 'inconsistent chain ids');
-    enforce(this.address !== other.address, 'same token');
-    return this.address.toLowerCase() < other.address.toLowerCase()
-      ? [this, other]
-      : [other, this];
-  }
-}
-
-export function currencyEquals(
-  currencyA: Currency,
-  currencyB: Currency
-): boolean {
-  if (currencyA instanceof Token && currencyB instanceof Token)
-    return currencyA.equals(currencyB);
-  else if (currencyA instanceof Token) return false;
-  else if (currencyB instanceof Token) return false;
-  else return currencyA === currencyB;
-}
+// A list of tokens that are commonly used in the DXdao ecosystem
+import { ChainId } from "../constants";
+import { Token } from "./token";
 
 export const USDC: Readonly<Record<ChainId, Token>> = {
   [ChainId.ETHEREUM]: new Token(
@@ -81,13 +36,15 @@ export const WETH: Readonly<Record<ChainId, Token>> = {
     ChainId.ETHEREUM,
     '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
     18,
-    'WETH'
+    'WETH',
+    'Wrapped Ether'
   ),
   [ChainId.GNOSIS]: new Token(
     ChainId.GNOSIS,
     '0x6A023CCd1ff6F2045C3309768eAd9E68F978f6e1',
     18,
-    'WETH'
+    'WETH',
+    'Wrapped Ether'
   ),
 };
 
@@ -110,14 +67,16 @@ export const WXDAI = new Token(
   ChainId.GNOSIS,
   '0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d',
   18,
-  'WXDAI'
+  'WXDAI',
+  'Wrapped xDAI'
 );
 
 export const DAI = new Token(
   ChainId.ETHEREUM,
   '0x6B175474E89094C44Da98b954EedeAC495271d0F',
   18,
-  'DAI'
+  'DAI',
+  'Dai Stablecoin'
 );
 
 export const GNO: Record<ChainId, Token> = {
@@ -140,13 +99,15 @@ export const DXD: Record<ChainId, Token> = {
     ChainId.ETHEREUM,
     '0xa1d65E8fB6e87b60FECCBc582F7f97804B725521',
     18,
-    'DXD'
+    'DXD',
+    'DXdao Token'
   ),
   [ChainId.GNOSIS]: new Token(
     ChainId.GNOSIS,
     '0xb90d6bec20993be5d72a5ab353343f7a0281f158',
     18,
-    'DXD'
+    'DXD',
+    'DXdao Token'
   ),
 };
 
