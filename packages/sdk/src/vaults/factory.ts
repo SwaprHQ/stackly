@@ -13,7 +13,8 @@ import {
   DCAOrder__factory,
   ERC20__factory,
   OrderFactory,
-  Multicall__factory
+  Multicall__factory,
+  ERC20Bytes32__factory,
 } from '../generated/contracts';
 
 /**
@@ -40,6 +41,19 @@ export function getERC20Contract(
   signerOrProvider: Provider | Signer
 ) {
   return ERC20__factory.connect(tokenAddress, signerOrProvider);
+}
+
+/**
+ * Create a contract instance for an ERC20 bytes 32 token
+ * @param tokenAddress
+ * @param provider
+ * @returns
+ */
+export function getERC20Byte32Contract(
+  tokenAddress: string,
+  signerOrProvider: Provider | Signer
+) {
+  return ERC20Bytes32__factory.connect(tokenAddress, signerOrProvider);
 }
 
 /**
@@ -153,17 +167,13 @@ export async function createDCAOrderWithNonce(
   return createTx;
 }
 
-
-
-export const MULTICALL_ADDRESS = '0xcA11bde05977b3631167028862bE2a173976CA11'
+export const MULTICALL_ADDRESS = '0xcA11bde05977b3631167028862bE2a173976CA11';
 
 /**
  * Returns a contract instance for the Multicall contract
  * @param signerOrProvider
  * @returns
  */
-export function getMulticallContract(
-  signerOrProvider: Provider | Signer
-) {
+export function getMulticallContract(signerOrProvider: Provider | Signer) {
   return Multicall__factory.connect(MULTICALL_ADDRESS, signerOrProvider);
 }
