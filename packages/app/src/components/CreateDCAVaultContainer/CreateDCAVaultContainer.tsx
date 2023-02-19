@@ -3,10 +3,8 @@ import { BigNumber, constants } from 'ethers';
 import { useEffect, useState } from 'react';
 import {
   USDC,
-  Token,
   ChainId,
   Amount,
-  WXDAI,
   WETH,
   DCAFrequencyInterval,
   getOrderFactory,
@@ -14,25 +12,28 @@ import {
   createDCAOrderWithNonce,
   getorderAddressFromTransactionReceipt,
   getERC20Contract,
+  Currency,
 } from 'dca-sdk';
 import { FormGroup } from '../form/FormGroup';
 import { FlexContainer, FormButtonGroup, InnerContainer } from './styled';
-import { NumberInput } from '../form/NumberInput';
-import { InputGroup } from '../form';
-
 import dayjsUTCPlugin from 'dayjs/plugin/utc';
 import { useAccount, useNetwork, useSigner, useSwitchNetwork } from 'wagmi';
 import { Card, CardInnerWrapper } from '../Card';
 import { Container, ContainerTitle } from '../Container';
 import { ShadowButton } from '../form/FormButton';
-import { Modal, useModal } from '../../context/Modal';
+import { Modal, useModal } from '../../modal';
 import styled from 'styled-components';
-import { SelectBalanceButtonContainer } from '../SelectBalanceButtonContainer';
 import {
   VaultCreateAndDepositStepsModalProps,
   CreateVaultAndDepositStep,
 } from '../Modal/CreateVaultSteps';
-import { FrequencyIntervalSelect, TokenSelect } from './TokenSelect';
+import {
+  FrequencyIntervalSelect,
+  getFrequencyIntervalInHours,
+} from './FrequencyIntervalSelect';
+import { DateTimeInput } from '../form/DateTime';
+import { CurrencyAmountInput } from '../form/CurrencyAmountInput';
+import { CurrencyInput } from '../form/CurrencyInput';
 
 dayjs.extend(dayjsUTCPlugin);
 export const OrderInfo = styled.div`
@@ -40,35 +41,27 @@ export const OrderInfo = styled.div`
   font-weight: bold;
 `;
 
-const tokenOptions = [USDC[ChainId.GNOSIS], WXDAI, WETH[ChainId.GNOSIS]];
-
-export function findTokenByAddress(address: string) {
-  return tokenOptions.find(
-    (token) => token.address.toLowerCase() === address.toLowerCase()
-  );
-}
-
-export function getFrequencyIntervalInHours(interval: DCAFrequencyInterval) {
-  switch (interval) {
-    case DCAFrequencyInterval.HOUR:
-      return 1;
-    case DCAFrequencyInterval.DAY:
-      return 24;
-    case DCAFrequencyInterval.WEEK:
-      return 24 * 7;
-    case DCAFrequencyInterval.MONTH:
-      return 24 * 30;
-    default:
-      return 1;
+const JoinedFormGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  & #buy-currency button {
+    height: 100%;
   }
-}
+  & #buy-frequency {
+    flex: 1;
+  }
+  @media (min-width: 320px) {
+    flex-direction: row;
+  }
+`;
 
 function WalletConnectButton() {
   const account = useAccount();
   const { openModal } = useModal();
-  const { chains, chain } = useNetwork();
+  const { chain } = useNetwork();
   const { switchNetworkAsync } = useSwitchNetwork();
-  const isNetworkSupported = chains.find((c) => c.id === chain?.id);
+  const isNetworkSupported = chain && !chain.unsupported;
 
   if (account.isConnected && !isNetworkSupported) {
     return (
@@ -99,14 +92,20 @@ export function CreateDCAVaultContainer() {
     useModal<VaultCreateAndDepositStepsModalProps>();
   const { data: signer } = useSigner();
   const [startAt, setStartAt] = useState<Dayjs>(dayjs().add(1, 'h'));
-  const [endAt, setEndAt] = useState<Dayjs>(dayjs().add(25, 'h'));
+  const [endAt, setEndAt] = useState<Dayjs>(dayjs().add(7, 'd')); // 7 days from now
   const [hourInterval, setHourInterval] = useState<number>(1);
   const [frequencyInterval, setFrequencyInterval] =
     useState<DCAFrequencyInterval>(DCAFrequencyInterval.HOUR);
-  const [sellTokenAmount, setSellTokenAmount] = useState<Amount<Token>>(
-    new Amount(tokenOptions[0], '0')
+  const [sellTokenAmount, setSellTokenAmount] = useState<Amount<Currency>>(
+    chain && chain.id && !chain.unsupported
+      ? new Amount(USDC[chain.id as ChainId], '0')
+      : new Amount(USDC[ChainId.ETHEREUM], '0')
   );
-  const [buyToken, setBuyToken] = useState<Token>(WETH[ChainId.GNOSIS]);
+  const [buyToken, setBuyToken] = useState<Currency>(
+    chain && chain.id && !chain.unsupported
+      ? WETH[chain.id as ChainId]
+      : WETH[ChainId.ETHEREUM]
+  );
   const [createVaultError, setCreateVaultError] = useState<Error | null>(null);
   const [receiver] = useState<string | null>(null);
   const [allowance, setAllowance] = useState<BigNumber | null>(null);
@@ -162,7 +161,7 @@ export function CreateDCAVaultContainer() {
     openModal(Modal.VaultCreateAndDepositSteps, {
       chainId,
       stepsCompleted: [],
-      tokenSymbol: sellTokenAmount.currency.symbol,
+      tokenSymbol: sellTokenAmount.currency.symbol as string,
       tokenDepositAmount: parseFloat(sellTokenAmount.toFixed(3)),
     });
 
@@ -217,8 +216,6 @@ export function CreateDCAVaultContainer() {
       interval: hourInterval,
     };
 
-    console.log(initParams);
-
     const createOrderTransaction = await createDCAOrderWithNonce(
       orderFactory,
       initParams
@@ -271,93 +268,72 @@ export function CreateDCAVaultContainer() {
               <form>
                 <FormGroup>
                   <label>From</label>
-                  <InputGroup>
-                    <NumberInput
-                      value={sellTokenAmount.toString()}
-                      onChange={(nextSellAmount) => {
-                        setSellTokenAmount(
-                          new Amount(sellTokenAmount.currency, nextSellAmount)
-                        );
-                        setCreateVaultError(null);
+                  <CurrencyAmountInput
+                    disabled={!isNetworkSupported}
+                    value={sellTokenAmount}
+                    showNativeCurrency={false}
+                    userAddress={account.address}
+                    onChange={(nextSellAmount) => {
+                      setSellTokenAmount(nextSellAmount);
+                      setCreateVaultError(null);
+                    }}
+                  />
+                </FormGroup>
+                <JoinedFormGroup>
+                  <FormGroup id="buy-currency">
+                    <label>Stack</label>
+                    <CurrencyInput
+                      disabled={!isNetworkSupported}
+                      showNativeCurrency={false}
+                      value={buyToken}
+                      onChange={(nextBuyToken) => {
+                        // Prevent the user from selecting the same token for buy and sell
+                        if (
+                          nextBuyToken.address ===
+                          sellTokenAmount.currency.address
+                        ) {
+                          return;
+                        }
+                        setBuyToken(nextBuyToken);
                       }}
                     />
-                    <TokenSelect
-                      value={sellTokenAmount.currency as Token}
-                      onChange={(nextSellToken) => {
-                        setSellTokenAmount(
-                          new Amount(nextSellToken, sellTokenAmount.toString())
+                  </FormGroup>
+                  <FormGroup id="buy-frequency">
+                    <label>{buyToken.symbol} every</label>
+                    <FrequencyIntervalSelect
+                      disabled={!isNetworkSupported}
+                      value={frequencyInterval}
+                      onChange={(nextFrequencyInterval) => {
+                        const nextHourInterval = getFrequencyIntervalInHours(
+                          nextFrequencyInterval
                         );
+                        setFrequencyInterval(nextFrequencyInterval);
+                        setHourInterval(nextHourInterval);
                       }}
                     />
-                  </InputGroup>
-                  <SelectBalanceButtonContainer
-                    tokenAddress={sellTokenAmount.currency.address}
-                    tokenDecimals={sellTokenAmount.currency.decimals}
-                    userAddress={account.address as string}
-                    onBalanceSelect={(userBalance) => {
-                      setSellTokenAmount(
-                        Amount.fromRawAmount(
-                          sellTokenAmount.currency,
-                          userBalance
-                        )
-                      );
+                  </FormGroup>
+                </JoinedFormGroup>
+                <FormGroup>
+                  <label>Starting</label>
+                  <DateTimeInput
+                    disabled={!isNetworkSupported}
+                    value={startAt}
+                    onChange={(nextStartAt) => {
+                      setStartAt(nextStartAt);
                     }}
                   />
                 </FormGroup>
                 <FormGroup>
-                  <label>To</label>
-                  <TokenSelect
-                    value={buyToken}
-                    onChange={(nextBuyToken) => {
-                      // Prevent the user from selecting the same token for buy and sell
-                      if (
-                        nextBuyToken.address ===
-                        sellTokenAmount.currency.address
-                      ) {
-                        return;
-                      }
-                      setBuyToken(nextBuyToken);
-                    }}
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <label>Start At</label>
-                  <input
-                    type="datetime-local"
-                    min={dayjs().format('YYYY-MM-DDTHH:mm')}
-                    value={startAt.format('YYYY-MM-DDTHH:mm')}
-                    onChange={(e) => {
-                      // const nextStartAt = dayjs(e.target.value);
-                      setStartAt(dayjs(e.target.value));
-                    }}
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <label>End At</label>
-                  <input
-                    type="datetime-local"
-                    min={startAt.format('YYYY-MM-DDTHH:mm')}
-                    value={endAt.format('YYYY-MM-DDTHH:mm')}
-                    onChange={(e) => {
-                      const nextEndAt = dayjs(e.target.value);
+                  <label>Until</label>
+                  <DateTimeInput
+                    disabled={!isNetworkSupported}
+                    value={endAt}
+                    onChange={(nextEndAt) => {
                       const isBeforeStartAt = nextEndAt.isBefore(startAt);
                       if (isBeforeStartAt) {
                         return;
                       }
                       setEndAt(nextEndAt);
-                    }}
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <label>Buy {buyToken.symbol} every</label>
-                  <FrequencyIntervalSelect
-                    value={frequencyInterval}
-                    onChange={(nextFrequencyInterval) => {
-                      const nextHourInterval = getFrequencyIntervalInHours(
-                        nextFrequencyInterval
-                      );
-                      setFrequencyInterval(nextFrequencyInterval);
-                      setHourInterval(nextHourInterval);
                     }}
                   />
                 </FormGroup>

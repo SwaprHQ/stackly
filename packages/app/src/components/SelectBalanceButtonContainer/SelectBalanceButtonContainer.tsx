@@ -1,6 +1,6 @@
-import { getERC20Interface } from 'dca-sdk';
-import { BigNumber, utils } from 'ethers';
-import { useContractRead } from 'wagmi';
+import { Amount, Currency } from 'dca-sdk';
+import { utils } from 'ethers';
+import { useCurrencyBalance } from '../../tokens/hooks';
 import { numberFormatter } from '../../utils';
 
 import { SelectBalanceButton } from './styled';
@@ -8,30 +8,21 @@ import { SelectBalanceButton } from './styled';
 const { formatUnits } = utils;
 
 export function SelectBalanceButtonContainer({
-  tokenAddress,
-  tokenDecimals,
   userAddress,
+  currency,
   onBalanceSelect,
 }: {
-  tokenAddress: string;
-  tokenDecimals: number;
+  currency: Currency;
   userAddress: string;
-  onBalanceSelect: (balance: BigNumber) => void;
+  onBalanceSelect: (balance: Amount<Currency>) => void;
 }) {
-  const { data: userTokenBalance, isLoading: isUserSellTokenBalanceLoading } =
-    useContractRead<readonly utils.Fragment[], 'balanceOf', BigNumber>({
-      abi: getERC20Interface().fragments,
-      address: tokenAddress,
-      functionName: 'balanceOf',
-      args: [userAddress],
-      enabled: !!userAddress,
-    });
+  const { balance, loading } = useCurrencyBalance(userAddress, currency);
 
   if (userAddress === undefined) {
     return <SelectBalanceButton type="button" disabled alignRight />;
   }
 
-  if (isUserSellTokenBalanceLoading || userTokenBalance === undefined) {
+  if (loading || !balance) {
     return (
       <SelectBalanceButton type="button" disabled alignRight>
         Loading ...
@@ -43,11 +34,11 @@ export function SelectBalanceButtonContainer({
     <SelectBalanceButton
       type="button"
       alignRight
-      onClick={() => onBalanceSelect(userTokenBalance)}
+      onClick={() => onBalanceSelect(balance)}
     >
       Balance:{' '}
       {numberFormatter.format(
-        parseFloat(formatUnits(userTokenBalance, tokenDecimals))
+        parseFloat(formatUnits(balance.toRawAmount(), currency.decimals))
       )}
     </SelectBalanceButton>
   );

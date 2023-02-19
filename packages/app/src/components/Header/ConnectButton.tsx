@@ -1,6 +1,6 @@
 import { useAccount, useDisconnect, useNetwork, useSwitchNetwork } from 'wagmi';
 import { shortenAddress } from '../../utils';
-import { useModal, Modal } from '../../context/Modal';
+import { useModal, Modal } from '../../modal';
 import { ChainId } from 'dca-sdk';
 
 export function WalletConnectButton() {

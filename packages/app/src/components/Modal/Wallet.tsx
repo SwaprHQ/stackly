@@ -1,7 +1,7 @@
 import { ChainId } from 'dca-sdk';
 import styled from 'styled-components';
 import { useConnect } from 'wagmi';
-import { Modal, useModal } from '../../context/Modal';
+import { Modal, useModal } from '../../modal';
 import {
   ModalBackdrop,
   ModalContentWithNoPadding,

@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 
 type FormGroupProps = {
+  id?: string;
   children: React.ReactNode;
 };
 

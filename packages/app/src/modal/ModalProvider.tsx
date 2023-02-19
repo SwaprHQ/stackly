@@ -3,10 +3,13 @@ import {
   useCallback,
   useState,
   createContext,
-  useContext,
   Dispatch,
   SetStateAction,
 } from 'react';
+
+import { WalletModal } from '../components/Modal/Wallet';
+import { CreateVaultStepsModal } from '../components/Modal/CreateVaultSteps';
+import { CancelOrderModal } from '../components/Modal/CancelOrder';
 
 export enum Modal {
   VaultCreateAndDepositSteps = 'VaultCreateAndDepositSteps',
@@ -14,6 +17,7 @@ export enum Modal {
   CancelOrder = 'CancelOrder',
   Withdraw = 'Withdraw',
   Wallet = 'Wallet',
+  TokenSelect = 'TokenSelect',
 }
 
 export interface IModalContext<ModalData = unknown> {
@@ -65,11 +69,10 @@ export function ModalProvider({ children }: PropsWithChildren) {
         setModalData,
       }}
     >
+      <WalletModal />
+      <CancelOrderModal />
+      <CreateVaultStepsModal />
       {children}
     </ModalContext.Provider>
   );
-}
-
-export function useModal<ModalData = unknown>() {
-  return useContext(ModalContext as React.Context<IModalContext<ModalData>>);
 }

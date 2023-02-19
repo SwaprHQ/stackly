@@ -2,14 +2,15 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import './index.css';
-import { WagmiConfig } from 'wagmi';
-import { wagmiClient } from './provider/wagmi';
+import { WalletProvider } from './wallet';
 import IndexPage from './pages';
 import OrdersPage from './pages/orders';
-import { ModalProvider } from './context/Modal';
-import { WalletModal } from './components/Modal/Wallet';
-import { CreateVaultStepsModal } from './components/Modal/CreateVaultSteps';
-import { CancelOrderModal } from './components/Modal/CancelOrder';
+import { Provider as StateProvider } from 'react-redux';
+import { ModalProvider } from './modal/ModalProvider';
+import { UserUpdater } from './state/user/updater';
+import { ListsUpdater } from './state/lists/updater';
+import { MulticallUpdater } from './state/multicall/updater';
+import store from './state';
 
 const router = createBrowserRouter([
   {
@@ -30,15 +31,25 @@ const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 
+function Updaters() {
+  return (
+    <>
+      <ListsUpdater />
+      <UserUpdater />
+      <MulticallUpdater />
+    </>
+  );
+}
+
 root.render(
   <React.StrictMode>
-    <WagmiConfig client={wagmiClient}>
-      <ModalProvider>
-        <WalletModal />
-        <CancelOrderModal />
-        <CreateVaultStepsModal />
-        <RouterProvider router={router} />
-      </ModalProvider>
-    </WagmiConfig>
+    <StateProvider store={store}>
+      <WalletProvider>
+        <ModalProvider>
+          <Updaters />
+          <RouterProvider router={router} />
+        </ModalProvider>
+      </WalletProvider>
+    </StateProvider>
   </React.StrictMode>
 );

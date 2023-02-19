@@ -1,10 +1,10 @@
-import { getDCAOrderContract, getERC20Interface } from 'dca-sdk';
+import { getERC20Interface } from 'dca-sdk';
 import { BigNumber } from 'ethers';
 import { formatUnits, Fragment } from 'ethers/lib/utils.js';
 import { useEffect } from 'react';
 import styled from 'styled-components';
 import { useContractRead, useNetwork, useSigner } from 'wagmi';
-import { Modal, useModal } from '../../context/Modal';
+import { Modal, useModal } from '../../modal';
 import { CancelOrderModalProps } from '../../components/Modal/CancelOrder';
 
 import { getExplorerLink } from '../../utils';
@@ -32,19 +32,6 @@ export function VaultCardContainer({ order }: { order: SubgraphOrder }) {
     if (!signer) {
       return;
     }
-
-    const orderContract = getDCAOrderContract(order.id, signer);
-
-    orderContract
-      .slotSellAmount()
-      .then((slotSellAmount) => {
-        console.log({
-          slotSellAmount,
-        });
-      })
-      .catch((err) => {
-        console.log('slotSellAmount err', err);
-      });
   }, [signer, order.id]);
 
   return (

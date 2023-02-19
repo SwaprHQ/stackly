@@ -8,7 +8,7 @@ export const InputGroup = styled.div`
   width: 100%;
   gap: 8px;
 
-  @media (min-width: 480px) {
+  @media (min-width: 320px) {
     flex-direction: row;
   }
 

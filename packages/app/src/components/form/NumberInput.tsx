@@ -7,12 +7,18 @@ interface NumberInputProps
     'onChange' | 'pattern' | 'type'
   > {
   onChange: (value: string) => void;
+  border?: boolean;
 }
 
-export function NumberInput({ onChange, ...props }: NumberInputProps) {
+export function NumberInput({
+  border = true,
+  onChange,
+  ...props
+}: NumberInputProps) {
   return (
     <StyledInput
       {...props}
+      border={border}
       onWheel={(e) => e.currentTarget.blur()}
       type="number"
       pattern="^-?[0-9]\d*\.?\d*$"
@@ -24,8 +30,27 @@ export function NumberInput({ onChange, ...props }: NumberInputProps) {
   );
 }
 
-const StyledInput = styled.input`
-  border: 2px solid #000;
+export function TextInput({
+  border = true,
+  onChange,
+  ...props
+}: NumberInputProps) {
+  return (
+    <StyledInput
+      {...props}
+      border={border}
+      type="text"
+      onChange={(e) => {
+        onChange(e.target.value);
+      }}
+    />
+  );
+}
+
+const StyledInput = styled.input<{ border?: boolean }>(
+  ({ border }) => `
+  ${border === false ? 'border: none !important;' : ''}
   border-radius: 0;
   width: 100%;
-`;
+`
+);

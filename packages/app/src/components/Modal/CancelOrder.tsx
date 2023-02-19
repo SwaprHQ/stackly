@@ -1,4 +1,4 @@
-import { Modal, useModal } from '../../context/Modal';
+import { Modal, useModal } from '../../modal';
 import {
   ModalOutterWrapper,
   ModalBackdrop,
@@ -123,4 +123,3 @@ export function CancelOrderModal() {
     </ModalBackdrop>
   );
 }
-
