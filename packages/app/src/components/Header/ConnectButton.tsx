@@ -2,6 +2,8 @@ import { useAccount, useDisconnect, useNetwork, useSwitchNetwork } from 'wagmi';
 import { shortenAddress } from '../../utils';
 import { useModal, Modal } from '../../modal';
 import { ChainId } from 'dca-sdk';
+import { WhiteButton as _Button } from '../../ui/components/Button/Button';
+import styled from 'styled-components';
 
 export function WalletConnectButton() {
   const { chains, chain } = useNetwork();
@@ -15,20 +17,24 @@ export function WalletConnectButton() {
   if (account.isConnected) {
     if (isNetworkSupported) {
       return (
-        <button onClick={() => disconnect()}>
+        <Button onClick={() => disconnect()}>
           Disconnect {shortenAddress(account.address)}
-        </button>
+        </Button>
       );
     } else {
       return (
-        <button onClick={() => switchNetworkAsync?.(ChainId.GNOSIS)}>
+        <Button onClick={() => switchNetworkAsync?.(ChainId.GNOSIS)}>
           Unsupported Network
-        </button>
+        </Button>
       );
     }
   }
 
   return (
-    <button onClick={() => openModal(Modal.Wallet)}>Connect Wallet</button>
+    <Button onClick={() => openModal(Modal.Wallet)}>Connect Wallet</Button>
   );
 }
+
+const Button = styled(_Button)`
+  height: 40px;
+`;

@@ -1,11 +1,12 @@
 import { Amount, Currency, USDC } from 'dca-sdk';
 import { useCallback, useEffect, useState } from 'react';
-import styled from 'styled-components';
-import { InputGroup } from './InputGroup';
-import { NumberInput } from './NumberInput';
 import { SelectBalanceButtonContainer } from '../SelectBalanceButtonContainer';
 import { CurrencySearchModal } from '../SearchModal/CurrencySearchModal';
 import { useNetwork } from 'wagmi';
+
+import { CurrencyAmountInputInnerWrapper, TokenButton } from './styled';
+import { InputGroup as _InputGroup, NumberInput } from '../form';
+import styled from 'styled-components';
 
 interface CurrencyAmountInputProps {
   value?: Amount<Currency>;
@@ -102,19 +103,6 @@ export function CurrencyAmountInput({
   );
 }
 
-const CurrencyAmountInputInnerWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-`;
-
-const TokenButton = styled.button`
-  border-radius: 0;
-  box-shadow: none;
-  background-color: transparent;
-  cursor: pointer;
-  font-size: 16px;
-  border: 2px solid #000;
-  padding: 8px 8px;
-  font-weight: 600;
+const InputGroup = styled(_InputGroup)`
+  margin-bottom: 8px;
 `;

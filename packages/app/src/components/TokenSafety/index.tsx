@@ -62,8 +62,6 @@ const StyledCloseButton = styled(StyledButton)`
   color: ${({ theme }) => theme.textPrimary};
 
   &:hover {
-    background-color: ${({ theme }) => theme.backgroundInteractive};
-    opacity: ${({ theme }) => theme.opacity.hover};
     transition: opacity 250ms ease;
   }
 `;
@@ -127,13 +125,6 @@ const ExplorerLinkWrapper = styled.div`
   overflow: hidden;
   align-items: center;
   cursor: pointer;
-
-  :hover {
-    opacity: ${({ theme }) => theme.opacity.hover};
-  }
-  :active {
-    opacity: ${({ theme }) => theme.opacity.click};
-  }
 `;
 
 const ExplorerLink = styled.div`

@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { WalletConnectButton } from './ConnectButton';
 
 import { ReactComponent as Burger } from './burger.svg';
+import { Container } from '../Container';
 
 export const HEADER_HEIGHT = '64px';
 
@@ -14,8 +15,8 @@ function NavMenuItems() {
         <h2>{`///`}</h2>
       </HeaderTitleContainer>
       <Nav>
-        <Link to="/">Home</Link>
-        <Link to="/orders">Your Orders</Link>
+        <Link to="/">Create a Stack</Link>
+        <Link to="/orders">Your Stacks</Link>
       </Nav>
       <WalletConnectButtonContainer>
         <WalletConnectButton />
@@ -36,9 +37,11 @@ export function Header() {
       <Aside isOpen={isOpen}>
         <NavMenuItems />
       </Aside>
-      <HeaderNav>
-        <NavMenuItems />
-      </HeaderNav>
+      <Container>
+        <HeaderNav>
+          <NavMenuItems />
+        </HeaderNav>
+      </Container>
     </HeaderFrame>
   );
 }
@@ -77,31 +80,9 @@ const SidebarToggleOverlay = styled.div`
 `;
 
 const WalletConnectButtonContainer = styled.div`
-  & > button {
-    height: 100%;
-    width: 100%;
-    background: #000;
-    color: #fff;
-    outline: none;
-    border: 0;
-    display: block;
-    padding: 20px;
-    font-weight: bold;
-    text-transform: uppercase;
-    border-top: 2px solid #000;
-    font-size: 16px;
-    &:hover {
-      background: #ffc900;
-      color: #000;
-    }
-  }
-  @media (min-width: 480px) {
-    & > button {
-      border-top: 0;
-      border-left: 2px solid #000;
-      padding: 0 20px;
-    }
-  }
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 const Aside = styled.aside<{ isOpen: boolean }>(
@@ -112,12 +93,10 @@ const Aside = styled.aside<{ isOpen: boolean }>(
   justify-content: space-between;
   gap: 16px;
   background: #fff;
-  z-index: 1000;
   width: 280px;
   height: 100%;
   position: fixed;
   z-index: 1048;
-  background: #fff;
   top: 0;
   left: 0;
   border-right: 2px solid #000;
@@ -135,7 +114,7 @@ const HeaderNav = styled.nav`
   flex-direction: column;
   justify-content: space-between;
   gap: 16px;
-  background: #fff;
+  background: transparent;
   z-index: 1000;
   position: relative;
   flex-direction: row;
@@ -154,13 +133,6 @@ const HeaderTitleContainer = styled.div`
 `;
 
 const HeaderFrame = styled.header`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 1000;
-  border-bottom: 2px solid #000;
-  background: #fff;
   height: ${HEADER_HEIGHT};
   @media (min-width: 480px) {
     width: 100%;
@@ -172,7 +144,7 @@ const Nav = styled.nav`
   flex: 1;
   align-items: center;
   flex-direction: column;
-  justify-content: start;
+  justify-content: end;
   gap: 16px;
   width: 100%;
 

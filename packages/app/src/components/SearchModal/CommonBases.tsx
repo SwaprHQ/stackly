@@ -20,12 +20,7 @@ const BaseWrapper = styled.div<{ disable?: boolean }>`
   align-items: center;
   :hover {
     cursor: ${({ disable }) => !disable && 'pointer'};
-    background-color: ${({ theme }) => theme.hoverDefault};
   }
-
-  color: ${({ theme, disable }) => disable && theme.accentAction};
-  background-color: ${({ theme, disable }) =>
-    disable && theme.accentActionSoft};
 `;
 
 type ChainCurrencyList = {

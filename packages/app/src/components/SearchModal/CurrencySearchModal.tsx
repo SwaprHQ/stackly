@@ -3,7 +3,7 @@ import { memo, useCallback, useEffect, useState } from 'react';
 import { useUserAddedTokens } from '../../state/user/hooks';
 import {
   ModalBackdrop,
-  ModalContentWithNoPadding,
+  ModalContent,
   ModalHeader,
   ModalInnerWrapper,
   ModalOutterWrapper,
@@ -92,7 +92,7 @@ export const CurrencySearchModal = memo(function CurrencySearchModal({
           <ModalHeader>
             <h2>Select A Token</h2>
           </ModalHeader>
-          <ModalContentWithNoPadding minHeight="400px">
+          <ModalContent minHeight="400px">
             <CurrencySearch
               isOpen={isOpen}
               onDismiss={onDismiss}
@@ -104,7 +104,7 @@ export const CurrencySearchModal = memo(function CurrencySearchModal({
               disableNonToken={disableNonToken}
               showNativeCurrency={showNativeCurrency}
             />
-          </ModalContentWithNoPadding>
+          </ModalContent>
         </>
       );
       break;

@@ -1,8 +1,8 @@
 import { Currency, USDC } from 'dca-sdk';
 import { useCallback, useEffect, useState } from 'react';
-import styled from 'styled-components';
-import { CurrencySearchModal } from '../SearchModal/CurrencySearchModal';
 import { useNetwork } from 'wagmi';
+import { CurrencySearchModal } from '../SearchModal/CurrencySearchModal';
+import { TokenButton } from './styled';
 
 interface CurrencyInputProps {
   value?: Currency;
@@ -58,15 +58,3 @@ export function CurrencyInput({
     </>
   );
 }
-
-const TokenButton = styled.button`
-  border-radius: 0;
-  box-shadow: none;
-  background-color: transparent;
-  cursor: pointer;
-  font-size: 16px;
-  border: 2px solid #000;
-  padding: 8px 8px;
-  font-weight: 600;
-  width: 100%;
-`;

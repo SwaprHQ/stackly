@@ -1,4 +1,4 @@
-import  { StylesConfig } from 'react-select';
+import { StylesConfig } from 'react-select';
 
 export function getStyles<T>() {
   return {
@@ -6,30 +6,30 @@ export function getStyles<T>() {
       ...provided,
       minWidth: '80px',
     }),
-    control: (provided) => ({
-      borderRadius: 0,
-      boxShadow: 'none',
-      backgroundColor: 'transparent',
+    control: () => ({
+      borderRadius: 8,
+      background: '#fefaf3',
+      boxShadow: '3px 3px 0px 1px #31322d',
       cursor: 'pointer',
       width: '100%',
       fontSize: '16px',
-      border: '2px solid #000',
+      border: '3px solid #000',
       padding: '8px 8px',
     }),
     valueContainer: (provided) => ({
       ...provided,
       padding: 0,
       fontSize: '18px',
-      fontFamily: `'Urbanist', sans-serif`,
       fontWeight: 'bold',
       textTransform: 'uppercase',
     }),
     menu: (provided) => ({
       ...provided,
-      borderRadius: 0,
-      border: '2px solid #000',
-      borderTop: 'none',
-      marginTop: 0,
+      borderRadius: 8,
+      background: '#fefaf3',
+      boxShadow: '3px 3px 0px 1px #31322d',
+      border: '3px solid #000',
+      overflow: 'hidden',
       zIndex: 10,
     }),
     option: (provided, state) => ({

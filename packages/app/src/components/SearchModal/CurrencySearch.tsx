@@ -33,11 +33,7 @@ import {
 import { useOnClickOutside } from '../../hooks/useOnClickOutside';
 import { CommonBases } from './CommonBases';
 import { useNetwork } from 'wagmi';
-import { FormGroup as _FormGroup, TextInput } from '../form';
-
-const FormGroup = styled(_FormGroup)`
-  border-bottom: 2px solid #000;
-`;
+import { FormGroup, TextInput } from '../form';
 
 interface CurrencySearchProps {
   isOpen: boolean;
@@ -135,7 +131,7 @@ export function CurrencySearch({
             n.symbol?.toLowerCase()?.indexOf(s) !== -1 ||
             n.name?.toLowerCase()?.indexOf(s) !== -1
         )
-      : [];
+      : [wrapped];
     return [...natives, ...tokens];
   }, [
     debouncedQuery,
@@ -277,7 +273,6 @@ export function CurrencySearch({
 
 const ContentWrapper = styled(Column)`
   width: 100%;
-  overflow: hidden;
   flex: 1 1;
   position: relative;
 `;

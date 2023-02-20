@@ -18,9 +18,8 @@ import { FormGroup } from '../form/FormGroup';
 import { FlexContainer, FormButtonGroup, InnerContainer } from './styled';
 import dayjsUTCPlugin from 'dayjs/plugin/utc';
 import { useAccount, useNetwork, useSigner, useSwitchNetwork } from 'wagmi';
-import { Card, CardInnerWrapper } from '../Card';
-import { Container, ContainerTitle } from '../Container';
-import { ShadowButton } from '../form/FormButton';
+import { CardExtraShadow as Card, CardInnerWrapper } from '../Card';
+import { Container } from '../Container';
 import { Modal, useModal } from '../../modal';
 import styled from 'styled-components';
 import {
@@ -32,8 +31,9 @@ import {
   getFrequencyIntervalInHours,
 } from './FrequencyIntervalSelect';
 import { DateTimeInput } from '../form/DateTime';
-import { CurrencyAmountInput } from '../form/CurrencyAmountInput';
-import { CurrencyInput } from '../form/CurrencyInput';
+import { CurrencyAmountInput } from '../CurrencyAmountInput';
+import { CurrencyInput } from '../CurrencyAmountInput/CurrencyInput';
+import { Button } from '../../ui/components/Button/Button';
 
 dayjs.extend(dayjsUTCPlugin);
 export const OrderInfo = styled.div`
@@ -65,24 +65,40 @@ function WalletConnectButton() {
 
   if (account.isConnected && !isNetworkSupported) {
     return (
-      <ShadowButton
+      <Button
         type="button"
         onClick={() => switchNetworkAsync?.(ChainId.GNOSIS)}
       >
         Switch Network
-      </ShadowButton>
+      </Button>
     );
   }
 
   return (
-    <ShadowButton
+    <Button
       type="button"
       onClick={() => openModal(Modal.Wallet)}
       title="Connect Wallet"
     >
       Connect Wallet
-    </ShadowButton>
+    </Button>
   );
+}
+
+function getInitialSellTokenAmountValue(
+  chain?: ReturnType<typeof useNetwork>['chain']
+) {
+  return chain && chain.id && !chain.unsupported
+    ? new Amount(USDC[chain.id as ChainId], '0')
+    : new Amount(USDC[ChainId.ETHEREUM], '0');
+}
+
+function getInitialBuyTokenValue(
+  chain?: ReturnType<typeof useNetwork>['chain']
+) {
+  return chain && chain.id && !chain.unsupported
+    ? WETH[chain.id as ChainId]
+    : WETH[ChainId.ETHEREUM];
 }
 
 export function CreateDCAVaultContainer() {
@@ -97,35 +113,35 @@ export function CreateDCAVaultContainer() {
   const [frequencyInterval, setFrequencyInterval] =
     useState<DCAFrequencyInterval>(DCAFrequencyInterval.HOUR);
   const [sellTokenAmount, setSellTokenAmount] = useState<Amount<Currency>>(
-    chain && chain.id && !chain.unsupported
-      ? new Amount(USDC[chain.id as ChainId], '0')
-      : new Amount(USDC[ChainId.ETHEREUM], '0')
+    getInitialSellTokenAmountValue(chain)
   );
   const [buyToken, setBuyToken] = useState<Currency>(
-    chain && chain.id && !chain.unsupported
-      ? WETH[chain.id as ChainId]
-      : WETH[ChainId.ETHEREUM]
+    getInitialBuyTokenValue(chain)
   );
   const [createVaultError, setCreateVaultError] = useState<Error | null>(null);
   const [receiver] = useState<string | null>(null);
   const [allowance, setAllowance] = useState<BigNumber | null>(null);
 
+  // Update initial values when chain changes
+  useEffect(() => {
+    setSellTokenAmount(getInitialSellTokenAmountValue(chain));
+    setBuyToken(getInitialBuyTokenValue(chain));
+  }, [signer, chain]);
+
   useEffect(() => {
     if (!signer || !account.address || !sellTokenAmount.currency.address) {
       return;
     }
-
     let factoryAddress;
     try {
       factoryAddress = getOrderFactoryAddress(chain?.id as ChainId);
+      getERC20Contract(sellTokenAmount.currency.address, signer)
+        .allowance(account.address, factoryAddress)
+        .then(setAllowance);
     } catch (e) {
-      return;
+      console.error(e);
     }
-
-    getERC20Contract(sellTokenAmount.currency.address, signer)
-      .allowance(account.address, factoryAddress)
-      .then(setAllowance);
-  }, [signer, account.address, sellTokenAmount.currency.address, chain?.id]);
+  }, [signer, account.address, sellTokenAmount.currency.address, chain]);
 
   const isNetworkSupported = !!chains.find((c) => c.id === chain?.id);
 
@@ -260,7 +276,6 @@ export function CreateDCAVaultContainer() {
 
   return (
     <Container>
-      <ContainerTitle>Create Order</ContainerTitle>
       <FlexContainer>
         <InnerContainer>
           <Card>
@@ -299,7 +314,7 @@ export function CreateDCAVaultContainer() {
                     />
                   </FormGroup>
                   <FormGroup id="buy-frequency">
-                    <label>{buyToken.symbol} every</label>
+                    <label>Every</label>
                     <FrequencyIntervalSelect
                       disabled={!isNetworkSupported}
                       value={frequencyInterval}
@@ -339,14 +354,14 @@ export function CreateDCAVaultContainer() {
                 </FormGroup>
                 <FormButtonGroup>
                   {account.isConnected && isNetworkSupported ? (
-                    <ShadowButton
+                    <Button
                       type="button"
                       onClick={onCreateOrderHandler}
                       title="Create Order"
                       disabled={!account.isConnected}
                     >
-                      Create
-                    </ShadowButton>
+                      Stack
+                    </Button>
                   ) : (
                     <WalletConnectButton />
                   )}

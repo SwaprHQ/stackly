@@ -7,9 +7,9 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-
 body {
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Public Sans', sans-serif;
+    background: linear-gradient(321.48deg, rgba(255, 92, 0, 0.5) -22.6%, rgba(250, 195, 54, 0.5) 67.78%), #FAC336;
 }
 
 code {
@@ -38,9 +38,7 @@ table {
   word-break: keep-all;
   white-space: nowrap;
   table-layout: fixed;
-
   border-collapse: collapse;
-
 }
 
 table th,
@@ -53,9 +51,12 @@ label,
 input,
 select {
   font-size: 18px;
-  font-family: 'Urbanist', sans-serif;
+  font-family: inherit;
+  }
+  
+  input,
+  select {
   font-weight: bold;
-  text-transform: uppercase;
 }
 
 input,
@@ -82,7 +83,7 @@ input[type="number"] {
 button {
   padding: 4px 8px;
   cursor: pointer;
-  font-family: 'Urbanist', sans-serif;
+  font-family: inherit;
   user-select: none;
 }
 
@@ -93,53 +94,5 @@ h4,
 h5,
 h6,
 p {
-  font-family: 'Urbanist', sans-serif;
-}
-
-.form-container {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-  width: 100%;
-}
-
-.connector-list {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-  width: 100%;
-}
-
-.wallet-modal {
-  display: none;
-  position: fixed;
-  z-index: 1;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-  background-color: rgba(0, 0, 0, 0.4);
-}
-
-.wallet-modal.open {
-  display: block;
-}
-
-.wallet-modal-content {
-  background-color: #fefefe;
-  margin: 15% auto;
-  padding: 20px;
-  border: 1px solid #888;
-  width: 80%;
-}
-
-
-#redeem-button {
-  display: none;
-  cursor: pointer;
+  font-family: inherit;
 }
