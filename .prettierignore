@@ -1,4 +1,8 @@
 /packages/contracts/out
 /packages/contracts/lib
 /packages/contracts/abis
+/packages/sdk/src/generated
+/packages/sdk/dist
+/packages/subgraph/generated
+/packages/subgraph/build
 /cache
