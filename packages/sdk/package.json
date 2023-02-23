@@ -16,7 +16,7 @@
     "typechain": "node --experimental-specifier-resolution=node ./bin/typechain.js",
     "clean": "rimraf ./dist",
     "build": "pnpm clean && tsc",
-    "test": "jest",
+    "test": "jest --passWithNoTests",
     "dev": "nodemon -x ts-node src/index.ts"
   },
   "dependencies": {
