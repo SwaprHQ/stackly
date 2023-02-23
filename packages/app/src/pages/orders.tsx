@@ -1,10 +1,10 @@
 import { PageLayout } from '../layout';
-import { UserVaultsContainer } from '../components/UserVaultsContainer/UserVaultsContainer';
+import { UserOrdersContainer } from '../components/UserVaultsContainer';
 
 export default function OrdersPage() {
   return (
     <PageLayout>
-      <UserVaultsContainer />
+      <UserOrdersContainer />
     </PageLayout>
   );
 }

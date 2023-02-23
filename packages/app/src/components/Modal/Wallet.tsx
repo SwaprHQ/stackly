@@ -2,9 +2,10 @@ import { ChainId } from 'dca-sdk';
 import styled from 'styled-components';
 import { useConnect } from 'wagmi';
 import { Modal, useModal } from '../../modal';
+import { PrimaryButton } from '../../ui/components/Button/Button';
 import {
   ModalBackdrop,
-  ModalContentWithNoPadding,
+  ModalContent,
   ModalHeader,
   ModalInnerWrapper,
   ModalOutterWrapper,
@@ -26,67 +27,34 @@ export function WalletModal() {
           <ModalHeader>
             <h2>Choose A Wallet</h2>
           </ModalHeader>
-          <ModalContentWithNoPadding>
-            <ConnectorListBig>
-              {connectors.map((connector) => (
-                <WalletButton
-                  type="button"
-                  disabled={!connector.ready}
-                  key={connector.id}
-                  onClick={async () => {
-                    await connectAsync({
-                      connector,
-                      chainId: ChainId.GNOSIS,
-                    });
-                    closeModal();
-                  }}
-                >
-                  {connector.name}
-                  {!connector.ready && ' (unsupported)'}
-                  {isLoading &&
-                    connector.id === pendingConnector?.id &&
-                    ' (connecting)'}
-                </WalletButton>
-              ))}
-              {/* {error && (
-                  <div>
-                    <p> {error.message}</p>
-                  </div>
-                )} */}
-            </ConnectorListBig>
-          </ModalContentWithNoPadding>
+          <ModalContent>
+            {connectors.map((connector) => (
+              <WalletButton
+                type="button"
+                disabled={!connector.ready}
+                key={connector.id}
+                onClick={async () => {
+                  await connectAsync({
+                    connector,
+                    chainId: ChainId.GNOSIS,
+                  });
+                  closeModal();
+                }}
+              >
+                {connector.name}
+                {!connector.ready && ' (unsupported)'}
+                {isLoading &&
+                  connector.id === pendingConnector?.id &&
+                  ' (connecting)'}
+              </WalletButton>
+            ))}
+          </ModalContent>
         </ModalInnerWrapper>
       </ModalOutterWrapper>
     </ModalBackdrop>
   );
 }
 
-const WalletButton = styled.button`
-  background: #fff;
-  border-radius: 0;
-  color: #000;
-  border: 2px solid #000;
-  padding: 8px 16px;
-`;
-
-const ConnectorListBig = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  width: 100%;
-
-  ${WalletButton} {
-    width: 100%;
-    border-radius: 0;
-    border: 0;
-    padding: 16px 24px;
-    font-size: 1.5rem;
-    &:not(:last-child) {
-      border-bottom: 2px solid #000;
-    }
-
-    &:hover {
-      background: #ffc900;
-    }
-  }
+const WalletButton = styled(PrimaryButton)`
+  margin-bottom: 1rem;
 `;

@@ -24,18 +24,16 @@ export const MenuItem = styled.div<{
   disabled: boolean;
   selected: boolean;
 }>`
-  padding: 4px 20px;
+  padding: 4px 0px;
   height: 56px;
-  display: grid;
-  grid-template-columns: auto minmax(auto, 1fr) auto minmax(0, 72px);
-  grid-gap: 16px;
+  display: flex;
+  justify-content: space-between;
   cursor: ${({ disabled }) => !disabled && 'pointer'};
   pointer-events: ${({ disabled }) => disabled && 'none'};
   :hover {
     background-color: ${({ theme }) => theme.hoverDefault};
   }
-  opacity: ${({ disabled, selected, dim }) =>
-    dim || disabled || selected ? 0.4 : 1};
+  opacity: ${({ disabled, selected, dim }) => (dim || disabled || selected ? 0.4 : 1)};
 `;
 
 export const Separator = styled.div`

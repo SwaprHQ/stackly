@@ -7,20 +7,15 @@ import { checkWarning } from '../../../token-list/tokenSafety';
 import { useCurrencyBalance } from '../../../tokens/hooks';
 import { Loader } from '../../Loader';
 
-// import Column, { AutoColumn } from '../../Column';
-// import Loader from '../../Loader';
-// import Row, { RowFixed } from '../../Row';
-// import { MouseoverTooltip } from '../../Tooltip';
 import { LoadingRows, MenuItem } from '../styleds';
-import { TokenTags } from './TokenTags';
+// import { TokenTags } from './TokenTags';
 
 function currencyKey(currency: Currency): string {
-  return currency instanceof Token
-    ? currency.address
-    : currency.symbol ?? 'ETHER';
+  return currency instanceof Token ? currency.address : currency.symbol ?? 'ETHER';
 }
 
-const CheckIcon = styled.div`
+// Copied from Uniswap, needs some redesign from the design team
+export const CheckIcon = styled.div`
   background: #ff007a;
   border-radius: 50%;
   height: 20px;
@@ -47,11 +42,7 @@ export const WarningContainer = styled.div`
 `;
 
 function Balance({ balance }: { balance: Amount<Currency> }) {
-  return (
-    <StyledBalanceText title={balance.toFixed()}>
-      {balance.toFixed(4)}
-    </StyledBalanceText>
-  );
+  return <StyledBalanceText title={balance.toFixed()}>{balance.toFixed(4)}</StyledBalanceText>;
 }
 
 export function CurrencyRow({
@@ -78,9 +69,7 @@ export function CurrencyRow({
       tabIndex={0}
       style={style}
       className={`token-item-${key}`}
-      onKeyPress={(e) =>
-        !isSelected && e.key === 'Enter' ? onSelect(!!warning) : null
-      }
+      onKeyPress={(e) => (!isSelected && e.key === 'Enter' ? onSelect(!!warning) : null)}
       onClick={() => (isSelected ? null : onSelect(!!warning))}
       disabled={isSelected}
       selected={otherSelected}
@@ -91,20 +80,16 @@ export function CurrencyRow({
         </div>
         <h4>{currency.symbol}</h4>
       </div>
-      <div>
+      {/* <div>
         <TokenTags currency={currency} />
-      </div>
+      </div> */}
       {showCurrencyAmount ? (
         <div style={{ justifySelf: 'flex-end' }}>
-          {balance ? (
-            <Balance balance={balance} />
-          ) : account ? (
-            <Loader />
-          ) : null}
-          {isSelected && <CheckIcon />}
+          {balance ? <Balance balance={balance} /> : account ? <Loader /> : null}
+          {isSelected && <></> /* <CheckIcon /> */}
         </div>
       ) : (
-        isSelected && <div style={{ justifySelf: 'flex-end' }}>✅</div>
+        isSelected && <></> /* <CheckIcon /> */
       )}
     </MenuItem>
   );

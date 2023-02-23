@@ -1,5 +1,5 @@
 import { Modal } from '../../components/Modal';
-import TokenSafety, { TokenSafetyProps } from '.';
+import { TokenSafety, TokenSafetyProps } from '.';
 
 interface TokenSafetyModalProps extends TokenSafetyProps {
   isOpen: boolean;

@@ -51,6 +51,7 @@ export type Order = {
   createdAt: Scalars['Int'];
   cancelledAt?: Maybe<Scalars['Int']>;
   orderSlots: string[];
+  interval: Scalars['Int'];
 };
 
 
@@ -79,6 +80,7 @@ const OrderFragment = gql`
     endTime
     orderSlots
     cancelledAt
+    interval
   }
 `;
 

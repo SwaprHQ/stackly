@@ -16,18 +16,22 @@ export function SelectBalanceButtonContainer({
   userAddress: string;
   onBalanceSelect: (balance: Amount<Currency>) => void;
 }) {
-  const { balance, loading } = useCurrencyBalance(userAddress, currency);
+  const { balance, loading, error } = useCurrencyBalance(userAddress, currency);
 
-  if (userAddress === undefined) {
+  if (!userAddress) {
     return <SelectBalanceButton type="button" disabled alignRight />;
   }
 
-  if (loading || !balance) {
+  if (loading && !balance) {
     return (
       <SelectBalanceButton type="button" disabled alignRight>
         Loading ...
       </SelectBalanceButton>
     );
+  }
+
+  if (error || !balance) {
+    return null;
   }
 
   return (

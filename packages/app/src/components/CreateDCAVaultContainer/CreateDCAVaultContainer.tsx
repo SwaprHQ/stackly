@@ -1,4 +1,4 @@
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs, { Dayjs, isDayjs } from 'dayjs';
 import { BigNumber, constants } from 'ethers';
 import { useEffect, useState } from 'react';
 import {
@@ -18,43 +18,19 @@ import { FormGroup } from '../form/FormGroup';
 import { FlexContainer, FormButtonGroup, InnerContainer } from './styled';
 import dayjsUTCPlugin from 'dayjs/plugin/utc';
 import { useAccount, useNetwork, useSigner, useSwitchNetwork } from 'wagmi';
-import { Card, CardInnerWrapper } from '../Card';
-import { Container, ContainerTitle } from '../Container';
-import { ShadowButton } from '../form/FormButton';
+import { CardExtraShadow as Card, CardInnerWrapper } from '../Card';
+import { Container } from '../Container';
 import { Modal, useModal } from '../../modal';
 import styled from 'styled-components';
-import {
-  VaultCreateAndDepositStepsModalProps,
-  CreateVaultAndDepositStep,
-} from '../Modal/CreateVaultSteps';
-import {
-  FrequencyIntervalSelect,
-  getFrequencyIntervalInHours,
-} from './FrequencyIntervalSelect';
+import { VaultCreateAndDepositStepsModalProps, CreateVaultAndDepositStep } from '../Modal/CreateVaultSteps';
+import { FrequencyIntervalSelect, getFrequencyIntervalInHours } from './FrequencyIntervalSelect';
 import { DateTimeInput } from '../form/DateTime';
-import { CurrencyAmountInput } from '../form/CurrencyAmountInput';
-import { CurrencyInput } from '../form/CurrencyInput';
+import { CurrencyAmountInput } from '../CurrencyAmountInput';
+import { CurrencyInput } from '../CurrencyAmountInput/CurrencyInput';
+import { Button } from '../../ui/components/Button/Button';
+import { useCurrencyBalance } from '../../tokens/hooks';
 
 dayjs.extend(dayjsUTCPlugin);
-export const OrderInfo = styled.div`
-  font-size: 18px;
-  font-weight: bold;
-`;
-
-const JoinedFormGroup = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  & #buy-currency button {
-    height: 100%;
-  }
-  & #buy-frequency {
-    flex: 1;
-  }
-  @media (min-width: 320px) {
-    flex-direction: row;
-  }
-`;
 
 function WalletConnectButton() {
   const account = useAccount();
@@ -65,67 +41,79 @@ function WalletConnectButton() {
 
   if (account.isConnected && !isNetworkSupported) {
     return (
-      <ShadowButton
-        type="button"
-        onClick={() => switchNetworkAsync?.(ChainId.GNOSIS)}
-      >
+      <Button type="button" onClick={() => switchNetworkAsync?.(ChainId.GNOSIS)}>
         Switch Network
-      </ShadowButton>
+      </Button>
     );
   }
 
   return (
-    <ShadowButton
-      type="button"
-      onClick={() => openModal(Modal.Wallet)}
-      title="Connect Wallet"
-    >
+    <Button type="button" onClick={() => openModal(Modal.Wallet)} title="Connect Wallet">
       Connect Wallet
-    </ShadowButton>
+    </Button>
   );
+}
+
+function getInitialSellTokenAmountValue(chain?: ReturnType<typeof useNetwork>['chain']) {
+  return chain && chain.id && !chain.unsupported
+    ? new Amount(USDC[chain.id as ChainId], '0')
+    : new Amount(USDC[ChainId.ETHEREUM], '0');
+}
+
+function getInitialBuyTokenValue(chain?: ReturnType<typeof useNetwork>['chain']) {
+  return chain && chain.id && !chain.unsupported ? WETH[chain.id as ChainId] : WETH[ChainId.ETHEREUM];
 }
 
 export function CreateDCAVaultContainer() {
   const account = useAccount();
   const { chain, chains } = useNetwork();
-  const { openModal, setModalData } =
-    useModal<VaultCreateAndDepositStepsModalProps>();
+  const { openModal, setModalData } = useModal<VaultCreateAndDepositStepsModalProps>();
   const { data: signer } = useSigner();
-  const [startAt, setStartAt] = useState<Dayjs>(dayjs().add(1, 'h'));
+  const [validationError, setValidationError] = useState<Error | null>(null);
+  const [startAt, setStartAt] = useState<Dayjs | 'now'>('now');
   const [endAt, setEndAt] = useState<Dayjs>(dayjs().add(7, 'd')); // 7 days from now
   const [hourInterval, setHourInterval] = useState<number>(1);
-  const [frequencyInterval, setFrequencyInterval] =
-    useState<DCAFrequencyInterval>(DCAFrequencyInterval.HOUR);
-  const [sellTokenAmount, setSellTokenAmount] = useState<Amount<Currency>>(
-    chain && chain.id && !chain.unsupported
-      ? new Amount(USDC[chain.id as ChainId], '0')
-      : new Amount(USDC[ChainId.ETHEREUM], '0')
-  );
-  const [buyToken, setBuyToken] = useState<Currency>(
-    chain && chain.id && !chain.unsupported
-      ? WETH[chain.id as ChainId]
-      : WETH[ChainId.ETHEREUM]
-  );
+  const [frequencyInterval, setFrequencyInterval] = useState<DCAFrequencyInterval>(DCAFrequencyInterval.HOUR);
+  const [sellTokenAmount, setSellTokenAmount] = useState<Amount<Currency>>(getInitialSellTokenAmountValue(chain));
+  const { balance: userSellTokenBalance } = useCurrencyBalance(account.address, sellTokenAmount.currency);
+  const [buyToken, setBuyToken] = useState<Currency>(getInitialBuyTokenValue(chain));
   const [createVaultError, setCreateVaultError] = useState<Error | null>(null);
   const [receiver] = useState<string | null>(null);
   const [allowance, setAllowance] = useState<BigNumber | null>(null);
 
+  // Update initial values when chain changes
+  useEffect(() => {
+    setSellTokenAmount(getInitialSellTokenAmountValue(chain));
+    setBuyToken(getInitialBuyTokenValue(chain));
+  }, [signer, chain]);
+
+  // Update allowance when account or sell token changes
   useEffect(() => {
     if (!signer || !account.address || !sellTokenAmount.currency.address) {
       return;
     }
-
     let factoryAddress;
     try {
       factoryAddress = getOrderFactoryAddress(chain?.id as ChainId);
+      getERC20Contract(sellTokenAmount.currency.address, signer)
+        .allowance(account.address, factoryAddress)
+        .then(setAllowance);
     } catch (e) {
+      console.error(e);
+    }
+  }, [signer, account.address, sellTokenAmount.currency.address, chain]);
+
+  // Validate the user has enough balance
+  useEffect(() => {
+    if (!signer || !account.address || !sellTokenAmount.currency.address || !userSellTokenBalance) {
       return;
     }
-
-    getERC20Contract(sellTokenAmount.currency.address, signer)
-      .allowance(account.address, factoryAddress)
-      .then(setAllowance);
-  }, [signer, account.address, sellTokenAmount.currency.address, chain?.id]);
+    if (userSellTokenBalance?.lessThan(sellTokenAmount)) {
+      setValidationError(new Error('Insufficient balance'));
+    } else {
+      setValidationError(null);
+    }
+  }, [userSellTokenBalance, signer, account.address, sellTokenAmount]);
 
   const isNetworkSupported = !!chains.find((c) => c.id === chain?.id);
 
@@ -133,14 +121,12 @@ export function CreateDCAVaultContainer() {
     setCreateVaultError(null);
 
     // Start date must be in the future
-    if (startAt.isBefore(dayjs())) {
+    if (isDayjs(startAt) && startAt.isBefore(dayjs())) {
       return setCreateVaultError(new Error('Start date must be in the future'));
     }
     // End date must be after start date
     if (endAt.isBefore(startAt)) {
-      return setCreateVaultError(
-        new Error('End date must be after start date')
-      );
+      return setCreateVaultError(new Error('End date must be after start date'));
     }
 
     if (!signer) {
@@ -148,11 +134,7 @@ export function CreateDCAVaultContainer() {
     }
 
     if (sellTokenAmount.eq('0')) {
-      return setCreateVaultError(
-        new Error(
-          `${sellTokenAmount.currency.symbol} amount must be greater than zero`
-        )
-      );
+      return setCreateVaultError(new Error(`${sellTokenAmount.currency.symbol} amount must be greater than zero`));
     }
 
     const chainId = chain?.id as ChainId;
@@ -165,10 +147,7 @@ export function CreateDCAVaultContainer() {
       tokenDepositAmount: parseFloat(sellTokenAmount.toFixed(3)),
     });
 
-    const sellTokenContract = getERC20Contract(
-      sellTokenAmount.currency.address,
-      signer
-    );
+    const sellTokenContract = getERC20Contract(sellTokenAmount.currency.address, signer);
 
     // Skip to next step if allowance is sufficient
     if (allowance && allowance.gt(sellTokenAmount.toRawAmount())) {
@@ -198,10 +177,7 @@ export function CreateDCAVaultContainer() {
       }));
     }
     // Create a new vault if one doesn't exist
-    const orderFactory = getOrderFactory(
-      getOrderFactoryAddress(chainId),
-      signer
-    );
+    const orderFactory = getOrderFactory(getOrderFactoryAddress(chainId), signer);
 
     const initParams: Parameters<typeof createDCAOrderWithNonce>['1'] = {
       nonce: dayjs().unix(),
@@ -211,15 +187,15 @@ export function CreateDCAVaultContainer() {
       sellToken: sellTokenAmount.currency.address,
       buyToken: buyToken.address,
       principal: sellTokenAmount.toRawAmount().toString(),
-      startTime: startAt.utc().unix(),
+      // If startAt is 'now', set it to the current time plus 5 minutes into the future
+      startTime: startAt === 'now' ? dayjs().add(10, 'm').utc().unix() : startAt.utc().unix(),
       endTime: endAt.utc().unix(),
       interval: hourInterval,
     };
 
-    const createOrderTransaction = await createDCAOrderWithNonce(
-      orderFactory,
-      initParams
-    );
+    console.log('initParams', initParams);
+
+    const createOrderTransaction = await createDCAOrderWithNonce(orderFactory, initParams);
 
     setModalData((prev) => ({
       ...prev,
@@ -242,25 +218,22 @@ export function CreateDCAVaultContainer() {
 
     setModalData((prev) => ({
       ...prev,
-      stepsCompleted: [
-        ...prev.stepsCompleted,
-        CreateVaultAndDepositStep.CREATE_ORDER,
-      ],
+      stepsCompleted: [...prev.stepsCompleted, CreateVaultAndDepositStep.CREATE_ORDER],
       createOrderReceipt,
       orderProxy,
       isOrderCreated: true,
     }));
   };
 
+  /*
+   * @TODO: uncomment if there's use for this
   // Calculate the number of buy orders
   const buyOrders = Math.ceil(endAt.diff(startAt, 'hours') / hourInterval);
-  const buyAmountPerOrder = sellTokenAmount.div(
-    buyOrders === 0 ? 1 : buyOrders
-  );
+  const buyAmountPerOrder = sellTokenAmount.div(buyOrders === 0 ? 1 : buyOrders);
+  */
 
   return (
     <Container>
-      <ContainerTitle>Create Order</ContainerTitle>
       <FlexContainer>
         <InnerContainer>
           <Card>
@@ -274,6 +247,11 @@ export function CreateDCAVaultContainer() {
                     showNativeCurrency={false}
                     userAddress={account.address}
                     onChange={(nextSellAmount) => {
+                      // If the user select a token that is the same as the buy token, we swap the buy token
+                      if (nextSellAmount.currency.equals(buyToken)) {
+                        const nextBuyToken = sellTokenAmount.currency;
+                        setBuyToken(nextBuyToken);
+                      }
                       setSellTokenAmount(nextSellAmount);
                       setCreateVaultError(null);
                     }}
@@ -287,11 +265,8 @@ export function CreateDCAVaultContainer() {
                       showNativeCurrency={false}
                       value={buyToken}
                       onChange={(nextBuyToken) => {
-                        // Prevent the user from selecting the same token for buy and sell
-                        if (
-                          nextBuyToken.address ===
-                          sellTokenAmount.currency.address
-                        ) {
+                        // Prevent selecting the same token for buy and sell
+                        if (nextBuyToken.equals(sellTokenAmount.currency)) {
                           return;
                         }
                         setBuyToken(nextBuyToken);
@@ -299,14 +274,12 @@ export function CreateDCAVaultContainer() {
                     />
                   </FormGroup>
                   <FormGroup id="buy-frequency">
-                    <label>{buyToken.symbol} every</label>
+                    <label>Every</label>
                     <FrequencyIntervalSelect
                       disabled={!isNetworkSupported}
                       value={frequencyInterval}
                       onChange={(nextFrequencyInterval) => {
-                        const nextHourInterval = getFrequencyIntervalInHours(
-                          nextFrequencyInterval
-                        );
+                        const nextHourInterval = getFrequencyIntervalInHours(nextFrequencyInterval);
                         setFrequencyInterval(nextFrequencyInterval);
                         setHourInterval(nextHourInterval);
                       }}
@@ -316,6 +289,7 @@ export function CreateDCAVaultContainer() {
                 <FormGroup>
                   <label>Starting</label>
                   <DateTimeInput
+                    showNowOption={true}
                     disabled={!isNetworkSupported}
                     value={startAt}
                     onChange={(nextStartAt) => {
@@ -329,6 +303,8 @@ export function CreateDCAVaultContainer() {
                     disabled={!isNetworkSupported}
                     value={endAt}
                     onChange={(nextEndAt) => {
+                      // Cannot select now as end date
+                      if (nextEndAt === 'now') return;
                       const isBeforeStartAt = nextEndAt.isBefore(startAt);
                       if (isBeforeStartAt) {
                         return;
@@ -339,28 +315,27 @@ export function CreateDCAVaultContainer() {
                 </FormGroup>
                 <FormButtonGroup>
                   {account.isConnected && isNetworkSupported ? (
-                    <ShadowButton
+                    <Button
                       type="button"
                       onClick={onCreateOrderHandler}
                       title="Create Order"
-                      disabled={!account.isConnected}
+                      disabled={validationError !== null}
                     >
-                      Create
-                    </ShadowButton>
+                      {validationError !== null ? validationError.message : <>Stack</>}
+                    </Button>
                   ) : (
                     <WalletConnectButton />
                   )}
                 </FormButtonGroup>
               </form>
-              {buyAmountPerOrder.greaterThan(0) && (
+              {/* buyAmountPerOrder.greaterThan(0) && (
                 <OrderInfo>
                   <p>
-                    Buying {buyAmountPerOrder.toFixed(2)}{' '}
-                    {sellTokenAmount.currency.symbol} worth of {buyToken.symbol}{' '}
+                    Buying {buyAmountPerOrder.toFixed(2)} {sellTokenAmount.currency.symbol} worth of {buyToken.symbol}{' '}
                     every {frequencyInterval} for {buyOrders} times
                   </p>
                 </OrderInfo>
-              )}
+              ) */}
               {createVaultError && (
                 <div>
                   <p>{createVaultError.message}</p>
@@ -373,3 +348,23 @@ export function CreateDCAVaultContainer() {
     </Container>
   );
 }
+
+export const OrderInfo = styled.div`
+  font-size: 18px;
+  font-weight: bold;
+`;
+
+const JoinedFormGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  & #buy-currency button {
+    height: 100%;
+  }
+  & #buy-frequency {
+    flex: 1;
+  }
+  @media (min-width: 320px) {
+    flex-direction: row;
+  }
+`;

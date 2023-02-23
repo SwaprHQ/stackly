@@ -1,3 +1,4 @@
+import { NATIVE_TOKEN_ADDRESS } from 'dca-sdk';
 import { constants } from 'ethers';
 import {
   NATIVE_CHAIN_ID,
@@ -83,6 +84,7 @@ const BlockedWarning: Warning = {
 
 export function checkWarning(tokenAddress: string) {
   if (
+    tokenAddress === NATIVE_TOKEN_ADDRESS ||
     tokenAddress === NATIVE_CHAIN_ID ||
     tokenAddress === constants.AddressZero
   ) {

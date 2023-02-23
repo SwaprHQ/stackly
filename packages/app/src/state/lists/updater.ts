@@ -33,7 +33,6 @@ export function ListsUpdater(): null {
   const fetchList = useFetchListCallback();
   const fetchAllListsCallback = useCallback(() => {
     if (!isWindowVisible) return;
-    console.log({ DEFAULT_LIST_OF_LISTS });
     DEFAULT_LIST_OF_LISTS.forEach((url) => {
       // Skip validation on unsupported lists
       const isUnsupportedList = UNSUPPORTED_LIST_URLS.includes(url);

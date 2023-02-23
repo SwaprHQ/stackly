@@ -31,12 +31,12 @@ export function useCurrencyBalance(
   token: Currency | undefined
 ) {
   const provider = useProvider();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [balance, setBalance] = useState<Amount<Currency> | undefined>();
   const [error, setError] = useState<Error | null>();
 
   useEffect(() => {
-    if (!userAddress || !token || !provider) {
+    if (!userAddress || !token?.address || !provider) {
       return;
     }
 
@@ -50,6 +50,8 @@ export function useCurrencyBalance(
           setBalance(Amount.fromRawAmount(token, balance));
         })
         .catch((error) => {
+
+          console.log('Error getting the balance', error);
           setError(error);
           setBalance(undefined);
         })
@@ -57,9 +59,9 @@ export function useCurrencyBalance(
           setLoading(false);
         });
     } catch (error) {
-      console.error(error);
+      console.error('Error getting the balance', error);
     }
-  }, [userAddress, token, provider]);
+  }, [userAddress, token, token?.chainId, provider]);
 
   return {
     loading,

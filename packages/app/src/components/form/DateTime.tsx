@@ -1,13 +1,10 @@
 import dayjs, { Dayjs } from 'dayjs';
 import { getStyles } from './Select';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
+import styled from 'styled-components';
 import * as chrono from 'chrono-node';
 import dayjsCalendarPlugin from 'dayjs/plugin/calendar';
-import Select, {
-  OptionProps,
-  components as SelectComponents,
-} from 'react-select';
-import styled from 'styled-components';
+import Select from 'react-select';
 
 const calendarDefault = {
   sameDay: '[Today at] h:mm A', // The same day ( Today at 2:30 AM )
@@ -21,20 +18,39 @@ const calendarDefault = {
 dayjs.locale('en');
 dayjs.extend(dayjsCalendarPlugin, calendarDefault);
 
-interface TimeOption {
-  label: string;
-  value: string;
+interface NowDateOption {
+  date: 'now';
+  value: 'now';
+  label: 'Now';
 }
 
-interface DateOption {
+interface GenericDateOption {
   date: Dayjs;
   value: Date;
   label: string;
-  display?: string;
 }
-const defaultOptions: DateOption[] = ['now', 'tomorrow at 14:00'].map(
-  (option) => createOptionForDate(chrono.en.parseDate(option))
-);
+type DateOption = NowDateOption | GenericDateOption;
+
+const NOW_DATE_OPTION: NowDateOption = {
+  date: 'now',
+  value: 'now',
+  label: 'Now',
+};
+
+function createDefaultDateOptions(nowOptions?: boolean): DateOption[] {
+  const defaultDateOptions: DateOption[] = [];
+
+  if (nowOptions) {
+    defaultDateOptions.push(NOW_DATE_OPTION);
+  }
+
+  // Add random dates
+  defaultDateOptions.push(
+    ...['tomorrow at 14:00'].map((expression) => createDateOptionForDate(chrono.en.parseDate(expression)))
+  );
+
+  return defaultDateOptions;
+}
 
 const suggestions = [
   'sunday',
@@ -72,78 +88,7 @@ const suggest = (str: string) =>
     .map((i) => suggestions[i] || i)
     .join('');
 
-function Option(props: OptionProps<DateOption, false>) {
-  const { data, innerRef, innerProps } = props;
-  if (data.display === 'calendar') {
-    return (
-      <span {...innerProps} ref={innerRef}>
-        {data.date.format('D')}
-      </span>
-    );
-  } else return <SelectComponents.Option {...props} />;
-}
-
-interface DatePickerProps {
-  readonly value: DateOption | null;
-  readonly onChange: (newValue: DateOption | null) => void;
-  readonly disabled?: boolean;
-}
-
-function DatePicker(props: DatePickerProps) {
-  const [options, setOptions] = useState(defaultOptions);
-
-  const handleInputChange = (value: string) => {
-    if (!value) {
-      setOptions(defaultOptions);
-      return;
-    }
-
-    const date = chrono.parseDate(suggest(value.toLowerCase()));
-
-    // Date could not be parsed, return empty options
-    if (!date) {
-      setOptions([]);
-      return;
-    }
-
-    setOptions([createOptionForDate(date)]);
-  };
-
-  return (
-    <Select<DateOption, false>
-      {...props}
-      isDisabled={props.disabled}
-      id="date-picker"
-      components={{
-        Option,
-        DropdownIndicator: () => null,
-        IndicatorSeparator: () => null,
-      }}
-      filterOption={null}
-      styles={getStyles<DateOption>()}
-      isMulti={false}
-      isOptionSelected={(o, v) => v.some((i) => i.date.isSame(o.date, 'day'))}
-      maxMenuHeight={380}
-      getOptionLabel={(o) => o.label}
-      onChange={props.onChange}
-      onInputChange={handleInputChange}
-      options={options}
-      value={props.value}
-    />
-  );
-}
-
-// A list of time: 00:00 - 23:00
-const timeOptions: TimeOption[] = Array.from(Array(24).keys()).map((i) => {
-  const value = i.toString();
-  const label = i < 10 ? `0${i}:00` : `${i}:00`;
-  return {
-    label,
-    value,
-  };
-});
-
-function createOptionForDate(d: Dayjs | Date) {
+function createDateOptionForDate(d: Dayjs | Date): DateOption {
   const date = dayjs.isDayjs(d)
     ? d
     : dayjs(d, {
@@ -157,64 +102,72 @@ function createOptionForDate(d: Dayjs | Date) {
 }
 
 interface DateTimeInputProps {
-  value: Dayjs;
-  onChange: (nextValue: Dayjs) => void;
-  defaultDateOptions?: DateOption[];
+  value: Dayjs | 'now';
+  onChange: (nextValue: Dayjs | 'now') => void;
   disabled?: boolean;
+  showNowOption?: boolean;
 }
 
-interface TimeInputProps {
-  hour: string;
-  handleHourChange: (hour: string) => void;
-  disabled?: boolean;
-}
+export function DateTimeInput({ showNowOption = false, disabled, value, onChange }: DateTimeInputProps) {
+  const instanceDefaultDateOptions = useMemo(() => createDefaultDateOptions(showNowOption), [showNowOption]);
+  const [options, setOptions] = useState(instanceDefaultDateOptions);
 
-export function TimeInput({
-  hour,
-  handleHourChange,
-  disabled,
-}: TimeInputProps) {
-  return (
-    <Select<TimeOption, false>
-      isDisabled={disabled}
-      value={timeOptions.find((option) => option.value === hour)}
-      options={timeOptions}
-      getOptionLabel={(option) => option.label}
-      getOptionValue={(option) => option.value}
-      components={{
-        DropdownIndicator: () => null,
-        IndicatorSeparator: () => null,
-      }}
-      styles={getStyles<TimeOption>()}
-      isMulti={false}
-      onChange={(option) => {
-        if (option) {
-          handleHourChange(option?.value as string);
-        }
-      }}
-    />
-  );
-}
+  const handleInputChange = (value: string) => {
+    // If the user types nothing, return the default options
+    if (!value) {
+      setOptions(instanceDefaultDateOptions);
+      return;
+    }
 
-export function DateTimeInput({
-  disabled,
-  value,
-  onChange,
-}: DateTimeInputProps) {
+    const nextOptions = [];
+    value = value.toLowerCase();
+    // The expression starts "no" or "now"
+    const hasNowExpression = ['no', 'now'].some((searchTerm) => value.startsWith(searchTerm));
+
+    if (hasNowExpression) {
+      nextOptions.push(NOW_DATE_OPTION);
+    }
+
+    // Attempt to suggest more options
+    const parsedDate = chrono.parseDate(suggest(value));
+    // If the expression is a valid date, add it to the options
+    if (parsedDate) {
+      nextOptions.push(createDateOptionForDate(parsedDate));
+    }
+
+    // Update the options
+    setOptions(nextOptions);
+  };
+
   return (
     <DateTimeInputWrapper>
-      <DatePicker
-        disabled={disabled}
-        value={{
-          date: value,
-          value: value.toDate(),
-          label: value.calendar(null, calendarDefault),
+      <Select<DateOption, false>
+        isDisabled={disabled}
+        id="chrono-datetime"
+        components={{
+          DropdownIndicator: () => null,
+          IndicatorSeparator: () => null,
         }}
-        onChange={(option) => {
-          if (option) {
-            onChange(option?.date);
+        filterOption={null}
+        styles={getStyles<DateOption>()}
+        isMulti={false}
+        maxMenuHeight={380}
+        getOptionLabel={(o) => o.label}
+        onChange={(nextOption) => {
+          if (nextOption) {
+            onChange(nextOption?.date);
           }
         }}
+        onInputChange={handleInputChange}
+        options={options}
+        value={
+          {
+            date: value,
+            value: value === 'now' ? 'now' : value.toDate(),
+            label: value === 'now' ? 'Now' : value.calendar(null, calendarDefault),
+            display: value === 'now' ? 'Now' : 'calendar',
+          } as DateOption
+        }
       />
     </DateTimeInputWrapper>
   );

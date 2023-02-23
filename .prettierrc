@@ -4,6 +4,7 @@
   "singleQuote": true,
   "proseWrap": "always",
   "semi": true,
+  "printWidth": 120,
   "overrides": [
     {
       "files": "*.{yaml,yml,md}",

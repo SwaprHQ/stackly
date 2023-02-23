@@ -1,14 +1,16 @@
 import { Currency, Token } from 'dca-sdk';
 import { memo, useCallback, useEffect, useState } from 'react';
+import styled from 'styled-components';
 import { useUserAddedTokens } from '../../state/user/hooks';
 import {
   ModalBackdrop,
-  ModalContentWithNoPadding,
+  ModalContent as ModalContentBase,
   ModalHeader,
   ModalInnerWrapper,
   ModalOutterWrapper,
+  ModalTitle,
 } from '../Modal/styles';
-import TokenSafety from '../TokenSafety';
+import { TokenSafety } from '../TokenSafety';
 import { CurrencySearch } from './CurrencySearch';
 
 export interface TokenSafetyProps {
@@ -29,7 +31,6 @@ interface CurrencySearchModalProps {
   showCommonBases?: boolean;
   showCurrencyAmount?: boolean;
   showNativeCurrency?: boolean;
-  disableNonToken?: boolean;
 }
 
 export enum CurrencyModalView {
@@ -46,12 +47,9 @@ export const CurrencySearchModal = memo(function CurrencySearchModal({
   otherSelectedCurrency,
   showCommonBases = false,
   showCurrencyAmount = true,
-  disableNonToken = false,
   showNativeCurrency = true,
 }: CurrencySearchModalProps) {
-  const [modalView, setModalView] = useState<CurrencyModalView>(
-    CurrencyModalView.search
-  );
+  const [modalView, setModalView] = useState<CurrencyModalView>(CurrencyModalView.search);
   const lastOpen = isOpen;
   const userAddedTokens = useUserAddedTokens();
 
@@ -68,11 +66,7 @@ export const CurrencySearchModal = memo(function CurrencySearchModal({
 
   const handleCurrencySelect = useCallback(
     (currency: Currency, hasWarning?: boolean) => {
-      if (
-        hasWarning &&
-        currency.isToken &&
-        !userAddedTokens.find((token) => token.equals(currency))
-      ) {
+      if (hasWarning && currency.isToken && !userAddedTokens.find((token) => token.equals(currency))) {
         showTokenSafetySpeedbump(currency);
       } else {
         onCurrencySelect(currency);
@@ -90,9 +84,9 @@ export const CurrencySearchModal = memo(function CurrencySearchModal({
       content = (
         <>
           <ModalHeader>
-            <h2>Select A Token</h2>
+            <ModalTitle>Select A Token</ModalTitle>
           </ModalHeader>
-          <ModalContentWithNoPadding minHeight="400px">
+          <ModalContent minHeight="400px">
             <CurrencySearch
               isOpen={isOpen}
               onDismiss={onDismiss}
@@ -101,10 +95,9 @@ export const CurrencySearchModal = memo(function CurrencySearchModal({
               otherSelectedCurrency={otherSelectedCurrency}
               showCommonBases={showCommonBases}
               showCurrencyAmount={showCurrencyAmount}
-              disableNonToken={disableNonToken}
               showNativeCurrency={showNativeCurrency}
             />
-          </ModalContentWithNoPadding>
+          </ModalContent>
         </>
       );
       break;
@@ -126,10 +119,6 @@ export const CurrencySearchModal = memo(function CurrencySearchModal({
     return null;
   }
 
-  console.log({
-    isOpen,
-  });
-
   return (
     <ModalBackdrop onClick={onDismiss}>
       <ModalOutterWrapper onClick={(e) => e.stopPropagation()}>
@@ -138,3 +127,7 @@ export const CurrencySearchModal = memo(function CurrencySearchModal({
     </ModalBackdrop>
   );
 });
+
+const ModalContent = styled(ModalContentBase)`
+  padding-top: 0;
+`;
