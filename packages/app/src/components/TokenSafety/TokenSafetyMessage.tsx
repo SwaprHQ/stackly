@@ -39,7 +39,7 @@ type TokenSafetyMessageProps = {
   tokenAddress: string;
 };
 
-export default function TokenSafetyMessage({
+export function TokenSafetyMessage({
   warning,
   tokenAddress,
 }: TokenSafetyMessageProps) {

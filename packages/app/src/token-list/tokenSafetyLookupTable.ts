@@ -1,7 +1,7 @@
 import { TokenInfo } from '@uniswap/token-lists';
 
 import store from '../state';
-import { UNSUPPORTED_LIST_URLS } from './lists';
+import { DEFAULT_TOKEN_LIST, UNSUPPORTED_LIST_URLS } from './lists';
 
 export const NATIVE_CHAIN_ID = 'NATIVE';
 
@@ -24,10 +24,10 @@ class TokenSafetyLookupTable {
     //   dict[token.address.toLowerCase()] = TOKEN_LIST_TYPES.UNI_EXTENDED
     // })
 
-    // // Initialize default tokens second, so that any tokens on both default and extended will display as default (no warning)
-    // store.getState().lists.byUrl[UNI_LIST].current?.tokens.forEach((token) => {
-    //   dict[token.address.toLowerCase()] = TOKEN_LIST_TYPES.UNI_DEFAULT
-    // })
+    // Initialize default tokens second, so that any tokens on both default and extended will display as default (no warning)
+    store.getState().lists.byUrl[DEFAULT_TOKEN_LIST].current?.tokens.forEach((token) => {
+      dict[token.address.toLowerCase()] = TOKEN_LIST_TYPES.UNI_DEFAULT
+    })
 
     // // TODO: Figure out if this list is still relevant
     // brokenTokenList.tokens.forEach((token) => {

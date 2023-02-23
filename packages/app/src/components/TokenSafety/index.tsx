@@ -8,6 +8,7 @@ import {
   Warning,
 } from '../../token-list/tokenSafety';
 import { useToken } from '../../tokens/Tokens';
+import { Button } from '../../ui/components/Button/Button';
 import { getExplorerLink } from '../../utils';
 import { AutoColumn } from '../Column';
 import TokenSafetyLabel from './TokenSafetyLabel';
@@ -44,12 +45,6 @@ const InfoText = styled.p`
   text-align: center;
 `;
 
-const StyledButton = styled.button`
-  margin-top: 24px;
-  width: 100%;
-  font-weight: 600;
-`;
-
 const StyledCancelButton = styled.button`
   margin-top: 16px;
   color: ${({ theme }) => theme.textSecondary};
@@ -57,10 +52,7 @@ const StyledCancelButton = styled.button`
   font-size: 14px;
 `;
 
-const StyledCloseButton = styled(StyledButton)`
-  background-color: ${({ theme }) => theme.backgroundInteractive};
-  color: ${({ theme }) => theme.textPrimary};
-
+const StyledCloseButton = styled(Button)`
   &:hover {
     transition: opacity 250ms ease;
   }
@@ -81,7 +73,7 @@ const Buttons = ({
 }) => {
   return warning.canProceed ? (
     <>
-      <StyledButton onClick={onContinue}>I understand</StyledButton>
+      <Button onClick={onContinue}>I understand</Button>
       {showCancel && (
         <StyledCancelButton onClick={onCancel}>Cancel</StyledCancelButton>
       )}
@@ -185,7 +177,7 @@ export interface TokenSafetyProps {
   showCancel?: boolean;
 }
 
-export default function TokenSafety({
+export function TokenSafety({
   tokenAddress,
   secondTokenAddress,
   onContinue,

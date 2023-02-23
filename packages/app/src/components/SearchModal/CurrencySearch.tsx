@@ -221,33 +221,19 @@ export function CurrencySearch({
         />
       </FormGroup>
       {showCommonBases && (
-        <CommonBases
-          chainId={chainId}
-          onSelect={handleCurrencySelect}
-          selectedCurrency={selectedCurrency}
-        />
+        <CommonBases chainId={chainId} onSelect={handleCurrencySelect} selectedCurrency={selectedCurrency} />
       )}
       {searchToken && !searchTokenIsAdded ? (
-        <div style={{ padding: '20px 0', height: '100%' }}>
+        <Column style={{ padding: '20px 0', height: '100%' }}>
           <CurrencyRow
             currency={searchToken}
-            isSelected={Boolean(
-              searchToken &&
-                selectedCurrency &&
-                selectedCurrency.equals(searchToken)
-            )}
-            onSelect={(hasWarning: boolean) =>
-              searchToken && handleCurrencySelect(searchToken, hasWarning)
-            }
-            otherSelected={Boolean(
-              searchToken &&
-                otherSelectedCurrency &&
-                otherSelectedCurrency.equals(searchToken)
-            )}
+            isSelected={Boolean(searchToken && selectedCurrency && selectedCurrency.equals(searchToken))}
+            onSelect={(hasWarning: boolean) => searchToken && handleCurrencySelect(searchToken, hasWarning)}
+            otherSelected={Boolean(searchToken && otherSelectedCurrency && otherSelectedCurrency.equals(searchToken))}
             showCurrencyAmount={showCurrencyAmount}
           />
-        </div>
-      ) : searchCurrencies?.length > 0 || isLoading ? (
+        </Column>
+      ) : searchCurrencies?.length > 0 || filteredInactiveTokens?.length > 0 || isLoading ? (
         <div style={{ flex: '1' }}>
           <AutoSizer disableWidth>
             {({ height }) => (

@@ -22,8 +22,6 @@ export function SelectBalanceButtonContainer({
     return <SelectBalanceButton type="button" disabled alignRight />;
   }
 
-  console.log({ loading, balance });
-
   if (loading && !balance) {
     return (
       <SelectBalanceButton type="button" disabled alignRight>

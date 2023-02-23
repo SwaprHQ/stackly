@@ -8,7 +8,7 @@ import {
   ModalInnerWrapper,
   ModalOutterWrapper,
 } from '../Modal/styles';
-import TokenSafety from '../TokenSafety';
+import { TokenSafety } from '../TokenSafety';
 import { CurrencySearch } from './CurrencySearch';
 
 export interface TokenSafetyProps {
@@ -125,10 +125,6 @@ export const CurrencySearchModal = memo(function CurrencySearchModal({
   if (!isOpen) {
     return null;
   }
-
-  console.log({
-    isOpen,
-  });
 
   return (
     <ModalBackdrop onClick={onDismiss}>

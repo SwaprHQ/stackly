@@ -40,12 +40,6 @@ export function useCurrencyBalance(
       return;
     }
 
-    console.log({
-      userAddress,
-      token,
-      provider,
-    })
-
     try {
       const getBalancePromise = token.isToken
         ? getERC20Contract(token.address, provider).balanceOf(userAddress)
