@@ -11,7 +11,6 @@ import {BokkyPooBahsDateTimeLibrary} from "date/BokkyPooBahsDateTimeLibrary.sol"
 import {SafeMath} from "oz/utils/math/SafeMath.sol";
 import {Math} from "oz/utils/math/Math.sol";
 
-
 error OrderCancelled();
 error NotOwner();
 error NotReceiver();
@@ -28,6 +27,7 @@ error OrderExecutionTimeLessThanCurrentTime();
 contract DCAOrder is IConditionalOrder, EIP1271Verifier, IDCAOrder {
     using GPv2Order for GPv2Order.Data;
     /// @dev The owner of the order. The owner can cancel the order.
+
     address public owner;
     /// @dev All buyToken orders are sent to this address.
     address public receiver;

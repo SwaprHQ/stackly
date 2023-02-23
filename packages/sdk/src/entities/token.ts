@@ -1,8 +1,5 @@
 import invariant from 'tiny-invariant';
-import {
-  checkValidAddress,
-  validateAndParseAddress,
-} from '../utils/validateAndParseAddress';
+import { checkValidAddress, validateAndParseAddress } from '../utils/validateAndParseAddress';
 import { BaseCurrency } from './BaseCurrency';
 import { Currency } from './Currency';
 
@@ -48,11 +45,7 @@ export class Token extends BaseCurrency {
    * @param other other token to compare
    */
   public equals(other: Currency): boolean {
-    return (
-      other.isToken &&
-      this.chainId === other.chainId &&
-      this.address === other.address
-    );
+    return other.isToken && this.chainId === other.chainId && this.address === other.address;
   }
 
   /**

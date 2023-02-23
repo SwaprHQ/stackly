@@ -108,92 +108,70 @@
   {
     "type": "function",
     "stateMutability": "view",
-    "outputs": [
-      { "type": "uint256", "name": "basefee", "internalType": "uint256" }
-    ],
+    "outputs": [{ "type": "uint256", "name": "basefee", "internalType": "uint256" }],
     "name": "getBasefee",
     "inputs": []
   },
   {
     "type": "function",
     "stateMutability": "view",
-    "outputs": [
-      { "type": "bytes32", "name": "blockHash", "internalType": "bytes32" }
-    ],
+    "outputs": [{ "type": "bytes32", "name": "blockHash", "internalType": "bytes32" }],
     "name": "getBlockHash",
-    "inputs": [
-      { "type": "uint256", "name": "blockNumber", "internalType": "uint256" }
-    ]
+    "inputs": [{ "type": "uint256", "name": "blockNumber", "internalType": "uint256" }]
   },
   {
     "type": "function",
     "stateMutability": "view",
-    "outputs": [
-      { "type": "uint256", "name": "blockNumber", "internalType": "uint256" }
-    ],
+    "outputs": [{ "type": "uint256", "name": "blockNumber", "internalType": "uint256" }],
     "name": "getBlockNumber",
     "inputs": []
   },
   {
     "type": "function",
     "stateMutability": "view",
-    "outputs": [
-      { "type": "uint256", "name": "chainid", "internalType": "uint256" }
-    ],
+    "outputs": [{ "type": "uint256", "name": "chainid", "internalType": "uint256" }],
     "name": "getChainId",
     "inputs": []
   },
   {
     "type": "function",
     "stateMutability": "view",
-    "outputs": [
-      { "type": "address", "name": "coinbase", "internalType": "address" }
-    ],
+    "outputs": [{ "type": "address", "name": "coinbase", "internalType": "address" }],
     "name": "getCurrentBlockCoinbase",
     "inputs": []
   },
   {
     "type": "function",
     "stateMutability": "view",
-    "outputs": [
-      { "type": "uint256", "name": "difficulty", "internalType": "uint256" }
-    ],
+    "outputs": [{ "type": "uint256", "name": "difficulty", "internalType": "uint256" }],
     "name": "getCurrentBlockDifficulty",
     "inputs": []
   },
   {
     "type": "function",
     "stateMutability": "view",
-    "outputs": [
-      { "type": "uint256", "name": "gaslimit", "internalType": "uint256" }
-    ],
+    "outputs": [{ "type": "uint256", "name": "gaslimit", "internalType": "uint256" }],
     "name": "getCurrentBlockGasLimit",
     "inputs": []
   },
   {
     "type": "function",
     "stateMutability": "view",
-    "outputs": [
-      { "type": "uint256", "name": "timestamp", "internalType": "uint256" }
-    ],
+    "outputs": [{ "type": "uint256", "name": "timestamp", "internalType": "uint256" }],
     "name": "getCurrentBlockTimestamp",
     "inputs": []
   },
   {
     "type": "function",
     "stateMutability": "view",
-    "outputs": [
-      { "type": "uint256", "name": "balance", "internalType": "uint256" }
-    ],
+    "outputs": [{ "type": "uint256", "name": "balance", "internalType": "uint256" }],
     "name": "getEthBalance",
     "inputs": [{ "type": "address", "name": "addr", "internalType": "address" }]
   },
   {
     "type": "function",
     "stateMutability": "view",
-    "outputs": [
-      { "type": "bytes32", "name": "blockHash", "internalType": "bytes32" }
-    ],
+    "outputs": [{ "type": "bytes32", "name": "blockHash", "internalType": "bytes32" }],
     "name": "getLastBlockHash",
     "inputs": []
   },

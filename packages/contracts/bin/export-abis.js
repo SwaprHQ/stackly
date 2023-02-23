@@ -7,18 +7,9 @@ import ERC20Artifacts from '../out/ERC20.sol/ERC20.json' assert { type: 'json' }
 async function main() {
   await mkdir('./abis', { recursive: true });
 
-  await writeFile(
-    './abis/DCAOrder.json',
-    JSON.stringify(DCAOrderArtifacts.abi, null, 2)
-  );
-  await writeFile(
-    './abis/OrderFactory.json',
-    JSON.stringify(OrderFactoryArtifacts.abi, null, 2)
-  );
-  await writeFile(
-    './abis/ERC20.json',
-    JSON.stringify(ERC20Artifacts.abi, null, 2)
-  );
+  await writeFile('./abis/DCAOrder.json', JSON.stringify(DCAOrderArtifacts.abi, null, 2));
+  await writeFile('./abis/OrderFactory.json', JSON.stringify(OrderFactoryArtifacts.abi, null, 2));
+  await writeFile('./abis/ERC20.json', JSON.stringify(ERC20Artifacts.abi, null, 2));
 }
 
 main();
