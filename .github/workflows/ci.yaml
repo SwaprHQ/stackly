@@ -34,4 +34,4 @@ jobs:
       - name: Lint
         run: pnpm lint
       - name: Test
-        run: pnpm test
+        run: forge test && pnpm test --filter=dca-sdk && pnpm test --filter=app
