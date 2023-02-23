@@ -3,16 +3,22 @@ import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { WalletConnectButton } from './ConnectButton';
 
+import { ReactComponent as StacksLogo } from '../../assets/svg/stax-logo.svg';
 import { ReactComponent as Burger } from './burger.svg';
 import { Container } from '../Container';
 
-export const HEADER_HEIGHT = '64px';
+export const HEADER_HEIGHT = '88px'; // 4px * 22
+export const TOGGLE_BUTTON_SIZE = '64px';
+export const DESKTOP_BREAKPOINT = '768px';
+export const ASIDE_BACKGROUND_COLOR = '#fbf4e6';
 
 function NavMenuItems() {
   return (
     <>
       <HeaderTitleContainer>
-        <h2>{`///`}</h2>
+        <Link to="/">
+          <StacksLogo />
+        </Link>
       </HeaderTitleContainer>
       <Nav>
         <Link to="/">Create a Stack</Link>
@@ -56,12 +62,13 @@ const SidebarToggle = styled.button`
   font-weight: bold;
   text-transform: uppercase;
   position: fixed;
-  right: 0;
-  top: 0;
+  right: 10px;
+  top: 10px;
+  border-radius: 24px;
   z-index: 1000;
-  width: ${HEADER_HEIGHT};
-  height: ${HEADER_HEIGHT};
-  @media (min-width: 480px) {
+  width: ${TOGGLE_BUTTON_SIZE};
+  height: ${TOGGLE_BUTTON_SIZE};
+  @media (min-width: ${DESKTOP_BREAKPOINT}) {
     display: none;
   }
 `;
@@ -74,7 +81,7 @@ const SidebarToggleOverlay = styled.div`
   bottom: 0;
   backdrop-filter: blur(6px);
   z-index: 1047;
-  @media (min-width: 480px) {
+  @media (min-width: ${DESKTOP_BREAKPOINT}) {
     display: none;
   }
 `;
@@ -83,6 +90,11 @@ const WalletConnectButtonContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+  /** Bottom spacing for mobile nav */
+  margin-bottom: 32px;
+  @media (min-width: ${DESKTOP_BREAKPOINT}) {
+    margin-bottom: 0;
+  }
 `;
 
 const Aside = styled.aside<{ isOpen: boolean }>(
@@ -92,17 +104,18 @@ const Aside = styled.aside<{ isOpen: boolean }>(
   flex-direction: column;
   justify-content: space-between;
   gap: 16px;
-  background: #fff;
-  width: 280px;
+  background: ${ASIDE_BACKGROUND_COLOR};
+  width: 300px;
   height: 100%;
   position: fixed;
   z-index: 1048;
   top: 0;
   left: 0;
   border-right: 2px solid #000;
+  padding: 32px 0;
   transform: translateX(${props.isOpen ? '0' : '-100%'});
   transition: transform 0.3s ease-in-out;
-  @media (min-width: 480px) {
+  @media (min-width: ${DESKTOP_BREAKPOINT}) {
     display: none;
   }
 `
@@ -120,7 +133,7 @@ const HeaderNav = styled.nav`
   flex-direction: row;
   width: 100%;
   height: 100%;
-  @media (min-width: 480px) {
+  @media (min-width: ${DESKTOP_BREAKPOINT}) {
     display: flex;
   }
 `;
@@ -134,7 +147,7 @@ const HeaderTitleContainer = styled.div`
 
 const HeaderFrame = styled.header`
   height: ${HEADER_HEIGHT};
-  @media (min-width: 480px) {
+  @media (min-width: ${DESKTOP_BREAKPOINT}) {
     width: 100%;
   }
 `;
@@ -144,12 +157,14 @@ const Nav = styled.nav`
   flex: 1;
   align-items: center;
   flex-direction: column;
-  justify-content: end;
+  justify-content: start;
   gap: 16px;
   width: 100%;
 
-  @media (min-width: 480px) {
+  /** On dekstop, we want the nav to be on the right */
+  @media (min-width: ${DESKTOP_BREAKPOINT}) {
     flex-direction: row;
+    justify-content: end;
   }
 
   & > a {

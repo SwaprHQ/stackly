@@ -8,14 +8,14 @@ import { useCurrencyBalance } from '../../../tokens/hooks';
 import { Loader } from '../../Loader';
 
 import { LoadingRows, MenuItem } from '../styleds';
-import { TokenTags } from './TokenTags';
+// import { TokenTags } from './TokenTags';
 
 function currencyKey(currency: Currency): string {
   return currency instanceof Token ? currency.address : currency.symbol ?? 'ETHER';
 }
 
 // Copied from Uniswap, needs some redesign from the design team
-const CheckIcon = styled.div`
+export const CheckIcon = styled.div`
   background: #ff007a;
   border-radius: 50%;
   height: 20px;

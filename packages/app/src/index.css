@@ -10,6 +10,7 @@ body {
 body {
   font-family: 'Public Sans', sans-serif;
     background: linear-gradient(321.48deg, rgba(255, 92, 0, 0.5) -22.6%, rgba(250, 195, 54, 0.5) 67.78%), #FAC336;
+    background-attachment: fixed;
 }
 
 code {
@@ -53,7 +54,7 @@ select {
   font-size: 18px;
   font-family: inherit;
   }
-  
+
   input,
   select {
   font-weight: bold;
