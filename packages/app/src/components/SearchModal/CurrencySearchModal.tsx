@@ -8,6 +8,7 @@ import {
   ModalHeader,
   ModalInnerWrapper,
   ModalOutterWrapper,
+  ModalTitle,
 } from '../Modal/styles';
 import { TokenSafety } from '../TokenSafety';
 import { CurrencySearch } from './CurrencySearch';
@@ -83,7 +84,7 @@ export const CurrencySearchModal = memo(function CurrencySearchModal({
       content = (
         <>
           <ModalHeader>
-            <h2>Select A Token</h2>
+            <ModalTitle>Select A Token</ModalTitle>
           </ModalHeader>
           <ModalContent minHeight="400px">
             <CurrencySearch

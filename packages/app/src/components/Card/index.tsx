@@ -6,6 +6,7 @@ export const Card = styled.div`
   border: 5px solid #1e1f1b;
   box-shadow: 12px 12px 0px -1px #1e1f1b;
   border-radius: 24px;
+  margin-right: 12px;
 `;
 
 export const CardExtraShadow = styled(Card)`

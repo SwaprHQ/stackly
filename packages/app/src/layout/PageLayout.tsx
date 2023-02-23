@@ -25,7 +25,9 @@ const Container = styled.div`
 const Content = styled.main`
   width: 100%;
   min-height: calc(100vh - (${HEADER_HEIGHT} + ${FOOTER_HEIGHT}));
-  padding-top: ${HEADER_HEIGHT}; /* to account for the fixed header */
   flex: 1; /* to fill the remaining space */
   margin: 0 auto;
+  @media (min-width: 768px) {
+    padding-top: ${HEADER_HEIGHT}; /* to account for the fixed header */
+  }
 `;

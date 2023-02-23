@@ -17,7 +17,6 @@ export const ModalHeader = styled(ModalSection)`
 
 export const ModalTitle = styled.h2`
   margin: 0;
-  text-transform: uppercase;
 `;
 
 export const ModalFooter = styled(ModalSection)`
@@ -96,7 +95,6 @@ export const Step = styled.a<{
   padding: 20px;
   font-size: 20px;
   font-weight: bold;
-  text-transform: uppercase;
   text-decoration: none;
   color: #000;
   &:not(:last-child) {

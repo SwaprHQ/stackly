@@ -4,13 +4,14 @@ import {
   ModalBackdrop,
   ModalInnerWrapper,
   ModalHeader,
-  ModalContentWithNoPadding,
   Step,
   ModalTitle,
+  ModalContent as ModalContentBase,
 } from './styles';
 import { ContractReceipt, ContractTransaction } from 'ethers';
 import { getExplorerLink } from '../../utils';
 import { ChainId } from 'dca-sdk';
+import styled from 'styled-components';
 
 export enum CreateVaultAndDepositStep {
   APPROVE_FACTORY,
@@ -33,8 +34,7 @@ export type VaultCreateAndDepositStepsModalProps = {
 };
 
 export function CreateVaultStepsModal() {
-  const { modal, data, closeModal } =
-    useModal<VaultCreateAndDepositStepsModalProps>();
+  const { modal, data, closeModal } = useModal<VaultCreateAndDepositStepsModalProps>();
 
   if (modal === null || modal !== Modal.VaultCreateAndDepositSteps) {
     return null;
@@ -54,16 +54,10 @@ export function CreateVaultStepsModal() {
   } = data;
 
   const isFactoryApproved =
-    approveFactoryReceipt &&
-    stepsCompleted.includes(CreateVaultAndDepositStep.APPROVE_FACTORY)
-      ? true
-      : false;
+    approveFactoryReceipt && stepsCompleted.includes(CreateVaultAndDepositStep.APPROVE_FACTORY) ? true : false;
 
   const isOrderCreated =
-    createOrderReceipt &&
-    stepsCompleted.includes(CreateVaultAndDepositStep.CREATE_ORDER)
-      ? true
-      : false;
+    createOrderReceipt && stepsCompleted.includes(CreateVaultAndDepositStep.CREATE_ORDER) ? true : false;
 
   const approveFactoryTransactionLink = approveFactoryTransaction
     ? getExplorerLink(chainId, approveFactoryTransaction.hash, 'transaction')
@@ -78,54 +72,38 @@ export function CreateVaultStepsModal() {
       <ModalOutterWrapper maxWidth="500px" onClick={(e) => e.stopPropagation()}>
         <ModalInnerWrapper>
           <ModalHeader>
-            <ModalTitle>Create New DCA Order</ModalTitle>
+            <ModalTitle>Create Order</ModalTitle>
           </ModalHeader>
-          <ModalContentWithNoPadding>
+          <ModalContent>
             {isFactoryApproved ? (
-              <Step
-                href={approveFactoryTransactionLink}
-                isSuccess={true}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+              <Step href={approveFactoryTransactionLink} isSuccess={true} target="_blank" rel="noopener noreferrer">
                 Approved Factory
               </Step>
             ) : approveFactoryTransaction ? (
-              <Step
-                href={approveFactoryTransactionLink}
-                isBusy={true}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+              <Step href={approveFactoryTransactionLink} isBusy={true} target="_blank" rel="noopener noreferrer">
                 Approving Factory
               </Step>
             ) : (
               <Step isBusy={true}>Approving Factory</Step>
             )}
             {isOrderCreated ? (
-              <Step
-                href={createOrderTransactionLink}
-                isSuccess={true}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+              <Step href={createOrderTransactionLink} isSuccess={true} target="_blank" rel="noopener noreferrer">
                 Created Order
               </Step>
             ) : createOrderTransaction ? (
-              <Step
-                href={createOrderTransactionLink}
-                isBusy={true}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+              <Step href={createOrderTransactionLink} isBusy={true} target="_blank" rel="noopener noreferrer">
                 Creating Order
               </Step>
             ) : (
               <Step>Create Order</Step>
             )}
-          </ModalContentWithNoPadding>
+          </ModalContent>
         </ModalInnerWrapper>
       </ModalOutterWrapper>
     </ModalBackdrop>
   );
 }
+
+const ModalContent = styled(ModalContentBase)`
+  padding-top: 0;
+`;
