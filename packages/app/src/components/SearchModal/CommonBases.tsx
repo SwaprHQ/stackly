@@ -3,6 +3,7 @@ import { AutoColumn } from '../../components/Column';
 import { AutoRow } from '../../components/Row';
 import styled from 'styled-components/macro';
 import { currencyId } from '../../utils';
+import { Button } from '../../ui/components/Button/Button';
 
 const MobileWrapper = styled(AutoColumn)`
   @media (max-width: 480px) {
@@ -10,17 +11,18 @@ const MobileWrapper = styled(AutoColumn)`
   }
 `;
 
-const BaseWrapper = styled.div<{ disable?: boolean }>`
-  border: 1px solid;
-  border-radius: 16px;
+const BaseWrapper = styled(Button)<{
+  disable?: boolean;
+}>`
   display: flex;
-  padding: 6px;
-  padding-right: 12px;
-
+  padding: 0px 6px;
   align-items: center;
   :hover {
     cursor: ${({ disable }) => !disable && 'pointer'};
   }
+  font-size: 14px;
+  min-width: auto;
+  height: 40px;
 `;
 
 type ChainCurrencyList = {
@@ -41,8 +43,7 @@ export function CommonBases({
   selectedCurrency?: Currency | null;
   onSelect: (currency: Currency) => void;
 }) {
-  const bases =
-    typeof chainId !== 'undefined' ? COMMON_BASES[chainId] ?? [] : [];
+  const bases = typeof chainId !== 'undefined' ? COMMON_BASES[chainId] ?? [] : [];
 
   if (bases.length === 0) {
     return null;
@@ -57,21 +58,12 @@ export function CommonBases({
           return (
             <BaseWrapper
               tabIndex={0}
-              onKeyPress={(e) =>
-                !isSelected && e.key === 'Enter' && onSelect(currency)
-              }
+              onKeyPress={(e) => !isSelected && e.key === 'Enter' && onSelect(currency)}
               onClick={() => !isSelected && onSelect(currency)}
               disable={isSelected}
               key={currencyId(currency)}
             >
-              <span
-                style={{
-                  fontWeight: 500,
-                  fontSize: 16,
-                }}
-              >
-                {currency.symbol}
-              </span>
+              {currency.symbol}
             </BaseWrapper>
           );
         })}

@@ -49,21 +49,14 @@ export function CurrencyAmountInput({
   return (
     <CurrencyAmountInputInnerWrapper>
       <InputGroup>
-        <TokenButton
-          disabled={disabled}
-          type="button"
-          onClick={() => setIsSearchModalOpen(true)}
-        >
+        <TokenButton disabled={disabled} type="button" onClick={() => setIsSearchModalOpen(true)}>
           {currencyAmount.currency.symbol}
         </TokenButton>
         <NumberInput
           disabled={disabled}
           value={currencyAmount.toString()}
           onChange={(nextSellAmount) => {
-            const nextCurrencyAmount = new Amount(
-              currencyAmount.currency,
-              nextSellAmount
-            );
+            const nextCurrencyAmount = new Amount(currencyAmount.currency, nextSellAmount);
             setCurrencyAmount(nextCurrencyAmount);
             onChange(nextCurrencyAmount);
           }}
@@ -72,10 +65,7 @@ export function CurrencyAmountInput({
           isOpen={isSearchModalOpen}
           onDismiss={handleDismissSearch}
           onCurrencySelect={(nextCurrency) => {
-            const nextCurrencyAmount = Amount.fromRawAmount(
-              nextCurrency,
-              currencyAmount.toRawAmount()
-            );
+            const nextCurrencyAmount = Amount.fromRawAmount(nextCurrency, currencyAmount.toRawAmount());
             setCurrencyAmount(nextCurrencyAmount);
             onChange(nextCurrencyAmount);
             handleDismissSearch();
@@ -84,7 +74,6 @@ export function CurrencyAmountInput({
           showCommonBases={true}
           showCurrencyAmount={true}
           showNativeCurrency={showNativeCurrency}
-          disableNonToken={false}
         />
       </InputGroup>
       {userAddress && !disabled ? (

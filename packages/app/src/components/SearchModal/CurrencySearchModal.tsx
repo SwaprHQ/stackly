@@ -1,9 +1,10 @@
 import { Currency, Token } from 'dca-sdk';
 import { memo, useCallback, useEffect, useState } from 'react';
+import styled from 'styled-components';
 import { useUserAddedTokens } from '../../state/user/hooks';
 import {
   ModalBackdrop,
-  ModalContent,
+  ModalContent as ModalContentBase,
   ModalHeader,
   ModalInnerWrapper,
   ModalOutterWrapper,
@@ -29,7 +30,6 @@ interface CurrencySearchModalProps {
   showCommonBases?: boolean;
   showCurrencyAmount?: boolean;
   showNativeCurrency?: boolean;
-  disableNonToken?: boolean;
 }
 
 export enum CurrencyModalView {
@@ -46,12 +46,9 @@ export const CurrencySearchModal = memo(function CurrencySearchModal({
   otherSelectedCurrency,
   showCommonBases = false,
   showCurrencyAmount = true,
-  disableNonToken = false,
   showNativeCurrency = true,
 }: CurrencySearchModalProps) {
-  const [modalView, setModalView] = useState<CurrencyModalView>(
-    CurrencyModalView.search
-  );
+  const [modalView, setModalView] = useState<CurrencyModalView>(CurrencyModalView.search);
   const lastOpen = isOpen;
   const userAddedTokens = useUserAddedTokens();
 
@@ -68,11 +65,7 @@ export const CurrencySearchModal = memo(function CurrencySearchModal({
 
   const handleCurrencySelect = useCallback(
     (currency: Currency, hasWarning?: boolean) => {
-      if (
-        hasWarning &&
-        currency.isToken &&
-        !userAddedTokens.find((token) => token.equals(currency))
-      ) {
+      if (hasWarning && currency.isToken && !userAddedTokens.find((token) => token.equals(currency))) {
         showTokenSafetySpeedbump(currency);
       } else {
         onCurrencySelect(currency);
@@ -101,7 +94,6 @@ export const CurrencySearchModal = memo(function CurrencySearchModal({
               otherSelectedCurrency={otherSelectedCurrency}
               showCommonBases={showCommonBases}
               showCurrencyAmount={showCurrencyAmount}
-              disableNonToken={disableNonToken}
               showNativeCurrency={showNativeCurrency}
             />
           </ModalContent>
@@ -134,3 +126,7 @@ export const CurrencySearchModal = memo(function CurrencySearchModal({
     </ModalBackdrop>
   );
 });
+
+const ModalContent = styled(ModalContentBase)`
+  padding-top: 0;
+`;

@@ -34,11 +34,7 @@ export function CurrencyInput({
 
   return (
     <>
-      <TokenButton
-        disabled={disabled}
-        type="button"
-        onClick={() => setIsSearchModalOpen(true)}
-      >
+      <TokenButton disabled={disabled} type="button" onClick={() => setIsSearchModalOpen(true)}>
         {currency.symbol}
       </TokenButton>
       <CurrencySearchModal
@@ -52,7 +48,6 @@ export function CurrencyInput({
         selectedCurrency={currency}
         showCommonBases={true}
         showCurrencyAmount={true}
-        disableNonToken={false}
         showNativeCurrency={showNativeCurrency}
       />
     </>

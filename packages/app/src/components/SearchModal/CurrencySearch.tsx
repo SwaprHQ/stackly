@@ -44,7 +44,6 @@ interface CurrencySearchProps {
   showCommonBases?: boolean;
   showCurrencyAmount?: boolean;
   showNativeCurrency?: boolean;
-  disableNonToken?: boolean;
 }
 
 export function CurrencySearch({
@@ -54,7 +53,6 @@ export function CurrencySearch({
   showCommonBases,
   showCurrencyAmount,
   showNativeCurrency,
-  disableNonToken,
   onDismiss,
   isOpen,
 }: CurrencySearchProps) {
@@ -82,10 +80,7 @@ export function CurrencySearch({
             .filter((token) => {
               // If there is no query, filter out unselected user-added tokens with no balance.
               if (!debouncedQuery && token instanceof UserAddedToken) {
-                if (
-                  selectedCurrency?.equals(token) ||
-                  otherSelectedCurrency?.equals(token)
-                ) {
+                if (selectedCurrency?.equals(token) || otherSelectedCurrency?.equals(token)) {
                   return true;
                 }
                 return balances[token.address]?.greaterThan(0);
@@ -94,21 +89,11 @@ export function CurrencySearch({
             })
             .sort(tokenComparator.bind(null, balances))
         : [],
-    [
-      balances,
-      balancesAreLoading,
-      debouncedQuery,
-      filteredTokens,
-      otherSelectedCurrency,
-      selectedCurrency,
-    ]
+    [balances, balancesAreLoading, debouncedQuery, filteredTokens, otherSelectedCurrency, selectedCurrency]
   );
   const isLoading = Boolean(balancesAreLoading && !tokenLoaderTimerElapsed);
 
-  const filteredSortedTokens = useSortTokensByQuery(
-    debouncedQuery,
-    sortedTokens
-  );
+  const filteredSortedTokens = useSortTokensByQuery(debouncedQuery, sortedTokens);
 
   const native = useNativeCurrency();
   const wrapped = native?.wrapped;
@@ -116,31 +101,12 @@ export function CurrencySearch({
   const searchCurrencies: Currency[] = useMemo(() => {
     if (!wrapped) return [];
 
-    const s = debouncedQuery.toLowerCase().trim();
-
-    const tokens = filteredSortedTokens.filter(
-      (t) => !(t.equals(wrapped) || (disableNonToken && t.isNative))
-    );
-
-    const natives = showNativeCurrency
-      ? (disableNonToken || native.equals(wrapped)
-          ? [wrapped]
-          : [native, wrapped]
-        ).filter(
-          (n) =>
-            n.symbol?.toLowerCase()?.indexOf(s) !== -1 ||
-            n.name?.toLowerCase()?.indexOf(s) !== -1
-        )
-      : [wrapped];
+    // Pick all token except native and wrapped
+    const tokens = filteredSortedTokens.filter((t) => !(t.equals(wrapped) || t.isNative));
+    // Determine if we should show the native currency
+    const natives = showNativeCurrency ? [native, wrapped] : [wrapped];
     return [...natives, ...tokens];
-  }, [
-    debouncedQuery,
-    filteredSortedTokens,
-    wrapped,
-    disableNonToken,
-    showNativeCurrency,
-    native,
-  ]);
+  }, [filteredSortedTokens, wrapped, showNativeCurrency, native]);
 
   const handleCurrencySelect = useCallback(
     (currency: Currency, hasWarning?: boolean) => {
@@ -174,8 +140,7 @@ export function CurrencySearch({
           handleCurrencySelect(native);
         } else if (searchCurrencies.length > 0) {
           if (
-            searchCurrencies[0].symbol?.toLowerCase() ===
-              debouncedQuery.trim().toLowerCase() ||
+            searchCurrencies[0].symbol?.toLowerCase() === debouncedQuery.trim().toLowerCase() ||
             searchCurrencies.length === 1
           ) {
             handleCurrencySelect(searchCurrencies[0]);
@@ -193,10 +158,7 @@ export function CurrencySearch({
 
   // if no results on main list, show option to expand into inactive
   const filteredInactiveTokens = useSearchInactiveTokenLists(
-    filteredTokens.length === 0 ||
-      (debouncedQuery.length > 2 && !isAddressSearch)
-      ? debouncedQuery
-      : undefined
+    filteredTokens.length === 0 || (debouncedQuery.length > 2 && !isAddressSearch) ? debouncedQuery : undefined
   );
 
   // Timeout token loader after 3 seconds to avoid hanging in a loading state.
