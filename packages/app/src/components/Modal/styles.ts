@@ -79,6 +79,11 @@ export const ModalOutterWrapper = styled.div<{ maxWidth?: string }>(  props => `
   gap: 12px;
 `);
 
+
+/**
+ * Step component
+ * @todo fix state colors and hover
+ */
 export const Step = styled.a<{
   isSuccess?: boolean;
   isBusy?: boolean;
@@ -100,10 +105,11 @@ export const Step = styled.a<{
   &:not(:last-child) {
     border-bottom: 2px solid #000;
   }
-  ${props.isBusy ? 'background: #ffc900; &:hover { background: #ffc900; }' : ''}
+
+  ${props.isBusy ? '/* background: #ffc900; &:hover { background: #ffc900; } */' : ''}
   ${
     props.isSuccess
-      ? 'background: #1dff72; &:hover { background: #1dff72; }'
+      ? '/* background: #1dff72; &:hover { background: #1dff72; } */'
       : ''
   }
   `

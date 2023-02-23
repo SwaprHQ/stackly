@@ -21,7 +21,6 @@ export function getStyles<T>() {
       padding: 0,
       fontSize: '18px',
       fontWeight: 'bold',
-      textTransform: 'uppercase',
     }),
     menu: (provided) => ({
       ...provided,
