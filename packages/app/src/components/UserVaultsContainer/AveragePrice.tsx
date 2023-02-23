@@ -1,29 +1,37 @@
 import { formatUnits } from '@ethersproject/units';
 import { useEffect, useState } from 'react';
 import { useNetwork } from 'wagmi';
-import { SubgraphOrder } from './types';
 
-import { OrderMetaData } from '@cowprotocol/cow-sdk';
+import type { OrderMetaData } from '@cowprotocol/cow-sdk';// Should probably use the COW SDK instance
 import { ChainId } from 'dca-sdk';
+import { SubgraphOrder } from './types';
 
 const COW_API_BASE_URL: Readonly<Record<ChainId, string>> = {
   [ChainId.ETHEREUM]: `https://api.cow.fi/mainnet/api/v1`,
   [ChainId.GNOSIS]: `https://api.cow.fi/xdai/api/v1`,
 };
 
+/**
+ * Fetches the COW orders for a given user address
+ * @param userAddress The user address
+ * @param chainId The chain id
+ * @returns
+ */
 export async function getCOWOrders(
   userAddress: string,
   chainId: number
 ): Promise<OrderMetaData[]> {
   userAddress = userAddress.toLowerCase();
-
-  return fetch(
-    `${
-      COW_API_BASE_URL[chainId as ChainId]
-    }/account/${userAddress}/orders/?limit=100`
-  ).then((res) => res.json() as Promise<OrderMetaData[]>);
+  const fetchURL = `${COW_API_BASE_URL[chainId as ChainId]}/account/${userAddress}/orders/?limit=500`;
+  return fetch(fetchURL).then((res) => res.json() as Promise<OrderMetaData[]>);
 }
 
+/**
+ * Given an order and a list of COW orders, calculates the average price
+ * @param order the original Order from DCA protocol
+ * @param cowOrders the COW orders array
+ * @returns the average price as a float
+ */
 export function calculateAveragePrice(
   order: SubgraphOrder,
   cowOrders: OrderMetaData[]
