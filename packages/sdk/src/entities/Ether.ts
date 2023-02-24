@@ -24,10 +24,7 @@ export class Ether extends NativeCurrency {
   private static _etherCache: { [chainId: number]: Ether } = {};
 
   static onChain(chainId: number): Ether {
-    return (
-      this._etherCache[chainId] ||
-      (this._etherCache[chainId] = new Ether(chainId))
-    );
+    return this._etherCache[chainId] || (this._etherCache[chainId] = new Ether(chainId));
   }
 
   /**
@@ -35,10 +32,6 @@ export class Ether extends NativeCurrency {
    * @param other other token to compare
    */
   public equals(other: Currency): boolean {
-    return (
-      other.isNative &&
-      this.chainId === other.chainId &&
-      this.address === other.address
-    );
+    return other.isNative && this.chainId === other.chainId && this.address === other.address;
   }
 }

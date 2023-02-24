@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.17;
 
-import 'forge-std/Test.sol';
-import {ERC20Mintable} from './common/ERC20Mintable.sol';
-import {MockSettlement} from './common/MockSettlement.sol';
-import {SafeMath} from 'oz/utils/math/SafeMath.sol';
+import "forge-std/Test.sol";
+import {ERC20Mintable} from "./common/ERC20Mintable.sol";
+import {MockSettlement} from "./common/MockSettlement.sol";
+import {SafeMath} from "oz/utils/math/SafeMath.sol";
 
-import {GPv2Order} from '../src/libraries/GPv2Order.sol';
-import {DCAOrder, NotOwner, NotWithinStartAndEndTimes} from '../src/DCAOrder.sol';
+import {GPv2Order} from "../src/libraries/GPv2Order.sol";
+import {DCAOrder, NotOwner, NotWithinStartAndEndTimes} from "../src/DCAOrder.sol";
 
 contract DCAOrderTest is Test {
   MockSettlement public mockSettlement;
@@ -41,15 +41,7 @@ contract DCAOrderTest is Test {
   function testInitialize() public {
     sellToken.approve(address(dcaOrder), type(uint256).max);
     dcaOrder.initialize(
-      _owner,
-      _receiver,
-      _sellToken,
-      _buyToken,
-      _principal,
-      _startTime,
-      _endTime,
-      _interval,
-      address(mockSettlement)
+      _owner, _receiver, _sellToken, _buyToken, _principal, _startTime, _endTime, _interval, address(mockSettlement)
     );
 
     // Assert all properties are set correctly
@@ -67,15 +59,7 @@ contract DCAOrderTest is Test {
   function testSlots() public {
     sellToken.approve(address(dcaOrder), type(uint256).max);
     dcaOrder.initialize(
-      _owner,
-      _receiver,
-      _sellToken,
-      _buyToken,
-      _principal,
-      _startTime,
-      _endTime,
-      _interval,
-      address(mockSettlement)
+      _owner, _receiver, _sellToken, _buyToken, _principal, _startTime, _endTime, _interval, address(mockSettlement)
     );
 
     uint256[] memory slots = dcaOrder.orderSlots();
@@ -95,15 +79,7 @@ contract DCAOrderTest is Test {
     // Approve the dcaOrder to spend the sellToken
     sellToken.approve(address(dcaOrder), type(uint256).max);
     dcaOrder.initialize(
-      _owner,
-      _receiver,
-      _sellToken,
-      _buyToken,
-      _principal,
-      _startTime,
-      _endTime,
-      _interval,
-      address(mockSettlement)
+      _owner, _receiver, _sellToken, _buyToken, _principal, _startTime, _endTime, _interval, address(mockSettlement)
     );
     dcaOrder.cancel();
     // Balance should be 0
@@ -113,15 +89,7 @@ contract DCAOrderTest is Test {
   function testCannotCancelOrderIfNotOwner() public {
     sellToken.approve(address(dcaOrder), type(uint256).max);
     dcaOrder.initialize(
-      _owner,
-      _receiver,
-      _sellToken,
-      _buyToken,
-      _principal,
-      _startTime,
-      _endTime,
-      _interval,
-      address(mockSettlement)
+      _owner, _receiver, _sellToken, _buyToken, _principal, _startTime, _endTime, _interval, address(mockSettlement)
     );
     vm.prank(address(0x1));
     vm.expectRevert(NotOwner.selector);
@@ -132,15 +100,7 @@ contract DCAOrderTest is Test {
   function testCurrentSlot() public {
     sellToken.approve(address(dcaOrder), type(uint256).max);
     dcaOrder.initialize(
-      _owner,
-      _receiver,
-      _sellToken,
-      _buyToken,
-      _principal,
-      _startTime,
-      _endTime,
-      _interval,
-      address(mockSettlement)
+      _owner, _receiver, _sellToken, _buyToken, _principal, _startTime, _endTime, _interval, address(mockSettlement)
     );
     vm.prank(address(0x1));
 
@@ -175,18 +135,10 @@ contract DCAOrderTest is Test {
   function testGetTradeableOrder() public {
     sellToken.approve(address(dcaOrder), type(uint256).max);
 
-    uint _testPrincipal = 30 ether;
+    uint256 _testPrincipal = 30 ether;
 
     dcaOrder.initialize(
-      _owner,
-      _receiver,
-      _sellToken,
-      _buyToken,
-      _testPrincipal,
-      _startTime,
-      _endTime,
-      _interval,
-      address(mockSettlement)
+      _owner, _receiver, _sellToken, _buyToken, _testPrincipal, _startTime, _endTime, _interval, address(mockSettlement)
     );
     vm.prank(address(0x1));
 
@@ -207,14 +159,11 @@ contract DCAOrderTest is Test {
     assertEq(address(order.sellToken), _sellToken);
     assertEq(address(order.buyToken), _buyToken);
 
-    uint orderSlots = dcaOrder.orderSlots().length;
-    emit log_uint(uint(order.sellAmount));
+    uint256 orderSlots = dcaOrder.orderSlots().length;
+    emit log_uint(uint256(order.sellAmount));
     emit log_uint(orderSlots);
 
-    (, uint256 expectedOrderSellAmount) = SafeMath.tryDiv(
-      _testPrincipal,
-      orderSlots
-    );
+    (, uint256 expectedOrderSellAmount) = SafeMath.tryDiv(_testPrincipal, orderSlots);
     assertEq(order.sellAmount, expectedOrderSellAmount);
     // warp to 1 second after the startTime
     vm.warp(dcaOrder.endTime() + 1 seconds);
@@ -228,15 +177,7 @@ contract DCAOrderTest is Test {
 
     sellToken.approve(address(dcaOrder), type(uint256).max);
     dcaOrder.initialize(
-      _owner,
-      _receiver,
-      _sellToken,
-      _buyToken,
-      _principal,
-      _startTime,
-      _endTime,
-      _interval,
-      address(mockSettlement)
+      _owner, _receiver, _sellToken, _buyToken, _principal, _startTime, _endTime, _interval, address(mockSettlement)
     );
     // In a 6 week period, there should be 6 * 7 * 24 = 1008 slots
     uint256[] memory slots = dcaOrder.orderSlots();

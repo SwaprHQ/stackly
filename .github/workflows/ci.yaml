@@ -27,8 +27,8 @@ jobs:
           version: nightly
       - name: Install dependencies
         run: pnpm i
-      - name: Prepare subgraph packages
-        run: pnpm --filter=packages/subgraph prepare:mainnet
+      - name: Codegen
+        run: pnpm --filter=dca-subgraph prepare:mainnet && pnpm --filter=dca-sdk typechain
       - name: Build
         run: pnpm build
       - name: Lint

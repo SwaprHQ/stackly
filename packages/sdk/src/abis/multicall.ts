@@ -158,9 +158,7 @@ export const MULTICALL_ABI = [
   {
     inputs: [],
     name: 'getBlockNumber',
-    outputs: [
-      { internalType: 'uint256', name: 'blockNumber', type: 'uint256' },
-    ],
+    outputs: [{ internalType: 'uint256', name: 'blockNumber', type: 'uint256' }],
     stateMutability: 'view',
     type: 'function',
   },

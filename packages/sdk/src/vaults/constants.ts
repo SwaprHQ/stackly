@@ -26,10 +26,8 @@ export const COW_SETTLEMENT_ADDRESS_LIST: Record<ChainId, string> = {
 };
 
 export const SUBGRAPH_ENDPOINT_LIST: Readonly<Record<string, string>> = {
-  [ChainId.ETHEREUM]:
-    'https://api.thegraph.com/subgraphs/name/adamazad/dca-dev-ethereum',
-  [ChainId.GNOSIS]:
-    'https://api.thegraph.com/subgraphs/name/adamazad/dca-dev-gnosis',
+  [ChainId.ETHEREUM]: 'https://api.thegraph.com/subgraphs/name/adamazad/dca-dev-ethereum',
+  [ChainId.GNOSIS]: 'https://api.thegraph.com/subgraphs/name/adamazad/dca-dev-gnosis',
 };
 
 /**

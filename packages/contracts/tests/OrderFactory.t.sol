@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.17;
 
-import 'forge-std/Test.sol';
-import {ERC20Mintable} from './common/ERC20Mintable.sol';
-import {MockSettlement} from './common/MockSettlement.sol';
+import "forge-std/Test.sol";
+import {ERC20Mintable} from "./common/ERC20Mintable.sol";
+import {MockSettlement} from "./common/MockSettlement.sol";
 
-import {DCAOrder, AlreadyInitialized} from '../src/DCAOrder.sol';
-import {OrderFactory} from '../src/OrderFactory.sol';
+import {DCAOrder, AlreadyInitialized} from "../src/DCAOrder.sol";
+import {OrderFactory} from "../src/OrderFactory.sol";
 
 contract OrderFactoryTest is Test {
   MockSettlement public mockSettlement;
@@ -28,8 +28,6 @@ contract OrderFactoryTest is Test {
     sellToken = new ERC20Mintable('Test Token', 'TEST');
     mastercopy = new DCAOrder();
     factory = new OrderFactory();
-
-
 
     uint256 mastercopyStartTime = block.timestamp + 1 days;
     uint256 mastercopyEndTime = mastercopyStartTime + 1 hours;
@@ -54,12 +52,10 @@ contract OrderFactoryTest is Test {
     _startTime = block.timestamp + 1 hours;
     _endTime = _startTime + 1 days;
     _principal = 10 ether;
-    _interval= 1;
+    _interval = 1;
   }
 
-  function testMastercopy() public {
-
-  }
+  function testMastercopy() public {}
 
   function testCreateOrderWithNonce() public {
     // Approve the factory to spend the sell token
@@ -69,7 +65,7 @@ contract OrderFactoryTest is Test {
     address order = factory.createOrderWithNonce(
       address(mastercopy),
       abi.encodeWithSignature(
-        'initialize(address,address,address,address,uint256,uint256,uint256,uint256,address)',
+        "initialize(address,address,address,address,uint256,uint256,uint256,uint256,address)",
         _owner,
         _receiver,
         _sellToken,

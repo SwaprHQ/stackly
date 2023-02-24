@@ -14,17 +14,11 @@ export class Amount<T extends TokenOrCurrency> extends Decimal {
     this.currency = currency;
   }
 
-  public static fromRawAmount<T extends TokenOrCurrency>(
-    currency: T,
-    amount: BigNumberish
-  ) {
+  public static fromRawAmount<T extends TokenOrCurrency>(currency: T, amount: BigNumberish) {
     return new Amount(currency, formatUnits(amount, currency.decimals));
   }
 
   public toRawAmount() {
-    return parseUnits(
-      this.toFixed(this.currency.decimals),
-      this.currency.decimals
-    );
+    return parseUnits(this.toFixed(this.currency.decimals), this.currency.decimals);
   }
 }

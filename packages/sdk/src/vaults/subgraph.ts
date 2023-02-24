@@ -4,14 +4,12 @@ export type Maybe<T> = T | null;
 export type Exact<T extends { [key: string]: unknown }> = {
   [K in keyof T]: T[K];
 };
-export type MakeOptional<T, K extends keyof T> = Omit<T, K> &
-  {
-    [SubKey in K]?: Maybe<T[SubKey]>;
-  };
-export type MakeMaybe<T, K extends keyof T> = Omit<T, K> &
-  {
-    [SubKey in K]: Maybe<T[SubKey]>;
-  };
+export type MakeOptional<T, K extends keyof T> = Omit<T, K> & {
+  [SubKey in K]?: Maybe<T[SubKey]>;
+};
+export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & {
+  [SubKey in K]: Maybe<T[SubKey]>;
+};
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -53,9 +51,6 @@ export type Order = {
   orderSlots: string[];
   interval: Scalars['Int'];
 };
-
-
-
 
 const OrderFragment = gql`
   fragment OrderFragment on DCAOrder {
@@ -108,10 +103,7 @@ const getOrderQuery = gql`
  * @param userAddress - User address
  * @returns
  */
-export async function getUserOrders(
-  client: GraphQLClient,
-  userAddress: string
-) {
+export async function getUserOrders(client: GraphQLClient, userAddress: string) {
   const response = await client.request<{
     orders: Order[];
   }>(getUserOrdersQuery, {

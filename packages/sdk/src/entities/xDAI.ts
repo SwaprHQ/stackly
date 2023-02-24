@@ -18,10 +18,6 @@ export class xDAI extends NativeCurrency {
    * @param other other token to compare
    */
   public equals(other: Currency): boolean {
-    return (
-      other.isNative &&
-      this.chainId === other.chainId &&
-      this.address === other.address
-    );
+    return other.isNative && this.chainId === other.chainId && this.address === other.address;
   }
 }
