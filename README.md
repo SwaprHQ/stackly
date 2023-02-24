@@ -14,6 +14,23 @@ packages/apps:
 
 Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
 
-### Contributing
+### Getting Started
 
-Check out the [CONTRIBUTING.md](./CONTRIBUTING.md) file for instructions on how to contribute.
+
+[Install pnpm](https://pnpm.io/installation) if not installed. Clone the monorepo:
+```bash
+git clone git@github.com:ImpeccableHQ/stackly.git
+```
+
+Build the SDK first, 
+
+```bash
+pnpm run build --filter=dca-sdk
+```
+
+Then run the CRA 
+
+```
+cd packages/app 
+pnpm run start
+```
