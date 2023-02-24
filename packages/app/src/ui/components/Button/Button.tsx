@@ -12,6 +12,7 @@ export const Button = styled.button`
   background: linear-gradient(300.79deg, #ff8a00 -76.85%, #fac336 93.6%);
   height: 53px;
   transition: all 0.2s ease-in-out;
+  color: #000;
   &:hover {
     transform: translateY(-2px);
   }

@@ -104,12 +104,15 @@ const OrderListCard = styled(Card)`
 `;
 
 const OrderListHeader = styled.div`
-  display: flex;
+  display: none;
   justify-content: space-around;
   align-items: center;
   margin-bottom: 16px;
   h5 {
     font-size: 14px;
     font-weight: 500;
+  }
+  @media (min-width: 768px) {
+    display: flex;
   }
 `;

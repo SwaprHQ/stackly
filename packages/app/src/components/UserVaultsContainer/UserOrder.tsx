@@ -110,9 +110,8 @@ export function UserOrder({ order }: { order: SubgraphOrder }) {
 const ToggleShowDetailsButton = styled(ChevronDown)`
   position: absolute;
   right: 32px;
+  top: 32px;
   cursor: pointer;
-  top: 0px;
-  bottom: 0;
   margin: auto;
 `;
 
