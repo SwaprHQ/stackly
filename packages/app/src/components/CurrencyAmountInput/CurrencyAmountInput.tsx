@@ -39,6 +39,7 @@ export function CurrencyAmountInput({
   const [currencyAmount, setCurrencyAmount] = useState<Amount<Currency>>(
     value || new Amount(USDC[1], '0') // Start with USDC if no value is provided
   );
+  const [inputAmount, setInputAmount] = useState<string>('');
 
   // Close the search modal if the chain changes
   useEffect(() => {
@@ -54,10 +55,10 @@ export function CurrencyAmountInput({
         </TokenButton>
         <NumberInput
           disabled={disabled}
-          value={currencyAmount.toString()}
+          value={inputAmount}
           onChange={(nextSellAmount) => {
-            const nextCurrencyAmount = new Amount(currencyAmount.currency, nextSellAmount);
-            setCurrencyAmount(nextCurrencyAmount);
+            let nextCurrencyAmount = new Amount(currencyAmount.currency, nextSellAmount || 0);
+            setInputAmount(nextSellAmount);
             onChange(nextCurrencyAmount);
           }}
         />
@@ -65,7 +66,8 @@ export function CurrencyAmountInput({
           isOpen={isSearchModalOpen}
           onDismiss={handleDismissSearch}
           onCurrencySelect={(nextCurrency) => {
-            const nextCurrencyAmount = Amount.fromRawAmount(nextCurrency, currencyAmount.toRawAmount());
+            const nextCurrencyAmount = new Amount(nextCurrency, inputAmount);
+            setInputAmount(nextCurrencyAmount.toString());
             setCurrencyAmount(nextCurrencyAmount);
             onChange(nextCurrencyAmount);
             handleDismissSearch();
@@ -83,6 +85,7 @@ export function CurrencyAmountInput({
           onBalanceSelect={(userBalance) => {
             if (disabled) return;
             const nextCurrencyAmount = userBalance;
+            setInputAmount(nextCurrencyAmount.toString());
             setCurrencyAmount(nextCurrencyAmount);
             onChange(nextCurrencyAmount);
           }}

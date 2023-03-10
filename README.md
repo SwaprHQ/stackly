@@ -16,21 +16,27 @@ Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
 
 ### Getting Started
 
-
 [Install pnpm](https://pnpm.io/installation) if not installed. Clone the monorepo:
+
 ```bash
 git clone git@github.com:ImpeccableHQ/stackly.git
 ```
 
-Build the SDK first, 
+Generate contracts before building the SDK
+
+```bash
+pnpm run typechain
+```
+
+Then build the SDK
 
 ```bash
 pnpm run build --filter=dca-sdk
 ```
 
-Then run the CRA 
+Then run the CRA
 
 ```
-cd packages/app 
+cd packages/app
 pnpm run start
 ```

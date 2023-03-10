@@ -1,11 +1,7 @@
 import { InputHTMLAttributes } from 'react';
 import styled from 'styled-components';
 
-interface NumberInputProps
-  extends Omit<
-    InputHTMLAttributes<HTMLInputElement>,
-    'onChange' | 'pattern' | 'type'
-  > {
+interface NumberInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'pattern' | 'type'> {
   onChange: (value: string) => void;
   border?: boolean;
 }
@@ -16,12 +12,13 @@ export function NumberInput({ border = true, onChange, ...props }: NumberInputPr
       <StyledInput
         {...props}
         border={border}
-        onWheel={(e) => e.currentTarget.blur()}
-        type="number"
-        pattern="^-?[0-9]\d*\.?\d*$"
+        type="string"
         onChange={(e) => {
-          const value = e.target.value.replace(/-|e/gi, '');
-          onChange(value);
+          const decimalNumberRegex = /^[0-9]*[.,]?[0-9]*$/;
+
+          if (e.target.value === '' || decimalNumberRegex.test(e.target.value)) {
+            onChange(e.target.value);
+          }
         }}
       />
     </StyledInputShadowWrapper>
