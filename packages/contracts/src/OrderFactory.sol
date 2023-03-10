@@ -54,6 +54,9 @@ contract OrderFactory is Ownable2Step {
 
     // Transfer the principal to the order
     IERC20(_sellToken).transferFrom(msg.sender, order, _principal - ((_principal * protocolFee) / 10000));
+
+    // Transfer the fee to the factory
+    IERC20(_sellToken).transferFrom(msg.sender, address(this), (_principal * protocolFee) / 10000);
   }
 
   /// @dev Set the protocol fee percent  
