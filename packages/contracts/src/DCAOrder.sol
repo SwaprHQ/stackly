@@ -50,6 +50,8 @@ contract DCAOrder is IConditionalOrder, EIP1271Verifier, IDCAOrder {
   bool public cancelled;
   /// @dev The initial principal amount of the DCA order.
   uint256 public principal;
+  /// @dev The protocol fee amount
+  uint16 public fee;
 
   event Initialized(address indexed order);
   event Cancelled(address indexed order);
@@ -64,6 +66,7 @@ contract DCAOrder is IConditionalOrder, EIP1271Verifier, IDCAOrder {
   /// @param _endTime The end time of the DCA order.
   /// @param _interval The frequency interval of the DCA order in hours.
   /// @param _settlementContract The settlement contract address.
+  /// @param _fee The protocol fee amount
   function initialize(
     address _owner,
     address _receiver,
@@ -73,7 +76,8 @@ contract DCAOrder is IConditionalOrder, EIP1271Verifier, IDCAOrder {
     uint256 _startTime,
     uint256 _endTime,
     uint256 _interval,
-    address _settlementContract
+    address _settlementContract,
+    uint16 _fee
   ) external override returns (bool) {
     // Ensure that the order is not already initialized.
     if (owner != address(0)) {
@@ -103,7 +107,8 @@ contract DCAOrder is IConditionalOrder, EIP1271Verifier, IDCAOrder {
     startTime = _startTime;
     endTime = _endTime;
     interval = _interval;
-    principal = _principal;
+    principal = _principal - (_principal * _fee) / 10000;
+    fee = _fee;
     domainSeparator = IGPv2Settlement(_settlementContract).domainSeparator();
     // Approve the vaut relayer to spend the sell token
     IERC20(_sellToken).approve(address(IGPv2Settlement(_settlementContract).vaultRelayer()), type(uint256).max);

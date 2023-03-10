@@ -22,6 +22,7 @@ contract OrderFactoryTest is Test {
   uint256 public _startTime;
   uint256 public _endTime;
   uint256 public _principal;
+  uint16 public _fee;
 
   function setUp() public {
     mockSettlement = new MockSettlement();
@@ -40,7 +41,8 @@ contract OrderFactoryTest is Test {
       mastercopyStartTime,
       mastercopyEndTime,
       1,
-      address(mockSettlement)
+      address(mockSettlement),
+      5
     );
 
     sellToken.mint(address(this), 10000 ether);
@@ -53,6 +55,7 @@ contract OrderFactoryTest is Test {
     _endTime = _startTime + 1 days;
     _principal = 10 ether;
     _interval = 1;
+    _fee = 5;
   }
 
   function testMastercopy() public {}
@@ -65,7 +68,7 @@ contract OrderFactoryTest is Test {
     address order = factory.createOrderWithNonce(
       address(mastercopy),
       abi.encodeWithSignature(
-        "initialize(address,address,address,address,uint256,uint256,uint256,uint256,address)",
+        "initialize(address,address,address,address,uint256,uint256,uint256,uint256,address,uint16)",
         _owner,
         _receiver,
         _sellToken,
@@ -79,7 +82,7 @@ contract OrderFactoryTest is Test {
       1
     );
 
-    // // Balance has been transferred to the vault
-    assertEq(sellToken.balanceOf(order), _principal);
+    // Balance has been transferred to the vault
+    assertEq(sellToken.balanceOf(order), _principal - (_principal * _fee) / 10000);
   }
 }

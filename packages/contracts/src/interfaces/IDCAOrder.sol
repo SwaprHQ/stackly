@@ -12,7 +12,8 @@ interface IDCAOrder {
     uint256 _startTime,
     uint256 _endTime,
     uint256 _interval,
-    address _settlementContract
+    address _settlementContract,
+    uint16 _fee
   ) external returns (bool);
   function deposit() external returns (bool);
 }
