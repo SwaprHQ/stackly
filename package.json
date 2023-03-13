@@ -1,5 +1,5 @@
 {
-  "name": "@3ac.vc/cow-dca-monorepo",
+  "name": "@stackly/cow-dca-monorepo",
   "version": "0.1.0",
   "private": true,
   "packageManager": "pnpm@7.14.2",

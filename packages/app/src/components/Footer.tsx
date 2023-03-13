@@ -5,7 +5,7 @@ export const FOOTER_HEIGHT = '64px';
 export function Footer() {
   return (
     <FooterWrapper>
-      <FooterTitle>3AC Labs</FooterTitle>
+      <FooterTitle>Made with ❤️ from Swapr</FooterTitle>
     </FooterWrapper>
   );
 }
