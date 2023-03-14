@@ -25,6 +25,7 @@ git clone git@github.com:ImpeccableHQ/stackly.git
 Generate contracts before building the SDK
 
 ```bash
+cd packages/sdk
 pnpm run typechain
 ```
 
