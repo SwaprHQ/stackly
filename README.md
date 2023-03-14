@@ -29,9 +29,10 @@ cd packages/sdk
 pnpm run typechain
 ```
 
-Then build the SDK
+Then go to the root folder of the monorepo and build the SDK
 
 ```bash
+cd ../..
 pnpm run build --filter=dca-sdk
 ```
 
@@ -40,4 +41,10 @@ Then run the CRA
 ```
 cd packages/app
 pnpm run start
+```
+
+Get an API key from https://www.alchemy.com/ and add an .env file under app with your API key.
+
+```
+REACT_APP_ALCHEMY_KEY="your_key"
 ```
