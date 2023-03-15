@@ -15,6 +15,7 @@ error OrderCancelled();
 error NotOwner();
 error NotReceiver();
 error ReceiverIsOrder();
+error MissingOwner();
 error AlreadyInitialized();
 error IntervalMustBeGreaterThanZero();
 error InvalidStartTime();
@@ -82,6 +83,10 @@ contract DCAOrder is IConditionalOrder, EIP1271Verifier, IDCAOrder {
     // Ensure that the order is not already initialized.
     if (owner != address(0)) {
       revert AlreadyInitialized();
+    }
+    // Ensure an owner is set
+    if (_owner == address(0)) {
+      revert MissingOwner();
     }
     // Ensure that the receiver is not the current contract.
     if (_receiver == address(this)) {
