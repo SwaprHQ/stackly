@@ -60,3 +60,5 @@ generated
 
 # subgraph
 subgraph.yaml
+
+bin
