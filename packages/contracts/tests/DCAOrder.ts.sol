@@ -2,12 +2,14 @@
 pragma solidity ^0.8.17;
 
 import "forge-std/Test.sol";
+
 import {ERC20Mintable} from "./common/ERC20Mintable.sol";
 import {MockSettlement} from "./common/MockSettlement.sol";
 import {SafeMath} from "oz/utils/math/SafeMath.sol";
 
 import {GPv2Order} from "../src/libraries/GPv2Order.sol";
 import {DCAOrder, NotOwner, NotWithinStartAndEndTimes} from "../src/DCAOrder.sol";
+import {IConditionalOrder} from "../src/interfaces/IConditionalOrder.sol";
 
 contract DCAOrderTest is Test {
   MockSettlement public mockSettlement;
@@ -22,6 +24,13 @@ contract DCAOrderTest is Test {
   uint256 public _endTime;
   uint256 public _principal;
   uint16 public _fee;
+
+  // @todo: import from IConditionalOrder
+  event ConditionalOrderCreated(address indexed);
+
+  // @todo: import from DCAOrder
+  event Initialized(address indexed order);
+  event Cancelled(address indexed order);
 
   function setUp() public {
     mockSettlement = new MockSettlement();
@@ -40,7 +49,13 @@ contract DCAOrderTest is Test {
     _fee = 5;
   }
 
-  function testInitialize() public {
+  function testInitialize_success() public {
+    vm.expectEmit(true, true, false, true, address(dcaOrder));
+    emit ConditionalOrderCreated(address(dcaOrder));
+
+    vm.expectEmit(true, true, false, true, address(dcaOrder));
+    emit Initialized(address(dcaOrder));
+
     sellToken.approve(address(dcaOrder), type(uint256).max);
     dcaOrder.initialize(
       _owner, _receiver, _sellToken, _buyToken, _principal, _startTime, _endTime, _interval, address(mockSettlement), _fee
@@ -57,6 +72,59 @@ contract DCAOrderTest is Test {
     assertEq(dcaOrder.principal(), _principal - ((_principal * _fee) / 10000));
     assertEq(dcaOrder.domainSeparator(), mockSettlement.domainSeparator());
     assertEq(dcaOrder.fee(), _fee);
+  }
+
+  function testInitialize_AlreadyInitialized() public {
+    dcaOrder.initialize(
+      _owner, _receiver, _sellToken, _buyToken, _principal, _startTime, _endTime, _interval, address(mockSettlement), _fee
+    );
+
+    vm.expectRevert(bytes4(keccak256("AlreadyInitialized()")));
+
+    // Try to initialize again
+    dcaOrder.initialize(
+      _owner, _receiver, _sellToken, _buyToken, _principal, _startTime, _endTime, _interval, address(mockSettlement), _fee
+    );
+  }
+
+  function testInitialize_MissingOwner() public {
+    vm.expectRevert(bytes4(keccak256("MissingOwner()")));
+
+    dcaOrder.initialize(
+      address(0), _receiver, _sellToken, _buyToken, _principal, _startTime, _endTime, _interval, address(mockSettlement), _fee
+    );
+  }
+
+  function testInitialize_ReceiverIsOrder() public {
+    vm.expectRevert(bytes4(keccak256("ReceiverIsOrder()")));
+
+    dcaOrder.initialize(
+      _owner, address(dcaOrder), _sellToken, _buyToken, _principal, _startTime, _endTime, _interval, address(mockSettlement), _fee
+    );
+  }
+
+  function testInitialize_IntervalMustBeGreaterThanZero() public {
+    vm.expectRevert(bytes4(keccak256("IntervalMustBeGreaterThanZero()")));
+
+    dcaOrder.initialize(
+      _owner, _receiver, _sellToken, _buyToken, _principal, _startTime, _endTime, 0, address(mockSettlement), _fee
+    );
+  }
+
+  function testInitialize_InvalidStartTime() public {
+    vm.expectRevert(bytes4(keccak256("InvalidStartTime()")));
+
+    dcaOrder.initialize(
+      _owner, _receiver, _sellToken, _buyToken, _principal, block.timestamp, _endTime, _interval, address(mockSettlement), _fee
+    );
+  }
+
+  function testInitialize_InvalidEndTime() public {
+    vm.expectRevert(bytes4(keccak256("InvalidEndTime()")));
+
+    dcaOrder.initialize(
+      _owner, _receiver, _sellToken, _buyToken, _principal, _startTime, block.timestamp, _interval, address(mockSettlement), _fee
+    );
   }
 
   function testSlots() public {
@@ -84,6 +152,10 @@ contract DCAOrderTest is Test {
     dcaOrder.initialize(
       _owner, _receiver, _sellToken, _buyToken, _principal, _startTime, _endTime, _interval, address(mockSettlement), _fee
     );
+
+    vm.expectEmit(true, true, false, true, address(dcaOrder));
+    emit Cancelled(address(dcaOrder));
+
     dcaOrder.cancel();
     // Balance should be 0
     assertEq(sellToken.balanceOf(address(dcaOrder)), 0);
@@ -173,6 +245,36 @@ contract DCAOrderTest is Test {
     // Should revert because the order is not tradeable
     vm.expectRevert(NotWithinStartAndEndTimes.selector);
     order = dcaOrder.getTradeableOrder();
+  }
+
+  function testGetTradeableOrder_OrderCancelled() public {
+    sellToken.approve(address(dcaOrder), type(uint256).max);
+
+    uint256 _testPrincipal = 30 ether;
+
+    dcaOrder.initialize(
+      _owner, _receiver, _sellToken, _buyToken, _testPrincipal, _startTime, _endTime, _interval, address(mockSettlement), _fee
+    );
+
+    // Cancel the order
+    dcaOrder.cancel();
+    
+    vm.expectRevert(bytes4(keccak256("OrderCancelled()")));
+    dcaOrder.getTradeableOrder();
+  }
+
+  function testGetTradeableOrder_ZeroSellAmount() public {
+    sellToken.approve(address(dcaOrder), type(uint256).max);
+
+    uint256 _testPrincipal = 0 ether;
+
+    dcaOrder.initialize(
+      _owner, _receiver, _sellToken, _buyToken, _testPrincipal, _startTime, _endTime, _interval, address(mockSettlement), _fee
+    );
+    
+    vm.warp(dcaOrder.startTime());
+    vm.expectRevert(bytes4(keccak256("ZeroSellAmount()")));
+    dcaOrder.getTradeableOrder();
   }
 
   function testHourlyOverWeeksDCAOrders() public {
