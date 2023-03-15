@@ -42,9 +42,7 @@ contract DCAOrder is IConditionalOrder, EIP1271Verifier, IDCAOrder {
   uint256 public endTime;
   /// @dev The amount of tokens to buy in each order.
   uint256 public amount;
-  /// @dev The frequency of the DCA order. For example, if the frequency is 2 and the frequency interval is DAY, then the order will be executed every 2 days.
-  /// @dev If the frequency is 1 and the frequency interval is HOUR, then the order will be executed every hour.
-  /// @dev For weeks, the frequency should be 7 and the frequency interval should be DAY. So jumps of 7 days.
+  /// @dev The frequency of the DCA order in hours
   uint256 public interval;
   bytes32 public domainSeparator;
   /// @dev Indicates that the order has been cancelled.
