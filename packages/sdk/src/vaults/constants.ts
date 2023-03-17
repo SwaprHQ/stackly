@@ -6,7 +6,7 @@ import { ChainId } from '../constants';
  */
 export const ORDER_FACTORY_ADDRESS_LIST: Record<ChainId, string> = {
   [ChainId.ETHEREUM]: AddressZero,
-  [ChainId.GNOSIS]: '0x6fee18b2d1373304246bf7fdf734a4c539cc8566',
+  [ChainId.GNOSIS]: '0xCDe5E2948164C9115e374c5d722BeD3c6b0a219E',
 };
 
 /**
@@ -14,7 +14,7 @@ export const ORDER_FACTORY_ADDRESS_LIST: Record<ChainId, string> = {
  */
 export const DCAORDER_SINGLETON_ADDRESS_LIST: Record<ChainId, string> = {
   [ChainId.ETHEREUM]: AddressZero,
-  [ChainId.GNOSIS]: '0x54B95580849395085Da4388E431440a7edA5C03f',
+  [ChainId.GNOSIS]: '0xB27Da7650B3C82a1FF46d66bDF027a9007Ed8512',
 };
 
 /**
@@ -22,7 +22,7 @@ export const DCAORDER_SINGLETON_ADDRESS_LIST: Record<ChainId, string> = {
  */
 export const COW_SETTLEMENT_ADDRESS_LIST: Record<ChainId, string> = {
   [ChainId.ETHEREUM]: '0xC92E8bdf79f0507f65a392b0ab4667716BFE0110',
-  [ChainId.GNOSIS]: '0x9008d19f58aabd9ed0d60971565aa8510560ab41',
+  [ChainId.GNOSIS]: '0x9008D19f58AAbD9eD0D60971565AA8510560ab41',
 };
 
 export const SUBGRAPH_ENDPOINT_LIST: Readonly<Record<string, string>> = {
