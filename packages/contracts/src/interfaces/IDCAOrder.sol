@@ -15,5 +15,4 @@ interface IDCAOrder {
     address _settlementContract,
     uint16 _fee
   ) external returns (bool);
-  function deposit() external returns (bool);
 }

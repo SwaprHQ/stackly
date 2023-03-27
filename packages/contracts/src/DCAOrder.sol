@@ -121,11 +121,6 @@ contract DCAOrder is IConditionalOrder, EIP1271Verifier, IDCAOrder {
     return true;
   }
 
-  function deposit() external returns (bool) {
-    // Transfer the capital to the order
-    return IERC20(sellToken).transferFrom(msg.sender, address(this), principal);
-  }
-
   /// @dev Cancels the order and transfers the funds back to the owner.
   function cancel() external {
     if (msg.sender != owner) {
