@@ -66,7 +66,7 @@ export function CurrencyAmountInput({
           isOpen={isSearchModalOpen}
           onDismiss={handleDismissSearch}
           onCurrencySelect={(nextCurrency) => {
-            const nextCurrencyAmount = new Amount(nextCurrency, inputAmount);
+            const nextCurrencyAmount = new Amount(nextCurrency, inputAmount || 0);
             setInputAmount(nextCurrencyAmount.toString());
             setCurrencyAmount(nextCurrencyAmount);
             onChange(nextCurrencyAmount);
