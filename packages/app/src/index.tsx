@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { createHashRouter, RouterProvider } from 'react-router-dom';
 import './index.css';
 import { WalletProvider } from './wallet';
 import IndexPage from './pages';
@@ -12,7 +12,7 @@ import { ListsUpdater } from './state/lists/updater';
 import { MulticallUpdater } from './state/multicall/updater';
 import store from './state';
 
-const router = createBrowserRouter([
+const router = createHashRouter([
   {
     path: '/',
     element: <IndexPage />,
@@ -27,9 +27,7 @@ const router = createBrowserRouter([
   },
 ]);
 
-const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
-);
+const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 
 function Updaters() {
   return (
