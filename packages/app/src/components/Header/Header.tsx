@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { WalletConnectButton } from './ConnectButton';
 
-import { ReactComponent as StacksLogo } from '../../assets/svg/stax-logo.svg';
+import { ReactComponent as StacklyLogo } from '../../assets/svg/stackly-logo.svg';
 import { ReactComponent as Burger } from './burger.svg';
 import { Container } from '../Container';
 
@@ -17,7 +17,7 @@ function NavMenuItems() {
     <>
       <HeaderTitleContainer>
         <Link to="/">
-          <StacksLogo />
+          <StacklyLogo height="40" width="140" />
         </Link>
       </HeaderTitleContainer>
       <Nav>
