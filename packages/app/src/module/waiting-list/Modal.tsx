@@ -11,7 +11,7 @@ export const Modal = () => {
         <ModalOutterWrapper maxWidth="600px">
           <ModalInnerWrapper>
             <ModalHeader>
-              <h1>Stackly is launching soon</h1>
+              <Header1>Stackly is launching soon</Header1>
             </ModalHeader>
             <ModalContent>
               <Paragraph>
@@ -64,4 +64,8 @@ const SmallFontParagraph = styled.p`
   margin-top: 10px;
   font-size: 12x;
   opacity: 60%;
+`;
+
+const Header1 = styled.h1`
+  text-align: center;
 `;
