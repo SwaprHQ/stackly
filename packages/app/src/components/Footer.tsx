@@ -5,15 +5,25 @@ export const FOOTER_HEIGHT = '64px';
 export function Footer() {
   return (
     <FooterWrapper>
-      <FooterTitle>
-        Made with ❤️ from{' '}
-        <a href="https://swapr.eth.limo" target="_blank">
-          Swapr
-        </a>
-      </FooterTitle>
+      <FooterContent />
     </FooterWrapper>
   );
 }
+
+export function FooterContent() {
+  return (
+    <FooterTitle>
+      Made with ❤️ from{' '}
+      <HyperLink href="https://swapr.eth.limo" target="_blank">
+        Swapr
+      </HyperLink>
+    </FooterTitle>
+  );
+}
+
+const HyperLink = styled.a`
+  color: inherit;
+`;
 
 const FooterTitle = styled.span`
   font-size: 12px;

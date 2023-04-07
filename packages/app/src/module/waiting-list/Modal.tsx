@@ -1,5 +1,5 @@
 import { ModalContent } from '../../components/Modal/styles';
-import { Footer, FOOTER_HEIGHT } from '../../components/Footer';
+import { FooterContent } from '../../components/Footer';
 import { ModalBackdrop, ModalHeader, ModalInnerWrapper, ModalOutterWrapper } from '../../components/Modal/styles';
 import { Button } from '../../ui/components/Button';
 import { ReactComponent as DiscordLogo } from '../../assets/svg/discord-mark-black.svg';
@@ -29,7 +29,7 @@ export const Modal = () => {
                 </Flex>
               </ButtonLink>
               <SmallFontParagraph>Probably nothing...</SmallFontParagraph>
-              <Footer />
+              <FooterContent />
             </ModalContent>
           </ModalInnerWrapper>
         </ModalOutterWrapper>
@@ -39,6 +39,7 @@ export const Modal = () => {
 };
 const ButtonLink = styled(Button)`
   text-decoration: none;
+  margin-bottom: 10px;
 `;
 
 const Overlay = styled.div`
@@ -63,9 +64,9 @@ const Paragraph = styled.p`
 `;
 
 const SmallFontParagraph = styled.p`
-  margin-top: 10px;
-  font-size: 12x;
+  font-size: 12px;
   opacity: 60%;
+  margin-bottom: 40px;
 `;
 
 const Header1 = styled.h1`
