@@ -22,7 +22,7 @@ export const Modal = () => {
                 <br />
                 Join the waitlist via our Discord.
               </Paragraph>
-              <ButtonLink as="a" href="https://swapr.eth.limo" target="_blank">
+              <ButtonLink as="a" href="https://discord.gg/d2yh4XZC" target="_blank">
                 <Flex>
                   Go to Discord <DiscordLogo height="14px" />
                 </Flex>
