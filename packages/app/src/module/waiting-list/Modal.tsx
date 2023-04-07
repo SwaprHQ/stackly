@@ -1,4 +1,5 @@
 import { ModalContent } from '../../components/Modal/styles';
+import { Footer, FOOTER_HEIGHT } from '../../components/Footer';
 import { ModalBackdrop, ModalHeader, ModalInnerWrapper, ModalOutterWrapper } from '../../components/Modal/styles';
 import { Button } from '../../ui/components/Button';
 import { ReactComponent as DiscordLogo } from '../../assets/svg/discord-mark-black.svg';
@@ -28,6 +29,7 @@ export const Modal = () => {
                 </Flex>
               </ButtonLink>
               <SmallFontParagraph>Probably nothing...</SmallFontParagraph>
+              <Footer />
             </ModalContent>
           </ModalInnerWrapper>
         </ModalOutterWrapper>

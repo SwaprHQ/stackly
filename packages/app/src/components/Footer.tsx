@@ -5,7 +5,12 @@ export const FOOTER_HEIGHT = '64px';
 export function Footer() {
   return (
     <FooterWrapper>
-      <FooterTitle>Made with ❤️ from Swapr</FooterTitle>
+      <FooterTitle>
+        Made with ❤️ from{' '}
+        <a href="https://swapr.eth.limo" target="_blank">
+          Swapr
+        </a>
+      </FooterTitle>
     </FooterWrapper>
   );
 }
