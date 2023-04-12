@@ -1,5 +1,5 @@
 import { InputHTMLAttributes } from 'react';
-import styled from 'styled-components';
+import { StyledInput, StyledInputShadowWrapper } from './StyledInput';
 
 interface NumberInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'pattern' | 'type'> {
   onChange: (value: string) => void;
@@ -37,25 +37,3 @@ export function TextInput({ border = true, onChange, ...props }: NumberInputProp
     />
   );
 }
-
-/**
- * Adds a shadow to the input
- */
-const StyledInputShadowWrapper = styled.div`
-  box-shadow: 3px 3px 0px 1px #31322d;
-  border: 3px solid #1e1f1b;
-  border-radius: 8px;
-  overflow: hidden;
-`;
-
-const StyledInput = styled.input<{ border?: boolean }>(
-  ({ border }) => `
-  ${border === false ? '' : ''}
-  width: 100%;
-  background: #fefaf3;
-  &, &:focus, &:active {
-    outline: none;
-    border: none; /** Handled by StyledInputShadowWrapper */
-  }
-`
-);

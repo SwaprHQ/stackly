@@ -70,7 +70,7 @@ export function CreateDCAVaultContainer() {
   const { openModal, setModalData } = useModal<VaultCreateAndDepositStepsModalProps>();
   const { data: signer } = useSigner();
   const [validationError, setValidationError] = useState<Error | null>(null);
-  const [startAt, setStartAt] = useState<Dayjs | 'now'>('now');
+  const [startAt, setStartAt] = useState<Dayjs>(dayjs().add(10, 'm'));
   const [endAt, setEndAt] = useState<Dayjs>(dayjs().add(7, 'd')); // 7 days from now
   const [hourInterval, setHourInterval] = useState<number>(1);
   const [frequencyInterval, setFrequencyInterval] = useState<DCAFrequencyInterval>(DCAFrequencyInterval.HOUR);
@@ -187,8 +187,11 @@ export function CreateDCAVaultContainer() {
       sellToken: sellTokenAmount.currency.address,
       buyToken: buyToken.address,
       principal: sellTokenAmount.toRawAmount().toString(),
-      // If startAt is 'now', set it to the current time plus 5 minutes into the future
-      startTime: startAt === 'now' ? dayjs().add(10, 'm').utc().unix() : startAt.utc().unix(),
+      // If startAt is 'now', set it to the current time plus 10 minutes into the future
+      startTime:
+        startAt.utc().unix() < dayjs().add(10, 'm').utc().unix()
+          ? dayjs().add(10, 'm').utc().unix()
+          : startAt.utc().unix(),
       endTime: endAt.utc().unix(),
       interval: hourInterval,
     };
@@ -288,30 +291,11 @@ export function CreateDCAVaultContainer() {
                 </JoinedFormGroup>
                 <FormGroup>
                   <label>Starting</label>
-                  <DateTimeInput
-                    showNowOption={true}
-                    disabled={!isNetworkSupported}
-                    value={startAt}
-                    onChange={(nextStartAt) => {
-                      setStartAt(nextStartAt);
-                    }}
-                  />
+                  <DateTimeInput onChange={setStartAt} value={startAt} disabled={!isNetworkSupported} />
                 </FormGroup>
                 <FormGroup>
                   <label>Until</label>
-                  <DateTimeInput
-                    disabled={!isNetworkSupported}
-                    value={endAt}
-                    onChange={(nextEndAt) => {
-                      // Cannot select now as end date
-                      if (nextEndAt === 'now') return;
-                      const isBeforeStartAt = nextEndAt.isBefore(startAt);
-                      if (isBeforeStartAt) {
-                        return;
-                      }
-                      setEndAt(nextEndAt);
-                    }}
-                  />
+                  <DateTimeInput onChange={setEndAt} value={endAt} disabled={!isNetworkSupported} />
                 </FormGroup>
                 <FormButtonGroup>
                   {account.isConnected && isNetworkSupported ? (
