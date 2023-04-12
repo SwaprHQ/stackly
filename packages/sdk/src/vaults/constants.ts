@@ -6,7 +6,7 @@ import { ChainId } from '../constants';
  */
 export const ORDER_FACTORY_ADDRESS_LIST: Record<ChainId, string> = {
   [ChainId.ETHEREUM]: AddressZero,
-  [ChainId.GNOSIS]: '0xDaA06d9e9843f4D69FdD7E4Bd262f3DA6F822507',
+  [ChainId.GNOSIS]: '0xaB0E5e22cFd48bD104E94909DB1e6D62E25E6E9D',
 };
 
 /**
@@ -14,7 +14,7 @@ export const ORDER_FACTORY_ADDRESS_LIST: Record<ChainId, string> = {
  */
 export const DCAORDER_SINGLETON_ADDRESS_LIST: Record<ChainId, string> = {
   [ChainId.ETHEREUM]: AddressZero,
-  [ChainId.GNOSIS]: '0xc97ECBDBa20c672c61e27bD657d4dfbD2328F6fa',
+  [ChainId.GNOSIS]: '0x422Eb95947755e8D0D7ed99F7b20BFA62720b4C9',
 };
 
 /**
