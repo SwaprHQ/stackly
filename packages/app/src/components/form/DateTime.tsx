@@ -14,6 +14,9 @@ export function DateTimeInput({ disabled, value, onChange }: DateTimeInputProps)
   const handleClick = () => {
     if (ref.current) ref.current.showPicker();
   };
+  const handleFocus = () => {
+    if (ref.current) ref.current.showPicker();
+  };
   const valuesIsString = typeof value === 'string';
   return (
     <StyledInputShadowWrapper>
@@ -41,6 +44,7 @@ export function DateTimeInput({ disabled, value, onChange }: DateTimeInputProps)
         value={valuesIsString ? value : ''}
         disabled={disabled}
         onClick={handleClick}
+        onFocus={handleFocus}
         hidden={!valuesIsString}
       />
     </StyledInputShadowWrapper>
