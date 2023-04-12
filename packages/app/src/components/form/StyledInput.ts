@@ -9,6 +9,7 @@ export const StyledInputShadowWrapper = styled.div`
 
 export const StyledInput = styled.input<{ border?: boolean }>(
   ({ border, disabled }) => `
+  height: 48px;
   width: 100%;
   background: #fefaf3;
   &, &:focus, &:active {

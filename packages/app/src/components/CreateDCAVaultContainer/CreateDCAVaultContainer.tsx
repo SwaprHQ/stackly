@@ -70,7 +70,7 @@ export function CreateDCAVaultContainer() {
   const { openModal, setModalData } = useModal<VaultCreateAndDepositStepsModalProps>();
   const { data: signer } = useSigner();
   const [validationError, setValidationError] = useState<Error | null>(null);
-  const [startAt, setStartAt] = useState<Dayjs>(dayjs().add(10, 'm'));
+  const [startAt, setStartAt] = useState<Dayjs | 'Now'>('Now');
   const [endAt, setEndAt] = useState<Dayjs>(dayjs().add(7, 'd')); // 7 days from now
   const [hourInterval, setHourInterval] = useState<number>(1);
   const [frequencyInterval, setFrequencyInterval] = useState<DCAFrequencyInterval>(DCAFrequencyInterval.HOUR);
@@ -189,7 +189,7 @@ export function CreateDCAVaultContainer() {
       principal: sellTokenAmount.toRawAmount().toString(),
       // If startAt is 'now', set it to the current time plus 10 minutes into the future
       startTime:
-        startAt.utc().unix() < dayjs().add(10, 'm').utc().unix()
+        startAt === 'Now' || startAt.utc().unix() < dayjs().add(10, 'm').utc().unix()
           ? dayjs().add(10, 'm').utc().unix()
           : startAt.utc().unix(),
       endTime: endAt.utc().unix(),
@@ -291,7 +291,17 @@ export function CreateDCAVaultContainer() {
                 </JoinedFormGroup>
                 <FormGroup>
                   <label>Starting</label>
-                  <DateTimeInput onChange={setStartAt} value={startAt} disabled={!isNetworkSupported} />
+                  <DateTimeInput
+                    onChange={(value) => {
+                      if (value.utc().unix() <= dayjs().utc().unix()) {
+                        setStartAt('Now');
+                      } else {
+                        setStartAt(value);
+                      }
+                    }}
+                    value={startAt}
+                    disabled={!isNetworkSupported}
+                  />
                 </FormGroup>
                 <FormGroup>
                   <label>Until</label>
