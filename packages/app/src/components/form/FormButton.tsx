@@ -97,10 +97,7 @@ export const CreateDCAButton = styled.button`
   }
 `;
 
-export function ShadowButton({
-  children,
-  ...props
-}: ButtonHTMLAttributes<HTMLButtonElement>) {
+export function ShadowButton({ children, ...props }: ButtonHTMLAttributes<HTMLButtonElement>) {
   return (
     <CreateDCAButton {...props}>
       <div className="shadow-button-text">{children}</div>

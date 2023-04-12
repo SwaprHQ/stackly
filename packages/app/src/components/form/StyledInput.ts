@@ -8,13 +8,15 @@ export const StyledInputShadowWrapper = styled.div`
 `;
 
 export const StyledInput = styled.input<{ border?: boolean }>(
-  ({ border }) => `
-  ${border === false ? '' : ''}
+  ({ border, disabled }) => `
   width: 100%;
   background: #fefaf3;
   &, &:focus, &:active {
     outline: none;
     border: none; /** Handled by StyledInputShadowWrapper */
+  }
+  &:disabled {
+    color: #1010104d;
   }
 `
 );
