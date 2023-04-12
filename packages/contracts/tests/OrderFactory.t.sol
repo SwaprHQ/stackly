@@ -89,10 +89,10 @@ contract OrderFactoryTest is Test {
     );
 
     // Balance has been transferred to the vault
-    assertEq(sellToken.balanceOf(order), _principal - (_principal * _fee) / 10000);
+    assertEq(sellToken.balanceOf(order), _principal - (_principal * _fee) / 100);
 
     // Fee is left in the factory
-    assertEq(sellToken.balanceOf(address(factory)), (_principal * _fee) / 10000);
+    assertEq(sellToken.balanceOf(address(factory)), (_principal * _fee) / 100);
   }
 
   function testSetProtocolFee() public {
@@ -143,8 +143,8 @@ contract OrderFactoryTest is Test {
     factory.withdrawTokens(tokens);
     uint256 afterBalance = sellToken.balanceOf(address(this));
 
-    assertEq(afterBalance - beforeBalance, 5000000000000000);
-    assertEq(afterBalance - beforeBalance, (_principal * _fee) / 10000);
+    assertEq(afterBalance - beforeBalance, 500000000000000000);
+    assertEq(afterBalance - beforeBalance, (_principal * _fee) / 100);
 
     // Set caller to a different address
     cheatCodes.prank(address(1337));

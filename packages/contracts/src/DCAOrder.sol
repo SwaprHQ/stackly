@@ -110,7 +110,7 @@ contract DCAOrder is IConditionalOrder, EIP1271Verifier, IDCAOrder {
     startTime = _startTime;
     endTime = _endTime;
     interval = _interval;
-    principal = _principal - (_principal * _fee) / 10000;
+    principal = _principal - (_principal * _fee) / 100;
     fee = _fee;
     domainSeparator = IGPv2Settlement(_settlementContract).domainSeparator();
     // Approve the vaut relayer to spend the sell token

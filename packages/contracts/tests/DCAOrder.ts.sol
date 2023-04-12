@@ -69,7 +69,7 @@ contract DCAOrderTest is Test {
     assertEq(dcaOrder.startTime(), _startTime);
     assertEq(dcaOrder.endTime(), _endTime);
     assertEq(dcaOrder.interval(), _interval);
-    assertEq(dcaOrder.principal(), _principal - ((_principal * _fee) / 10000));
+    assertEq(dcaOrder.principal(), _principal - ((_principal * _fee) / 100));
     assertEq(dcaOrder.domainSeparator(), mockSettlement.domainSeparator());
     assertEq(dcaOrder.fee(), _fee);
   }
@@ -238,7 +238,7 @@ contract DCAOrderTest is Test {
     emit log_uint(uint256(order.sellAmount));
     emit log_uint(orderSlots);
 
-    (, uint256 expectedOrderSellAmount) = SafeMath.tryDiv(_testPrincipal - ((_testPrincipal * _fee) / 10000), orderSlots);
+    (, uint256 expectedOrderSellAmount) = SafeMath.tryDiv(_testPrincipal - ((_testPrincipal * _fee) / 100), orderSlots);
     assertEq(order.sellAmount, expectedOrderSellAmount);
     // warp to 1 second after the startTime
     vm.warp(dcaOrder.endTime() + 1 seconds);
