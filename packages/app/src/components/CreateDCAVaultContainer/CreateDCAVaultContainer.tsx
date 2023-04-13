@@ -80,7 +80,6 @@ export function CreateDCAVaultContainer() {
   const [createVaultError, setCreateVaultError] = useState<Error | null>(null);
   const [receiver] = useState<string | null>(null);
   const [allowance, setAllowance] = useState<BigNumber | null>(null);
-
   // Update initial values when chain changes
   useEffect(() => {
     setSellTokenAmount(getInitialSellTokenAmountValue(chain));
@@ -122,11 +121,15 @@ export function CreateDCAVaultContainer() {
 
     // Start date must be in the future
     if (isDayjs(startAt) && startAt.isBefore(dayjs())) {
-      return setCreateVaultError(new Error('Start date must be in the future'));
+      return setCreateVaultError(new Error('Starting date must be in the future'));
     }
     // End date must be after start date
     if (endAt.isBefore(startAt)) {
-      return setCreateVaultError(new Error('End date must be after start date'));
+      return setCreateVaultError(new Error('Until date must be after starting date'));
+    }
+
+    if (startAt === 'Now' && endAt.isBefore(dayjs().add(10, 'm'))) {
+      return setCreateVaultError(new Error('Until date must be more than 10 minutes after starting date'));
     }
 
     if (!signer) {
@@ -305,7 +308,17 @@ export function CreateDCAVaultContainer() {
                 </FormGroup>
                 <FormGroup>
                   <label>Until</label>
-                  <DateTimeInput onChange={setEndAt} value={endAt} disabled={!isNetworkSupported} />
+                  <DateTimeInput
+                    onChange={(value) => {
+                      if (value.utc().unix() <= dayjs().utc().unix()) {
+                        setEndAt(dayjs().add(30, 'm'));
+                      } else {
+                        setEndAt(value);
+                      }
+                    }}
+                    value={endAt}
+                    disabled={!isNetworkSupported}
+                  />
                 </FormGroup>
                 <FormButtonGroup>
                   {account.isConnected && isNetworkSupported ? (

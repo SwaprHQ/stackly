@@ -1,6 +1,6 @@
 import dayjs, { Dayjs } from 'dayjs';
 import { StyledInput, StyledInputShadowWrapper } from './StyledInput';
-import { useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 
 interface DateTimeInputProps {
@@ -10,22 +10,29 @@ interface DateTimeInputProps {
 }
 
 export function DateTimeInput({ disabled, value, onChange }: DateTimeInputProps) {
+  const valuesIsString = typeof value === 'string';
+  const [inputValue, setInputValue] = useState(valuesIsString ? value : value.format('YYYY-MM-DDTHH:mm'));
+  const valueIsNow = inputValue === 'Now';
+
+  useEffect(() => {
+    setInputValue(valuesIsString ? value : value.format('YYYY-MM-DDTHH:mm'));
+  }, [value]);
+
   const ref = useRef<HTMLInputElement>(null);
   const handleClick = () => {
     if (ref.current) ref.current.showPicker();
   };
   const handleFocus = () => {
-    if (ref.current) ref.current.showPicker();
+    if (ref.current) ref.current.focus();
   };
-  const valuesIsString = typeof value === 'string';
   return (
     <StyledInputShadowWrapper>
-      <HiddenInput $hide={valuesIsString}>
+      <HiddenInput $hide={valueIsNow}>
         <StyledInput
           ref={ref}
           type="datetime-local"
-          onChange={(event: React.FocusEvent<HTMLInputElement>) => onChange(dayjs(event.target.value))}
-          value={valuesIsString ? '' : value.format('YYYY-MM-DDTHH:mm')}
+          onChange={(event: React.FocusEvent<HTMLInputElement>) => setInputValue(event.target.value)}
+          value={inputValue}
           // For some reason, `min/max` values require the same format as `value`,
           // but they don't need to be in the user's timezone
           min={dayjs().format('YYYY-MM-DDTHH:mm')}
@@ -37,15 +44,18 @@ export function DateTimeInput({ disabled, value, onChange }: DateTimeInputProps)
             // See https://github.com/facebook/react/issues/8938
             event.target.defaultValue = '';
           }}
+          onBlur={() => {
+            onChange(dayjs(inputValue));
+          }}
           disabled={disabled}
         />
       </HiddenInput>
       <SpecialInput
-        value={valuesIsString ? value : ''}
+        value={valueIsNow ? inputValue : ''}
         disabled={disabled}
         onClick={handleClick}
         onFocus={handleFocus}
-        hidden={!valuesIsString}
+        hidden={!valueIsNow}
       />
     </StyledInputShadowWrapper>
   );
@@ -62,6 +72,5 @@ const HiddenInput = styled.div<{ $hide?: boolean }>(
     `
   width: 0;
   height: 0;
-  padding: 0;
 `
 );
