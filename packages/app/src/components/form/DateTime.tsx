@@ -1,182 +1,76 @@
 import dayjs, { Dayjs } from 'dayjs';
-import { getStyles } from './Select';
-import { useMemo, useState } from 'react';
+import { StyledInput, StyledInputShadowWrapper } from './StyledInput';
+import { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
-import * as chrono from 'chrono-node';
-import dayjsCalendarPlugin from 'dayjs/plugin/calendar';
-import Select from 'react-select';
-
-const calendarDefault = {
-  sameDay: '[Today at] h:mm A', // The same day ( Today at 2:30 AM )
-  nextDay: '[Tomorrow at] h:mm A', // The next day ( Tomorrow at 2:30 AM )
-  nextWeek: 'dddd [at] h:mm A', // The next week ( Sunday at 2:30 AM )
-  lastDay: '[Yesterday] at h:mm A', // The day before ( Yesterday at 2:30 AM )
-  lastWeek: '[Last] dddd at h A', // Last week ( Last Monday at 2:30 AM )
-  sameElse: 'dddd, MMM DD, YYYY [at] h:mm A', // Everything else ( 17/10/2011 )
-};
-
-dayjs.locale('en');
-dayjs.extend(dayjsCalendarPlugin, calendarDefault);
-
-interface NowDateOption {
-  date: 'now';
-  value: 'now';
-  label: 'Now';
-}
-
-interface GenericDateOption {
-  date: Dayjs;
-  value: Date;
-  label: string;
-}
-type DateOption = NowDateOption | GenericDateOption;
-
-const NOW_DATE_OPTION: NowDateOption = {
-  date: 'now',
-  value: 'now',
-  label: 'Now',
-};
-
-function createDefaultDateOptions(nowOptions?: boolean): DateOption[] {
-  const defaultDateOptions: DateOption[] = [];
-
-  if (nowOptions) {
-    defaultDateOptions.push(NOW_DATE_OPTION);
-  }
-
-  // Add random dates
-  defaultDateOptions.push(
-    ...['tomorrow at 14:00'].map((expression) => createDateOptionForDate(chrono.en.parseDate(expression)))
-  );
-
-  return defaultDateOptions;
-}
-
-const suggestions = [
-  'sunday',
-  'saturday',
-  'friday',
-  'thursday',
-  'wednesday',
-  'tuesday',
-  'monday',
-  'december',
-  'november',
-  'october',
-  'september',
-  'august',
-  'july',
-  'june',
-  'may',
-  'april',
-  'march',
-  'february',
-  'january',
-  'yesterday',
-  'tomorrow',
-  'today',
-].reduce<{ [key: string]: string }>((acc, str) => {
-  for (let i = 1; i < str.length; i++) {
-    acc[str.substr(0, i)] = str;
-  }
-  return acc;
-}, {});
-
-const suggest = (str: string) =>
-  str
-    .split(/\b/)
-    .map((i) => suggestions[i] || i)
-    .join('');
-
-function createDateOptionForDate(d: Dayjs | Date): DateOption {
-  const date = dayjs.isDayjs(d)
-    ? d
-    : dayjs(d, {
-        locale: 'en',
-      });
-  return {
-    date,
-    value: date.toDate(),
-    label: date.calendar(null, calendarDefault),
-  };
-}
 
 interface DateTimeInputProps {
-  value: Dayjs | 'now';
-  onChange: (nextValue: Dayjs | 'now') => void;
+  value: Dayjs | 'Now';
+  onChange: (nextValue: Dayjs) => void;
   disabled?: boolean;
-  showNowOption?: boolean;
 }
 
-export function DateTimeInput({ showNowOption = false, disabled, value, onChange }: DateTimeInputProps) {
-  const instanceDefaultDateOptions = useMemo(() => createDefaultDateOptions(showNowOption), [showNowOption]);
-  const [options, setOptions] = useState(instanceDefaultDateOptions);
+export function DateTimeInput({ disabled, value, onChange }: DateTimeInputProps) {
+  const valuesIsString = typeof value === 'string';
+  const [inputValue, setInputValue] = useState(valuesIsString ? value : value.format('YYYY-MM-DDTHH:mm'));
+  const valueIsNow = inputValue === 'Now';
 
-  const handleInputChange = (value: string) => {
-    // If the user types nothing, return the default options
-    if (!value) {
-      setOptions(instanceDefaultDateOptions);
-      return;
-    }
+  useEffect(() => {
+    setInputValue(valuesIsString ? value : value.format('YYYY-MM-DDTHH:mm'));
+  }, [value]);
 
-    const nextOptions = [];
-    value = value.toLowerCase();
-    // The expression starts "no" or "now"
-    const hasNowExpression = ['no', 'now'].some((searchTerm) => value.startsWith(searchTerm));
-
-    if (hasNowExpression) {
-      nextOptions.push(NOW_DATE_OPTION);
-    }
-
-    // Attempt to suggest more options
-    const parsedDate = chrono.parseDate(suggest(value));
-    // If the expression is a valid date, add it to the options
-    if (parsedDate) {
-      nextOptions.push(createDateOptionForDate(parsedDate));
-    }
-
-    // Update the options
-    setOptions(nextOptions);
+  const ref = useRef<HTMLInputElement>(null);
+  const handleClick = () => {
+    if (ref.current) ref.current.showPicker();
   };
-
+  const handleFocus = () => {
+    if (ref.current) ref.current.focus();
+  };
   return (
-    <DateTimeInputWrapper>
-      <Select<DateOption, false>
-        isDisabled={disabled}
-        id="chrono-datetime"
-        components={{
-          DropdownIndicator: () => null,
-          IndicatorSeparator: () => null,
-        }}
-        filterOption={null}
-        styles={getStyles<DateOption>()}
-        isMulti={false}
-        maxMenuHeight={380}
-        getOptionLabel={(o) => o.label}
-        onChange={(nextOption) => {
-          if (nextOption) {
-            onChange(nextOption?.date);
-          }
-        }}
-        onInputChange={handleInputChange}
-        options={options}
-        value={
-          {
-            date: value,
-            value: value === 'now' ? 'now' : value.toDate(),
-            label: value === 'now' ? 'Now' : value.calendar(null, calendarDefault),
-            display: value === 'now' ? 'Now' : 'calendar',
-          } as DateOption
-        }
+    <StyledInputShadowWrapper>
+      <HiddenInput $hide={valueIsNow}>
+        <StyledInput
+          ref={ref}
+          type="datetime-local"
+          onChange={(event: React.FocusEvent<HTMLInputElement>) => setInputValue(event.target.value)}
+          value={inputValue}
+          // For some reason, `min/max` values require the same format as `value`,
+          // but they don't need to be in the user's timezone
+          min={dayjs().format('YYYY-MM-DDTHH:mm')}
+          // The `pattern` is not used at all in `datetime-local` input, but is in place
+          // to enforce it when it isn't supported. In that case it's rendered as a regular `text` input
+          pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}"
+          onFocus={(event: React.FocusEvent<HTMLInputElement>) => {
+            // Bug fix for resetting input with `reset` button iOS
+            // See https://github.com/facebook/react/issues/8938
+            event.target.defaultValue = '';
+          }}
+          onBlur={() => {
+            onChange(dayjs(inputValue));
+          }}
+          disabled={disabled}
+        />
+      </HiddenInput>
+      <SpecialInput
+        value={valueIsNow ? inputValue : ''}
+        disabled={disabled}
+        onClick={handleClick}
+        onFocus={handleFocus}
+        hidden={!valueIsNow}
       />
-    </DateTimeInputWrapper>
+    </StyledInputShadowWrapper>
   );
 }
 
-const DateTimeInputWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  #date-picker {
-    flex: 1;
-  }
+const SpecialInput = styled(StyledInput)`
+  caret-color: transparent;
+  cursor: default;
 `;
+
+const HiddenInput = styled.div<{ $hide?: boolean }>(
+  ({ $hide }) =>
+    $hide &&
+    `
+  width: 0;
+  height: 0;
+`
+);

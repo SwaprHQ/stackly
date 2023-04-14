@@ -70,7 +70,7 @@ export function CreateDCAVaultContainer() {
   const { openModal, setModalData } = useModal<VaultCreateAndDepositStepsModalProps>();
   const { data: signer } = useSigner();
   const [validationError, setValidationError] = useState<Error | null>(null);
-  const [startAt, setStartAt] = useState<Dayjs | 'now'>('now');
+  const [startAt, setStartAt] = useState<Dayjs | 'Now'>('Now');
   const [endAt, setEndAt] = useState<Dayjs>(dayjs().add(7, 'd')); // 7 days from now
   const [hourInterval, setHourInterval] = useState<number>(1);
   const [frequencyInterval, setFrequencyInterval] = useState<DCAFrequencyInterval>(DCAFrequencyInterval.HOUR);
@@ -80,7 +80,6 @@ export function CreateDCAVaultContainer() {
   const [createVaultError, setCreateVaultError] = useState<Error | null>(null);
   const [receiver] = useState<string | null>(null);
   const [allowance, setAllowance] = useState<BigNumber | null>(null);
-
   // Update initial values when chain changes
   useEffect(() => {
     setSellTokenAmount(getInitialSellTokenAmountValue(chain));
@@ -122,11 +121,15 @@ export function CreateDCAVaultContainer() {
 
     // Start date must be in the future
     if (isDayjs(startAt) && startAt.isBefore(dayjs())) {
-      return setCreateVaultError(new Error('Start date must be in the future'));
+      return setCreateVaultError(new Error('Starting date must be in the future'));
     }
     // End date must be after start date
     if (endAt.isBefore(startAt)) {
-      return setCreateVaultError(new Error('End date must be after start date'));
+      return setCreateVaultError(new Error('Until date must be after starting date'));
+    }
+
+    if (startAt === 'Now' && endAt.isBefore(dayjs().add(10, 'm'))) {
+      return setCreateVaultError(new Error('Until date must be more than 10 minutes after starting date'));
     }
 
     if (!signer) {
@@ -187,8 +190,11 @@ export function CreateDCAVaultContainer() {
       sellToken: sellTokenAmount.currency.address,
       buyToken: buyToken.address,
       principal: sellTokenAmount.toRawAmount().toString(),
-      // If startAt is 'now', set it to the current time plus 5 minutes into the future
-      startTime: startAt === 'now' ? dayjs().add(10, 'm').utc().unix() : startAt.utc().unix(),
+      // If startAt is 'now', set it to the current time plus 10 minutes into the future
+      startTime:
+        startAt === 'Now' || startAt.utc().unix() < dayjs().add(10, 'm').utc().unix()
+          ? dayjs().add(10, 'm').utc().unix()
+          : startAt.utc().unix(),
       endTime: endAt.utc().unix(),
       interval: hourInterval,
     };
@@ -289,28 +295,29 @@ export function CreateDCAVaultContainer() {
                 <FormGroup>
                   <label>Starting</label>
                   <DateTimeInput
-                    showNowOption={true}
-                    disabled={!isNetworkSupported}
-                    value={startAt}
-                    onChange={(nextStartAt) => {
-                      setStartAt(nextStartAt);
+                    onChange={(value) => {
+                      if (value.utc().unix() <= dayjs().utc().unix()) {
+                        setStartAt('Now');
+                      } else {
+                        setStartAt(value);
+                      }
                     }}
+                    value={startAt}
+                    disabled={!isNetworkSupported}
                   />
                 </FormGroup>
                 <FormGroup>
                   <label>Until</label>
                   <DateTimeInput
-                    disabled={!isNetworkSupported}
-                    value={endAt}
-                    onChange={(nextEndAt) => {
-                      // Cannot select now as end date
-                      if (nextEndAt === 'now') return;
-                      const isBeforeStartAt = nextEndAt.isBefore(startAt);
-                      if (isBeforeStartAt) {
-                        return;
+                    onChange={(value) => {
+                      if (value.utc().unix() <= dayjs().utc().unix()) {
+                        setEndAt(dayjs().add(30, 'm'));
+                      } else {
+                        setEndAt(value);
                       }
-                      setEndAt(nextEndAt);
                     }}
+                    value={endAt}
+                    disabled={!isNetworkSupported}
                   />
                 </FormGroup>
                 <FormButtonGroup>

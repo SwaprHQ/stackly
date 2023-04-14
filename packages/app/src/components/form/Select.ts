@@ -16,7 +16,7 @@ export function getStyles<T>() {
       border: '3px solid #000',
       padding: '8px 8px',
     }),
-    valueContainer: (provided) => ({
+    valueContainer: (provided, state) => ({
       ...provided,
       padding: 0,
       fontSize: '18px',
