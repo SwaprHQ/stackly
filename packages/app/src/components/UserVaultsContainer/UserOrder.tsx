@@ -78,7 +78,7 @@ export function UserOrder({ order, type }: { order: SubgraphOrder; type: string 
             {order.sellToken.symbol}
           </div>
           <div>
-            {averagePrice.toFixed(2)} {order.buyToken.symbol} / {order.sellToken.symbol}
+            {averagePrice.toFixed(2)} {order.sellToken.symbol} / {order.buyToken.symbol}
           </div>
           <TotalBuyAmount>
             {totalBuyAmount.toFixed(2)} {order.buyToken.symbol}
@@ -105,7 +105,7 @@ export function UserOrder({ order, type }: { order: SubgraphOrder; type: string 
               <span>Every {formatHours(order.interval)}</span>
             </OrderInfo>
             {type === 'active' && (
-              <OrderInfo>
+              <ButtonOrderInfo>
                 <CancelButton
                   onClick={() =>
                     openModal(Modal.CancelOrder, {
@@ -117,7 +117,7 @@ export function UserOrder({ order, type }: { order: SubgraphOrder; type: string 
                 >
                   <Trash2 />
                 </CancelButton>
-              </OrderInfo>
+              </ButtonOrderInfo>
             )}
           </OrderDetails>
         )}
@@ -136,20 +136,29 @@ const CancelButton = styled(Button)`
 
 const ToggleShowDetailsButton = styled(ChevronDown)`
   position: absolute;
-  right: 32px;
-  top: 32px;
+  right: 12px;
+  top: 20px;
+  @media (min-width: 768px) {
+    right: 32px;
+    top: 36px;
+  }
   cursor: pointer;
   margin: auto;
 `;
 
 const OrderContainerWrapper = styled.div`
-  margin-bottom: 16px;
+  padding: 22px 12px;
+  @media (min-width: 768px) {
+    margin-bottom: 16px;
+    padding: 32px;
+  }
   background: #ece4d5;
   border-radius: 22px;
-  padding: 32px;
   position: relative;
-  > div {
-    margin-right: 44px;
+  @media (min-width: 768px) {
+    > div {
+      margin-right: 44px;
+    }
   }
 `;
 
@@ -162,11 +171,16 @@ const OrderDetails = styled.div`
     flex-direction: row;
   }
   margin-top: 24px;
+  > div {
+    margin-top: 6px;
+  }
 `;
 
 const OrderHighlights = styled(OrderDetails)`
   flex-direction: column;
-  align-items: center;
+  @media (min-width: 768px) {
+    align-items: center;
+  }
   margin-top: 0px;
   @media (min-width: 768px) {
     flex-direction: row;
@@ -176,6 +190,7 @@ const OrderHighlights = styled(OrderDetails)`
 `;
 
 const OrderTitle = styled.a`
+  width: fit-content;
   font-weight: 700;
   text-transform: uppercase;
   text-decoration: none;
@@ -206,4 +221,8 @@ const OrderInfo = styled.div`
   > span:last-child {
     font-weight: 700;
   }
+`;
+
+const ButtonOrderInfo = styled(OrderInfo)`
+  align-self: end;
 `;

@@ -38,7 +38,10 @@ export const CardInnerWrapper = styled.div`
   position: relative;
   width: 100%;
   height: 100%;
-  padding: 28px;
+  padding: 16px;
+  @media (min-width: 768px) {
+    padding: 28px;
+  }
   display: flex;
   flex-direction: column;
   justify-content: space-between;
