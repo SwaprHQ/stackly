@@ -8,15 +8,9 @@ import { ChainId, Currency } from 'dca-sdk';
  * @returns The shortened address
  * @throws If the address is not checksummed
  */
-export function shortenAddress(
-  address?: string,
-  charsBefore = 4,
-  charsAfter = 4
-): string {
+export function shortenAddress(address?: string, charsBefore = 4, charsAfter = 4): string {
   if (!address) return '';
-  return `${address.substring(0, charsBefore + 2)}...${address.substring(
-    42 - charsAfter
-  )}`;
+  return `${address.substring(0, charsBefore + 2)}...${address.substring(42 - charsAfter)}`;
 }
 
 export const numberFormatter = new Intl.NumberFormat('en-US', {
@@ -44,19 +38,13 @@ const ETHERSCAN_PREFIXES: { [chainId in ChainId | number]: string } = {
 function getExplorerPrefix(chainId: ChainId) {
   switch (chainId) {
     case ChainId.GNOSIS:
-      return 'https://gnosisscan.io/';
+      return 'https://gnosisscan.io';
     default:
-      return `https://${
-        ETHERSCAN_PREFIXES[chainId] || ETHERSCAN_PREFIXES[1]
-      }etherscan.io`;
+      return `https://${ETHERSCAN_PREFIXES[chainId] || ETHERSCAN_PREFIXES[1]}etherscan.io`;
   }
 }
 
-export function getExplorerLink(
-  chainId: ChainId,
-  hash: string,
-  type: keyof typeof EXPLORER_LINK_TYPE
-): string {
+export function getExplorerLink(chainId: ChainId, hash: string, type: keyof typeof EXPLORER_LINK_TYPE): string {
   const prefix = getExplorerPrefix(chainId);
   switch (type) {
     case EXPLORER_LINK_TYPE.transaction: {
@@ -91,16 +79,11 @@ export function uriToHttp(uri: string): string[] {
       return [`https://ipfs.io/ipfs/${hash}/`, `https://ipfs.io/ipfs/${hash}/`];
     case 'ipns':
       const name = uri.match(/^ipns:(\/\/)?(.*)$/i)?.[2];
-      return [
-        `https://cloudflare-ipfs.com/ipns/${name}/`,
-        `https://ipfs.io/ipns/${name}/`,
-      ];
+      return [`https://cloudflare-ipfs.com/ipns/${name}/`, `https://ipfs.io/ipns/${name}/`];
     default:
       return [];
   }
 }
-
-
 
 /**
  * Returns the checksummed address if the address is valid, otherwise returns false
@@ -110,5 +93,5 @@ export function uriToHttp(uri: string): string[] {
 export function currencyId(currency: Currency): string {
   if (currency.isNative) return `${currency.chainId}-ETH`;
   if (currency.isToken) return `${currency.chainId}-${currency.address}`;
-  throw new Error('invalid currency')
+  throw new Error('invalid currency');
 }

@@ -2,24 +2,29 @@ import { useEffect, useMemo, useState } from 'react';
 import { formatUnits } from '@ethersproject/units';
 import { ChainId } from 'dca-sdk';
 import styled from 'styled-components';
-import { useNetwork } from 'wagmi';
-import { ChevronDown } from 'react-feather';
+import { useNetwork, useSigner } from 'wagmi';
+import { ChevronDown, Trash2 } from 'react-feather';
 import dayjs from 'dayjs';
 import dayjsRelativeTimePlugin from 'dayjs/plugin/relativeTime';
 import { SubgraphOrder } from './types';
 import { getExplorerLink } from '../../utils';
 import { calculateAveragePrice, getCOWOrders } from './AveragePrice';
 import { formatHours } from './utils';
+import { Button } from '../../ui/components/Button';
+import { Modal, useModal } from '../../modal';
+import { CancelOrderModalProps } from '../Modal/CancelOrder';
 
 dayjs.extend(dayjsRelativeTimePlugin);
 
-export function UserOrder({ order }: { order: SubgraphOrder }) {
+export function UserOrder({ order, type }: { order: SubgraphOrder; type: string }) {
   const { chain } = useNetwork();
   const [fundsUsed, setFundsUsed] = useState(0);
   const [showDetails, setShowDetails] = useState(false);
   const [averagePrice, setAveragePrice] = useState(0);
   const [totalBuyAmount, setTotalBuyAmount] = useState(0);
   const [cowOrders, setCOWOrders] = useState<Awaited<ReturnType<typeof getCOWOrders>>>([]);
+  const { openModal } = useModal<CancelOrderModalProps>();
+  const { data: signer } = useSigner();
 
   const handleShowDetails = () => {
     setShowDetails(!showDetails);
@@ -99,6 +104,21 @@ export function UserOrder({ order }: { order: SubgraphOrder }) {
               <span>Period</span>
               <span>Every {formatHours(order.interval)}</span>
             </OrderInfo>
+            {type === 'active' && (
+              <OrderInfo>
+                <CancelButton
+                  onClick={() =>
+                    openModal(Modal.CancelOrder, {
+                      chainId: chain?.id as any,
+                      signer: signer as any,
+                      orderId: order.id,
+                    })
+                  }
+                >
+                  <Trash2 />
+                </CancelButton>
+              </OrderInfo>
+            )}
           </OrderDetails>
         )}
       </div>
@@ -106,6 +126,13 @@ export function UserOrder({ order }: { order: SubgraphOrder }) {
     </OrderContainerWrapper>
   );
 }
+
+const CancelButton = styled(Button)`
+  font-size: 12px;
+  min-width: auto;
+  height: 100%;
+  background: #fff;
+`;
 
 const ToggleShowDetailsButton = styled(ChevronDown)`
   position: absolute;
