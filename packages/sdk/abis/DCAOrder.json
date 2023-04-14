@@ -21,12 +21,22 @@
   },
   {
     "inputs": [],
+    "name": "MissingOwner",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "NotOwner",
     "type": "error"
   },
   {
     "inputs": [],
     "name": "NotWithinStartAndEndTimes",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "OrderCancelled",
     "type": "error"
   },
   {
@@ -118,6 +128,19 @@
   },
   {
     "inputs": [],
+    "name": "cancelled",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "currentSlot",
     "outputs": [
       {
@@ -163,6 +186,19 @@
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "fee",
+    "outputs": [
+      {
+        "internalType": "uint16",
+        "name": "",
+        "type": "uint16"
       }
     ],
     "stateMutability": "view",
@@ -289,6 +325,11 @@
         "internalType": "address",
         "name": "_settlementContract",
         "type": "address"
+      },
+      {
+        "internalType": "uint16",
+        "name": "_fee",
+        "type": "uint16"
       }
     ],
     "name": "initialize",
