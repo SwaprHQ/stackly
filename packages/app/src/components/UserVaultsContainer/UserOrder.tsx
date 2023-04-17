@@ -2,24 +2,29 @@ import { useEffect, useMemo, useState } from 'react';
 import { formatUnits } from '@ethersproject/units';
 import { ChainId } from 'dca-sdk';
 import styled from 'styled-components';
-import { useNetwork } from 'wagmi';
-import { ChevronDown } from 'react-feather';
+import { useNetwork, useSigner } from 'wagmi';
+import { ChevronDown, Trash2 } from 'react-feather';
 import dayjs from 'dayjs';
 import dayjsRelativeTimePlugin from 'dayjs/plugin/relativeTime';
 import { SubgraphOrder } from './types';
 import { getExplorerLink } from '../../utils';
 import { calculateAveragePrice, getCOWOrders } from './AveragePrice';
 import { formatHours } from './utils';
+import { Button } from '../../ui/components/Button';
+import { Modal, useModal } from '../../modal';
+import { CancelOrderModalProps } from '../Modal/CancelOrder';
 
 dayjs.extend(dayjsRelativeTimePlugin);
 
-export function UserOrder({ order }: { order: SubgraphOrder }) {
+export function UserOrder({ order, type }: { order: SubgraphOrder; type: string }) {
   const { chain } = useNetwork();
   const [fundsUsed, setFundsUsed] = useState(0);
   const [showDetails, setShowDetails] = useState(false);
   const [averagePrice, setAveragePrice] = useState(0);
   const [totalBuyAmount, setTotalBuyAmount] = useState(0);
   const [cowOrders, setCOWOrders] = useState<Awaited<ReturnType<typeof getCOWOrders>>>([]);
+  const { openModal } = useModal<CancelOrderModalProps>();
+  const { data: signer } = useSigner();
 
   const handleShowDetails = () => {
     setShowDetails(!showDetails);
@@ -73,7 +78,7 @@ export function UserOrder({ order }: { order: SubgraphOrder }) {
             {order.sellToken.symbol}
           </div>
           <div>
-            {averagePrice.toFixed(2)} {order.buyToken.symbol} / {order.sellToken.symbol}
+            {averagePrice.toFixed(2)} {order.sellToken.symbol} / {order.buyToken.symbol}
           </div>
           <TotalBuyAmount>
             {totalBuyAmount.toFixed(2)} {order.buyToken.symbol}
@@ -99,6 +104,21 @@ export function UserOrder({ order }: { order: SubgraphOrder }) {
               <span>Period</span>
               <span>Every {formatHours(order.interval)}</span>
             </OrderInfo>
+            {type === 'active' && (
+              <ButtonOrderInfo>
+                <CancelButton
+                  onClick={() =>
+                    openModal(Modal.CancelOrder, {
+                      chainId: chain?.id as any,
+                      signer: signer as any,
+                      orderId: order.id,
+                    })
+                  }
+                >
+                  <Trash2 />
+                </CancelButton>
+              </ButtonOrderInfo>
+            )}
           </OrderDetails>
         )}
       </div>
@@ -107,22 +127,38 @@ export function UserOrder({ order }: { order: SubgraphOrder }) {
   );
 }
 
+const CancelButton = styled(Button)`
+  font-size: 12px;
+  min-width: auto;
+  height: 100%;
+  background: #fff;
+`;
+
 const ToggleShowDetailsButton = styled(ChevronDown)`
   position: absolute;
-  right: 32px;
-  top: 32px;
+  right: 12px;
+  top: 20px;
+  @media (min-width: 768px) {
+    right: 32px;
+    top: 36px;
+  }
   cursor: pointer;
   margin: auto;
 `;
 
 const OrderContainerWrapper = styled.div`
-  margin-bottom: 16px;
+  padding: 22px 12px;
+  @media (min-width: 768px) {
+    margin-bottom: 16px;
+    padding: 32px;
+  }
   background: #ece4d5;
   border-radius: 22px;
-  padding: 32px;
   position: relative;
-  > div {
-    margin-right: 44px;
+  @media (min-width: 768px) {
+    > div {
+      margin-right: 44px;
+    }
   }
 `;
 
@@ -135,11 +171,16 @@ const OrderDetails = styled.div`
     flex-direction: row;
   }
   margin-top: 24px;
+  > div {
+    margin-top: 6px;
+  }
 `;
 
 const OrderHighlights = styled(OrderDetails)`
   flex-direction: column;
-  align-items: center;
+  @media (min-width: 768px) {
+    align-items: center;
+  }
   margin-top: 0px;
   @media (min-width: 768px) {
     flex-direction: row;
@@ -149,6 +190,7 @@ const OrderHighlights = styled(OrderDetails)`
 `;
 
 const OrderTitle = styled.a`
+  width: fit-content;
   font-weight: 700;
   text-transform: uppercase;
   text-decoration: none;
@@ -179,4 +221,8 @@ const OrderInfo = styled.div`
   > span:last-child {
     font-weight: 700;
   }
+`;
+
+const ButtonOrderInfo = styled(OrderInfo)`
+  align-self: end;
 `;

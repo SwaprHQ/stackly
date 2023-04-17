@@ -10,7 +10,7 @@ import { Card, CardInnerWrapper } from '../Card';
 import { UserOrder } from './UserOrder';
 import dayjs from 'dayjs';
 
-function OrderList({ orders }: { orders: SubgraphOrder[] }) {
+function OrderList({ orders, type }: { orders: SubgraphOrder[]; type: string }) {
   return (
     <OrderListCard>
       <CardInnerWrapper>
@@ -21,10 +21,28 @@ function OrderList({ orders }: { orders: SubgraphOrder[] }) {
           <h5>Stacked</h5>
         </OrderListHeader>
         {orders.map((order) => (
-          <UserOrder key={order.id} order={order} />
+          <UserOrder key={order.id} order={order} type={type} />
         ))}
       </CardInnerWrapper>
     </OrderListCard>
+  );
+}
+
+function ActiveOrderList({ orders }: { orders: SubgraphOrder[] }) {
+  return (
+    <>
+      <ContainerTitle>Active Stacks</ContainerTitle>
+      <OrderList orders={orders} type={'active'} />
+    </>
+  );
+}
+
+function FinishedOrderList({ orders }: { orders: SubgraphOrder[] }) {
+  return (
+    <>
+      <ContainerTitle>Finished Stacks</ContainerTitle>
+      <OrderList orders={orders} type={'finished'} />
+    </>
   );
 }
 
@@ -89,10 +107,8 @@ export function UserOrdersContainer() {
 
   return (
     <Container>
-      <ContainerTitle>Active Stacks</ContainerTitle>
-      <OrderList orders={activeOrders} />
-      <ContainerTitle>Finished Stacks</ContainerTitle>
-      <OrderList orders={finishedOrders} />
+      <ActiveOrderList orders={activeOrders} />
+      <FinishedOrderList orders={finishedOrders} />
     </Container>
   );
 }
