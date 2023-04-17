@@ -16,7 +16,7 @@ export function DateTimeInput({ disabled, value, onChange }: DateTimeInputProps)
 
   useEffect(() => {
     setInputValue(valuesIsString ? value : value.format('YYYY-MM-DDTHH:mm'));
-  }, [value]);
+  }, [value, valuesIsString]);
 
   const ref = useRef<HTMLInputElement>(null);
   const handleClick = () => {
@@ -45,7 +45,7 @@ export function DateTimeInput({ disabled, value, onChange }: DateTimeInputProps)
             event.target.defaultValue = '';
           }}
           onBlur={() => {
-            onChange(dayjs(inputValue));
+            if (!valueIsNow) onChange(dayjs(inputValue));
           }}
           disabled={disabled}
         />
