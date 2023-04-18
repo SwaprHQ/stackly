@@ -13,7 +13,7 @@ export function Footer() {
 export function FooterContent() {
   return (
     <FooterTitle>
-      Made with ❤️ from{' '}
+      Made with 💜 from{' '}
       <HyperLink href="https://swapr.eth.limo" target="_blank">
         Swapr
       </HyperLink>
