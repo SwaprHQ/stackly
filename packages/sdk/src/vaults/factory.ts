@@ -135,11 +135,11 @@ export async function createDCAOrderWithNonce(
     endTime,
     interval,
     settlementContract,
-    0
+    0,
   ]);
 
   // Strips out the fee param, added by factory contract before DCAOrder initialization
-  const initializerWithoutFee = initializer.slice(0,-64);
+  const initializerWithoutFee = initializer.slice(0, -64);
   return await orderFactory.createOrderWithNonce(singleton, initializerWithoutFee, nonce);
 }
 
