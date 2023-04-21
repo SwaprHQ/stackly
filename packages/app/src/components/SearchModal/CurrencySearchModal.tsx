@@ -84,7 +84,7 @@ export const CurrencySearchModal = memo(function CurrencySearchModal({
       content = (
         <>
           <ModalHeader>
-            <ModalTitle>Select A Token</ModalTitle>
+            <ModalTitle>Select a token</ModalTitle>
           </ModalHeader>
           <ModalContent minHeight="400px">
             <CurrencySearch

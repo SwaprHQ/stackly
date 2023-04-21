@@ -54,17 +54,6 @@ export const GNO: Record<ChainId, Token> = {
   [ChainId.GNOSIS]: new Token(ChainId.GNOSIS, '0x9C58BAcC331c9aa871AFD802DB6379a98e80CEdb', 18, 'GNO'),
 };
 
-export const DXD: Record<ChainId, Token> = {
-  [ChainId.ETHEREUM]: new Token(
-    ChainId.ETHEREUM,
-    '0xa1d65E8fB6e87b60FECCBc582F7f97804B725521',
-    18,
-    'DXD',
-    'DXdao Token'
-  ),
-  [ChainId.GNOSIS]: new Token(ChainId.GNOSIS, '0xb90d6bec20993be5d72a5ab353343f7a0281f158', 18, 'DXD', 'DXdao Token'),
-};
-
 export const WBTC: Record<ChainId, Token> = {
   [ChainId.ETHEREUM]: new Token(ChainId.ETHEREUM, '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599', 8, 'WBTC'),
   [ChainId.GNOSIS]: new Token(ChainId.GNOSIS, '0x8e5bbbb09ed1ebde8674cda39a0c169401db4252', 8, 'WBTC'),

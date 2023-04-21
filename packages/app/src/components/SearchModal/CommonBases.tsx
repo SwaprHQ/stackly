@@ -1,4 +1,4 @@
-import { ChainId, Currency, USDC, WETH } from 'dca-sdk';
+import { ChainId, Currency, USDC, WETH, SWPR, WBTC } from 'dca-sdk';
 import { AutoColumn } from '../../components/Column';
 import { AutoRow } from '../../components/Row';
 import styled from 'styled-components/macro';
@@ -30,8 +30,8 @@ type ChainCurrencyList = {
 };
 
 const COMMON_BASES: ChainCurrencyList = {
-  [ChainId.ETHEREUM]: [WETH[ChainId.ETHEREUM], USDC[ChainId.ETHEREUM]],
-  [ChainId.GNOSIS]: [WETH[ChainId.GNOSIS], USDC[ChainId.GNOSIS]],
+  [ChainId.ETHEREUM]: [WETH[ChainId.ETHEREUM], USDC[ChainId.ETHEREUM], WBTC[ChainId.ETHEREUM], SWPR[ChainId.ETHEREUM]],
+  [ChainId.GNOSIS]: [WETH[ChainId.GNOSIS], USDC[ChainId.GNOSIS], WBTC[ChainId.GNOSIS], SWPR[ChainId.GNOSIS]],
 };
 
 export function CommonBases({
