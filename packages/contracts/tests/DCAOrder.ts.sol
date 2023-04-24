@@ -22,8 +22,7 @@ contract DCAOrderTest is Test {
   uint256 public _interval;
   uint256 public _startTime;
   uint256 public _endTime;
-  uint256 public _principal;
-  uint16 public _fee;
+  uint256 public _totalAmount;
 
   // @todo: import from IConditionalOrder
   event ConditionalOrderCreated(address indexed);
@@ -45,8 +44,7 @@ contract DCAOrderTest is Test {
     _interval = 1; // every 1 hours
     _startTime = block.timestamp + 1 hours;
     _endTime = _startTime + 1 days;
-    _principal = 10 ether;
-    _fee = 5;
+    _totalAmount = 10 ether;
   }
 
   function testInitialize_success() public {
@@ -58,7 +56,7 @@ contract DCAOrderTest is Test {
 
     sellToken.approve(address(dcaOrder), type(uint256).max);
     dcaOrder.initialize(
-      _owner, _receiver, _sellToken, _buyToken, _principal, _startTime, _endTime, _interval, address(mockSettlement), _fee
+      _owner, _receiver, _sellToken, _buyToken, _totalAmount, _startTime, _endTime, _interval, address(mockSettlement)
     );
 
     // Assert all properties are set correctly
@@ -69,21 +67,20 @@ contract DCAOrderTest is Test {
     assertEq(dcaOrder.startTime(), _startTime);
     assertEq(dcaOrder.endTime(), _endTime);
     assertEq(dcaOrder.interval(), _interval);
-    assertEq(dcaOrder.principal(), _principal - ((_principal * _fee) / 100));
+    assertEq(dcaOrder.totalAmount(), _totalAmount);
     assertEq(dcaOrder.domainSeparator(), mockSettlement.domainSeparator());
-    assertEq(dcaOrder.fee(), _fee);
   }
 
   function testInitialize_AlreadyInitialized() public {
     dcaOrder.initialize(
-      _owner, _receiver, _sellToken, _buyToken, _principal, _startTime, _endTime, _interval, address(mockSettlement), _fee
+      _owner, _receiver, _sellToken, _buyToken, _totalAmount, _startTime, _endTime, _interval, address(mockSettlement)
     );
 
     vm.expectRevert(bytes4(keccak256("AlreadyInitialized()")));
 
     // Try to initialize again
     dcaOrder.initialize(
-      _owner, _receiver, _sellToken, _buyToken, _principal, _startTime, _endTime, _interval, address(mockSettlement), _fee
+      _owner, _receiver, _sellToken, _buyToken, _totalAmount, _startTime, _endTime, _interval, address(mockSettlement)
     );
   }
 
@@ -91,7 +88,15 @@ contract DCAOrderTest is Test {
     vm.expectRevert(bytes4(keccak256("MissingOwner()")));
 
     dcaOrder.initialize(
-      address(0), _receiver, _sellToken, _buyToken, _principal, _startTime, _endTime, _interval, address(mockSettlement), _fee
+      address(0),
+      _receiver,
+      _sellToken,
+      _buyToken,
+      _totalAmount,
+      _startTime,
+      _endTime,
+      _interval,
+      address(mockSettlement)
     );
   }
 
@@ -99,7 +104,15 @@ contract DCAOrderTest is Test {
     vm.expectRevert(bytes4(keccak256("ReceiverIsOrder()")));
 
     dcaOrder.initialize(
-      _owner, address(dcaOrder), _sellToken, _buyToken, _principal, _startTime, _endTime, _interval, address(mockSettlement), _fee
+      _owner,
+      address(dcaOrder),
+      _sellToken,
+      _buyToken,
+      _totalAmount,
+      _startTime,
+      _endTime,
+      _interval,
+      address(mockSettlement)
     );
   }
 
@@ -107,7 +120,7 @@ contract DCAOrderTest is Test {
     vm.expectRevert(bytes4(keccak256("IntervalMustBeGreaterThanZero()")));
 
     dcaOrder.initialize(
-      _owner, _receiver, _sellToken, _buyToken, _principal, _startTime, _endTime, 0, address(mockSettlement), _fee
+      _owner, _receiver, _sellToken, _buyToken, _totalAmount, _startTime, _endTime, 0, address(mockSettlement)
     );
   }
 
@@ -115,7 +128,15 @@ contract DCAOrderTest is Test {
     vm.expectRevert(bytes4(keccak256("InvalidStartTime()")));
 
     dcaOrder.initialize(
-      _owner, _receiver, _sellToken, _buyToken, _principal, block.timestamp, _endTime, _interval, address(mockSettlement), _fee
+      _owner,
+      _receiver,
+      _sellToken,
+      _buyToken,
+      _totalAmount,
+      block.timestamp,
+      _endTime,
+      _interval,
+      address(mockSettlement)
     );
   }
 
@@ -123,14 +144,22 @@ contract DCAOrderTest is Test {
     vm.expectRevert(bytes4(keccak256("InvalidEndTime()")));
 
     dcaOrder.initialize(
-      _owner, _receiver, _sellToken, _buyToken, _principal, _startTime, block.timestamp, _interval, address(mockSettlement), _fee
+      _owner,
+      _receiver,
+      _sellToken,
+      _buyToken,
+      _totalAmount,
+      _startTime,
+      block.timestamp,
+      _interval,
+      address(mockSettlement)
     );
   }
 
   function testSlots() public {
     sellToken.approve(address(dcaOrder), type(uint256).max);
     dcaOrder.initialize(
-      _owner, _receiver, _sellToken, _buyToken, _principal, _startTime, _endTime, _interval, address(mockSettlement), _fee
+      _owner, _receiver, _sellToken, _buyToken, _totalAmount, _startTime, _endTime, _interval, address(mockSettlement)
     );
 
     uint256[] memory slots = dcaOrder.orderSlots();
@@ -150,7 +179,7 @@ contract DCAOrderTest is Test {
     // Approve the dcaOrder to spend the sellToken
     sellToken.approve(address(dcaOrder), type(uint256).max);
     dcaOrder.initialize(
-      _owner, _receiver, _sellToken, _buyToken, _principal, _startTime, _endTime, _interval, address(mockSettlement), _fee
+      _owner, _receiver, _sellToken, _buyToken, _totalAmount, _startTime, _endTime, _interval, address(mockSettlement)
     );
 
     vm.expectEmit(true, true, false, true, address(dcaOrder));
@@ -164,7 +193,7 @@ contract DCAOrderTest is Test {
   function testCannotCancelOrderIfNotOwner() public {
     sellToken.approve(address(dcaOrder), type(uint256).max);
     dcaOrder.initialize(
-      _owner, _receiver, _sellToken, _buyToken, _principal, _startTime, _endTime, _interval, address(mockSettlement), _fee
+      _owner, _receiver, _sellToken, _buyToken, _totalAmount, _startTime, _endTime, _interval, address(mockSettlement)
     );
     vm.prank(address(0x1));
     vm.expectRevert(NotOwner.selector);
@@ -175,7 +204,7 @@ contract DCAOrderTest is Test {
   function testCurrentSlot() public {
     sellToken.approve(address(dcaOrder), type(uint256).max);
     dcaOrder.initialize(
-      _owner, _receiver, _sellToken, _buyToken, _principal, _startTime, _endTime, _interval, address(mockSettlement), _fee
+      _owner, _receiver, _sellToken, _buyToken, _totalAmount, _startTime, _endTime, _interval, address(mockSettlement)
     );
     vm.prank(address(0x1));
 
@@ -210,10 +239,18 @@ contract DCAOrderTest is Test {
   function testGetTradeableOrder() public {
     sellToken.approve(address(dcaOrder), type(uint256).max);
 
-    uint256 _testPrincipal = 30 ether;
+    uint256 _testTotalAmount = 30 ether;
 
     dcaOrder.initialize(
-      _owner, _receiver, _sellToken, _buyToken, _testPrincipal, _startTime, _endTime, _interval, address(mockSettlement), _fee
+      _owner,
+      _receiver,
+      _sellToken,
+      _buyToken,
+      _testTotalAmount,
+      _startTime,
+      _endTime,
+      _interval,
+      address(mockSettlement)
     );
     vm.prank(address(0x1));
 
@@ -238,7 +275,7 @@ contract DCAOrderTest is Test {
     emit log_uint(uint256(order.sellAmount));
     emit log_uint(orderSlots);
 
-    (, uint256 expectedOrderSellAmount) = SafeMath.tryDiv(_testPrincipal - ((_testPrincipal * _fee) / 100), orderSlots);
+    (, uint256 expectedOrderSellAmount) = SafeMath.tryDiv(_testTotalAmount, orderSlots);
     assertEq(order.sellAmount, expectedOrderSellAmount);
     // warp to 1 second after the startTime
     vm.warp(dcaOrder.endTime() + 1 seconds);
@@ -253,12 +290,12 @@ contract DCAOrderTest is Test {
     uint256 _testPrincipal = 30 ether;
 
     dcaOrder.initialize(
-      _owner, _receiver, _sellToken, _buyToken, _testPrincipal, _startTime, _endTime, _interval, address(mockSettlement), _fee
+      _owner, _receiver, _sellToken, _buyToken, _testPrincipal, _startTime, _endTime, _interval, address(mockSettlement)
     );
 
     // Cancel the order
     dcaOrder.cancel();
-    
+
     vm.expectRevert(bytes4(keccak256("OrderCancelled()")));
     dcaOrder.getTradeableOrder();
   }
@@ -269,9 +306,9 @@ contract DCAOrderTest is Test {
     uint256 _testPrincipal = 0 ether;
 
     dcaOrder.initialize(
-      _owner, _receiver, _sellToken, _buyToken, _testPrincipal, _startTime, _endTime, _interval, address(mockSettlement), _fee
+      _owner, _receiver, _sellToken, _buyToken, _testPrincipal, _startTime, _endTime, _interval, address(mockSettlement)
     );
-    
+
     vm.warp(dcaOrder.startTime());
     vm.expectRevert(bytes4(keccak256("ZeroSellAmount()")));
     dcaOrder.getTradeableOrder();
@@ -282,7 +319,7 @@ contract DCAOrderTest is Test {
 
     sellToken.approve(address(dcaOrder), type(uint256).max);
     dcaOrder.initialize(
-      _owner, _receiver, _sellToken, _buyToken, _principal, _startTime, _endTime, _interval, address(mockSettlement), _fee
+      _owner, _receiver, _sellToken, _buyToken, _totalAmount, _startTime, _endTime, _interval, address(mockSettlement)
     );
     // In a 6 week period, there should be 6 * 7 * 24 = 1008 slots
     uint256[] memory slots = dcaOrder.orderSlots();
@@ -297,12 +334,11 @@ contract DCAOrderTest is Test {
       _receiver,
       _sellToken,
       _buyToken,
-      _principal,
+      _totalAmount,
       _startTime,
       _endTime,
       24, // 1 day
-      address(mockSettlement),
-      _fee
+      address(mockSettlement)
     );
     // In a 6 week period, there should be 6 * 7 = 42 slots
     uint256[] memory slots = dcaOrder.orderSlots();
@@ -317,12 +353,11 @@ contract DCAOrderTest is Test {
       _receiver,
       _sellToken,
       _buyToken,
-      _principal,
+      _totalAmount,
       _startTime,
       _endTime,
       24 * 3, // 3 days
-      address(mockSettlement),
-      _fee
+      address(mockSettlement)
     );
     // in a 12 week period where buys are every 3 days, there should be 12 * 7 / 3 = 28 slots
     uint256[] memory slots = dcaOrder.orderSlots();

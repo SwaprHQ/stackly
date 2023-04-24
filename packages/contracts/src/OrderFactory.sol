@@ -8,7 +8,6 @@ import {Ownable2Step} from "oz/access/Ownable2Step.sol";
 error ForbiddenValue();
 
 contract OrderFactory is Ownable2Step {
-
   uint16 public protocolFee = 5; // default 0.05% (range: 0-10000)
 
   event OrderCreated(address indexed order);
@@ -16,61 +15,87 @@ contract OrderFactory is Ownable2Step {
   /// @dev Allows to create a new proxy contract and execute a message call to the new proxy within one transaction.
   /// @param _singleton Address of singleton contract. Must be deployed at the time of execution.
   /// @param _initializer Payload for a message call to be sent to a new proxy contract.
-  /// @param saltNonce Nonce that will be used to generate the salt to calculate the address of the new proxy contract.
-  function createProxy(address _singleton, bytes memory _initializer, uint256 saltNonce)
+  /// @param _saltNonce Nonce that will be used to generate the salt to calculate the address of the new proxy contract.
+  function createProxy(address _singleton, bytes memory _initializer, uint256 _saltNonce)
     internal
     returns (address order)
   {
-    // Adds protocolFee param to initializer
-    bytes memory initializer = abi.encodePacked(_initializer, abi.encodePacked(bytes30(0), protocolFee));
-
     // If the initializer changes the proxy address should change too. Hashing the initializer data is cheaper than just concatinating it
-    bytes32 salt = keccak256(abi.encodePacked(keccak256(initializer), saltNonce));
+    bytes32 salt = keccak256(abi.encodePacked(keccak256(_initializer), _saltNonce));
     order = Clones.cloneDeterministic(_singleton, salt);
 
-    if (initializer.length > 0) {
+    if (_initializer.length > 0) {
       // solhint-disable-next-line no-inline-assembly
       assembly {
-        if eq(call(gas(), order, 0, add(initializer, 0x20), mload(initializer), 0, 0), 0) { revert(0, 0) }
+        if eq(call(gas(), order, 0, add(_initializer, 0x20), mload(_initializer), 0, 0), 0) { revert(0, 0) }
       }
     }
   }
 
   /// @dev Allows to create a new order contract and execute a message call to the new order within one transaction.
   /// @param _singleton Address of singleton contract. Must be deployed at the time of execution.
-  /// @param initializer Payload for a message call to be sent to a new order contract.
-  /// @param saltNonce Nonce that will be used to generate the salt to calculate the address of the new order contract.
-  function createOrderWithNonce(address _singleton, bytes calldata initializer, uint256 saltNonce)
-    public
-    returns (address order)
-  {
-    // Deploy a new order
-    order = createProxy(_singleton, initializer, saltNonce);
+  /// @param _owner The owner of the order.
+  /// @param _receiver The receiver of the buyToken orders.
+  /// @param _sellToken The token that is being traded in the order.
+  /// @param _totalAmount The total amount of the DCA order.
+  /// @param _buyToken The token that is DCA'd in the order.
+  /// @param _startTime The start time of the DCA order.
+  /// @param _endTime The end time of the DCA order.
+  /// @param _interval The frequency interval of the DCA order in hours.
+  /// @param _settlementContract The settlement contract address.
+  /// @param _saltNonce Nonce that will be used to generate the salt to calculate the address of the new order contract.
+  function createOrderWithNonce(
+    address _singleton,
+    address _owner,
+    address _receiver,
+    address _sellToken,
+    address _buyToken,
+    uint256 _totalAmount,
+    uint256 _startTime,
+    uint256 _endTime,
+    uint256 _interval,
+    address _settlementContract,
+    uint256 _saltNonce
+  ) public returns (address order) {
+    uint256 totalAmountWithoutFees = _totalAmount - (_totalAmount * protocolFee) / 100;
 
-    // Extract the principal from the initializer
-    (,, address _sellToken,, uint256 _principal,,,,) =
-      abi.decode(initializer[4:], (address, address, address, address, uint256, uint256, uint256, uint256, address));
+    bytes memory initliazier = abi.encodeWithSignature(
+      "initialize(address,address,address,address,uint256,uint256,uint256,uint256,address)",
+      _owner,
+      _receiver,
+      _sellToken,
+      _buyToken,
+      totalAmountWithoutFees,
+      _startTime,
+      _endTime,
+      _interval,
+      _settlementContract
+    );
+
+    // Deploy a new order
+    order = createProxy(_singleton, initliazier, _saltNonce);
+
     emit OrderCreated(order);
 
-    // Transfer the principal to the order
-    IERC20(_sellToken).transferFrom(msg.sender, order, _principal - ((_principal * protocolFee) / 100));
+    // Transfer the total amount to the order
+    IERC20(_sellToken).transferFrom(msg.sender, order, totalAmountWithoutFees);
 
     // Transfer the fee to the factory
-    IERC20(_sellToken).transferFrom(msg.sender, address(this), (_principal * protocolFee) / 100);
+    IERC20(_sellToken).transferFrom(msg.sender, address(this), (_totalAmount * protocolFee) / 100);
   }
 
-  /// @dev Set the protocol fee percent  
+  /// @dev Set the protocol fee percent
   /// @param _fee The new protocol fee percent 0-100% (range: 0-10000)
   function setProtocolFee(uint16 _fee) external onlyOwner {
-      if (_fee > 10000) revert ForbiddenValue();
-      protocolFee = _fee;
+    if (_fee > 10000) revert ForbiddenValue();
+    protocolFee = _fee;
   }
 
   /// @dev Withdraw protocol fee share
   /// @param tokens Tokens' addresses transferred to the owner as protocol fee
   function withdrawTokens(address[] calldata tokens) external onlyOwner {
-      for (uint256 i = 0; i < tokens.length; i++) {
-        IERC20(tokens[i]).transfer(owner(), IERC20(tokens[i]).balanceOf(address(this)));
-      }
+    for (uint256 i = 0; i < tokens.length; i++) {
+      IERC20(tokens[i]).transfer(owner(), IERC20(tokens[i]).balanceOf(address(this)));
+    }
   }
 }
