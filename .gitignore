@@ -62,3 +62,6 @@ generated
 subgraph.yaml
 
 bin
+
+# vscode
+.vscode
