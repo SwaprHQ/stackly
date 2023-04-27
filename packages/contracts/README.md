@@ -47,7 +47,7 @@ can be withdrawn by the contract owner.
 
 ### Functions
 
-#### `createOrderWithNonce(address _singleton, address _owner, address _receiver, address _sellToken, address _buyToken, uint256 _totalAmount, uint256 _startTime, uint256 _endTime, uint256 _interval, address _settlementContract, uint256 _saltNonce) public returns (address order)`
+#### `createOrderWithNonce(address _singleton, address _owner, address _receiver, address _sellToken, address _buyToken, uint256 _amount, uint256 _startTime, uint256 _endTime, uint256 _interval, address _settlementContract, uint256 _saltNonce) public returns (address order)`
 
 This function creates a new order contract and executes a message call to the new order within one
 transaction.
@@ -56,7 +56,7 @@ transaction.
 - `_owner`: The owner of the order.
 - `_receiver`: The receiver of the buyToken orders.
 - `_sellToken`: The token that is being traded in the order.
-- `_totalAmount`: The total amount of the DCA order.
+- `_amount`: The amount of the DCA order.
 - `_buyToken`: The token that is DCA'd in the order.
 - `_startTime`: The start time of the DCA order.
 - `_endTime`: The end time of the DCA order.
@@ -89,14 +89,14 @@ interfaces.
 
 ### Functions
 
-#### `initialize(address _owner, address _receiver, address _sellToken, address _buyToken, uint256 _totalAmount, uint256 _startTime, uint256 _endTime, uint256 _interval, address _settlementContract) external override returns (bool)`
+#### `initialize(address _owner, address _receiver, address _sellToken, address _buyToken, uint256 _amount, uint256 _startTime, uint256 _endTime, uint256 _interval, address _settlementContract) external override returns (bool)`
 
 Initializes the DCA order with the specified parameters.
 
 - `_owner`: The owner of the order.
 - `_receiver`: The receiver of the buyToken orders.
 - `_sellToken`: The token that is being traded in the order.
-- `_totalAmount`: The total amount of the DCA order.
+- `_amount`: The amount of the DCA order.
 - `_buyToken`: The token that is DCA'd in the order.
 - `_startTime`: The start time of the DCA order.
 - `_endTime`: The end time of the DCA order.

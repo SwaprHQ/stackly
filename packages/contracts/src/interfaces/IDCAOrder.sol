@@ -8,7 +8,7 @@ interface IDCAOrder {
     address _receiver,
     address _sellToken,
     address _buyToken,
-    uint256 _totalAmount,
+    uint256 _amount,
     uint256 _startTime,
     uint256 _endTime,
     uint256 _interval,

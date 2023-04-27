@@ -26,7 +26,7 @@ contract OrderFactoryTest is Test {
   uint256 public _interval;
   uint256 public _startTime;
   uint256 public _endTime;
-  uint256 public _totalAmount;
+  uint256 public _amount;
   uint16 public _fee;
 
   function setUp() public {
@@ -58,7 +58,7 @@ contract OrderFactoryTest is Test {
 
     _startTime = block.timestamp + 1 hours;
     _endTime = _startTime + 1 days;
-    _totalAmount = 10 ether;
+    _amount = 10 ether;
     _interval = 1;
     _fee = 5;
   }
@@ -76,7 +76,7 @@ contract OrderFactoryTest is Test {
       _receiver,
       _sellToken,
       _buyToken,
-      _totalAmount,
+      _amount,
       _startTime,
       _endTime,
       _interval,
@@ -85,10 +85,10 @@ contract OrderFactoryTest is Test {
     );
 
     // Balance has been transferred to the vault
-    assertEq(sellToken.balanceOf(order), _totalAmount - (_totalAmount * _fee) / 100);
+    assertEq(sellToken.balanceOf(order), _amount - (_amount * _fee) / 100);
 
     // Fee is left in the factory
-    assertEq(sellToken.balanceOf(address(factory)), (_totalAmount * _fee) / 100);
+    assertEq(sellToken.balanceOf(address(factory)), (_amount * _fee) / 100);
   }
 
   function testSetProtocolFee() public {
@@ -121,7 +121,7 @@ contract OrderFactoryTest is Test {
       _receiver,
       _sellToken,
       _buyToken,
-      _totalAmount,
+      _amount,
       _startTime,
       _endTime,
       _interval,
@@ -137,7 +137,7 @@ contract OrderFactoryTest is Test {
     uint256 afterBalance = sellToken.balanceOf(address(this));
 
     assertEq(afterBalance - beforeBalance, 500000000000000000);
-    assertEq(afterBalance - beforeBalance, (_totalAmount * _fee) / 100);
+    assertEq(afterBalance - beforeBalance, (_amount * _fee) / 100);
 
     // Set caller to a different address
     cheatCodes.prank(address(1337));

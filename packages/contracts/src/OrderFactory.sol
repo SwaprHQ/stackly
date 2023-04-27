@@ -37,7 +37,7 @@ contract OrderFactory is Ownable2Step {
   /// @param _owner The owner of the order.
   /// @param _receiver The receiver of the buyToken orders.
   /// @param _sellToken The token that is being traded in the order.
-  /// @param _totalAmount The total amount of the DCA order.
+  /// @param _amount The amount of the DCA order.
   /// @param _buyToken The token that is DCA'd in the order.
   /// @param _startTime The start time of the DCA order.
   /// @param _endTime The end time of the DCA order.
@@ -50,14 +50,15 @@ contract OrderFactory is Ownable2Step {
     address _receiver,
     address _sellToken,
     address _buyToken,
-    uint256 _totalAmount,
+    uint256 _amount,
     uint256 _startTime,
     uint256 _endTime,
     uint256 _interval,
     address _settlementContract,
     uint256 _saltNonce
   ) public returns (address order) {
-    uint256 totalAmountWithoutFees = _totalAmount - (_totalAmount * protocolFee) / 100;
+    uint256 feeAmount = (_amount * protocolFee) / 100;
+    uint256 amountWithoutFees = _amount - feeAmount;
 
     bytes memory initliazier = abi.encodeWithSignature(
       "initialize(address,address,address,address,uint256,uint256,uint256,uint256,address)",
@@ -65,7 +66,7 @@ contract OrderFactory is Ownable2Step {
       _receiver,
       _sellToken,
       _buyToken,
-      totalAmountWithoutFees,
+      amountWithoutFees,
       _startTime,
       _endTime,
       _interval,
@@ -77,11 +78,11 @@ contract OrderFactory is Ownable2Step {
 
     emit OrderCreated(order);
 
-    // Transfer the total amount to the order
-    IERC20(_sellToken).transferFrom(msg.sender, order, totalAmountWithoutFees);
+    // Transfer the amount to the order
+    IERC20(_sellToken).transferFrom(msg.sender, order, amountWithoutFees);
 
     // Transfer the fee to the factory
-    IERC20(_sellToken).transferFrom(msg.sender, address(this), (_totalAmount * protocolFee) / 100);
+    IERC20(_sellToken).transferFrom(msg.sender, address(this), feeAmount);
   }
 
   /// @dev Set the protocol fee percent
