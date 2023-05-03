@@ -125,7 +125,8 @@ export async function createDCAOrderWithNonce(
   const singleton = getDCAOrderSingletonAddress(chainId);
   const settlementContract = getCOWProtocolSettlementAddress(chainId);
 
-  let initializer = getDCAOrderInterface().encodeFunctionData('initialize', [
+  return await orderFactory.createOrderWithNonce(
+    singleton,
     owner,
     receiver,
     sellToken,
@@ -135,12 +136,8 @@ export async function createDCAOrderWithNonce(
     endTime,
     interval,
     settlementContract,
-    0,
-  ]);
-
-  // Strips out the fee param, added by factory contract before DCAOrder initialization
-  const initializerWithoutFee = initializer.slice(0, -64);
-  return await orderFactory.createOrderWithNonce(singleton, initializerWithoutFee, nonce);
+    nonce
+  );
 }
 
 export const MULTICALL_ADDRESS = '0xcA11bde05977b3631167028862bE2a173976CA11';
