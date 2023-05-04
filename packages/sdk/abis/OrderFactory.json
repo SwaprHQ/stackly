@@ -70,13 +70,53 @@
         "type": "address"
       },
       {
-        "internalType": "bytes",
-        "name": "initializer",
-        "type": "bytes"
+        "internalType": "address",
+        "name": "_owner",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_receiver",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_sellToken",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_buyToken",
+        "type": "address"
       },
       {
         "internalType": "uint256",
-        "name": "saltNonce",
+        "name": "_amount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_startTime",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_endTime",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_interval",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "_settlementContract",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_saltNonce",
         "type": "uint256"
       }
     ],
