@@ -108,7 +108,10 @@ contract DCAOrder is IConditionalOrder, EIP1271Verifier, IDCAOrder {
     sellToken = IERC20(_sellToken);
     buyToken = IERC20(_buyToken);
     startTime = _startTime;
-    endTime = _endTime;
+
+    // Adds interval time to make sure the last order has time to execute
+    endTime = _endTime + (interval * 3600);
+
     interval = _interval;
     principal = _principal - (_principal * _fee) / 100;
     fee = _fee;
