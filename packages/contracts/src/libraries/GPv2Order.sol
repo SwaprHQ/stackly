@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
-pragma solidity 0.8.17;
+pragma solidity 0.8.19;
 
 import {IERC20} from "oz/interfaces/IERC20.sol";
 
