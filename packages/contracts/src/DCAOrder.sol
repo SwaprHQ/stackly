@@ -111,7 +111,7 @@ contract DCAOrder is IConditionalOrder, EIP1271Verifier, IDCAOrder {
     amount = _amount;
     domainSeparator = IGPv2Settlement(_settlementContract).domainSeparator();
     // Approve the vaut relayer to spend the sell token
-    _sellToken.safeApprove(address(IGPv2Settlement(_settlementContract).vaultRelayer()), type(uint256).max);
+    IERC20(_sellToken).safeApprove(address(IGPv2Settlement(_settlementContract).vaultRelayer()), type(uint256).max);
     emit ConditionalOrderCreated(address(this)); // Required by COW to watch this contract
     // Emit Initialized event for indexing
     emit Initialized(address(this));
