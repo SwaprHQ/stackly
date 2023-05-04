@@ -19,6 +19,8 @@ contract OrderFactoryTest is Test {
   OrderFactory public factory;
   CheatCodes public cheatCodes;
 
+  uint16 private constant HUNDRED_PERCENT = 10000;
+
   address public _owner;
   address public _receiver;
   address public _sellToken;
@@ -85,10 +87,10 @@ contract OrderFactoryTest is Test {
     );
 
     // Balance has been transferred to the vault
-    assertEq(sellToken.balanceOf(order), _amount - (_amount * _fee) / 100);
+    assertEq(sellToken.balanceOf(order), _amount - (_amount * _fee) / HUNDRED_PERCENT);
 
     // Fee is left in the factory
-    assertEq(sellToken.balanceOf(address(factory)), (_amount * _fee) / 100);
+    assertEq(sellToken.balanceOf(address(factory)), (_amount * _fee) / HUNDRED_PERCENT);
   }
 
   function testSetProtocolFee() public {
@@ -137,7 +139,7 @@ contract OrderFactoryTest is Test {
     uint256 afterBalance = sellToken.balanceOf(address(this));
 
     assertEq(afterBalance - beforeBalance, 500000000000000000);
-    assertEq(afterBalance - beforeBalance, (_amount * _fee) / 100);
+    assertEq(afterBalance - beforeBalance, (_amount * _fee) / HUNDRED_PERCENT);
 
     // Set caller to a different address
     cheatCodes.prank(address(1337));

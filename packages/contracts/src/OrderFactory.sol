@@ -10,8 +10,8 @@ error ForbiddenValue();
 
 contract OrderFactory is Ownable2Step {
   using SafeERC20 for IERC20;
-  
-  uint16 public protocolFee = 5; // default 0.05% (range: 0-10000)
+  uint16 private constant HUNDRED_PERCENT = 10000;
+  uint16 public protocolFee = 5; // default 0.05% (range: 0-500 / 0-5%)
 
   event OrderCreated(address indexed order);
 
@@ -60,7 +60,7 @@ contract OrderFactory is Ownable2Step {
     address _settlementContract,
     uint256 _saltNonce
   ) public returns (address order) {
-    uint256 feeAmount = (_amount * protocolFee) / 100;
+    uint256 feeAmount = (_amount * protocolFee) / HUNDRED_PERCENT;
     uint256 amountWithoutFees = _amount - feeAmount;
 
     bytes memory initliazier = abi.encodeWithSignature(
