@@ -41,17 +41,13 @@ contract DCAOrder is IConditionalOrder, EIP1271Verifier, IDCAOrder {
   uint256 public startTime;
   /// @dev The end time of the DCA order.
   uint256 public endTime;
-  /// @dev The amount of tokens to buy in each order.
-  uint256 public amount;
   /// @dev The frequency of the DCA order in hours
   uint256 public interval;
   bytes32 public domainSeparator;
   /// @dev Indicates that the order has been cancelled.
   bool public cancelled;
-  /// @dev The initial principal amount of the DCA order.
-  uint256 public principal;
-  /// @dev The protocol fee amount
-  uint16 public fee;
+  /// @dev The initial amount of the DCA order.
+  uint256 public amount;
 
   event Initialized(address indexed order);
   event Cancelled(address indexed order);
@@ -60,24 +56,22 @@ contract DCAOrder is IConditionalOrder, EIP1271Verifier, IDCAOrder {
   /// @param _owner The owner of the order.
   /// @param _receiver The receiver of the buyToken orders.
   /// @param _sellToken The token that is being traded in the order.
-  /// @param _principal The principal amount of the DCA order.
+  /// @param _amount The amount of the DCA order.
   /// @param _buyToken The token that is DCA'd in the order.
   /// @param _startTime The start time of the DCA order.
   /// @param _endTime The end time of the DCA order.
   /// @param _interval The frequency interval of the DCA order in hours.
   /// @param _settlementContract The settlement contract address.
-  /// @param _fee The protocol fee amount
   function initialize(
     address _owner,
     address _receiver,
     address _sellToken,
     address _buyToken,
-    uint256 _principal,
+    uint256 _amount,
     uint256 _startTime,
     uint256 _endTime,
     uint256 _interval,
-    address _settlementContract,
-    uint16 _fee
+    address _settlementContract
   ) external override returns (bool) {
     // Ensure that the order is not already initialized.
     if (owner != address(0)) {
@@ -114,8 +108,7 @@ contract DCAOrder is IConditionalOrder, EIP1271Verifier, IDCAOrder {
     endTime = _endTime + (interval * 3600);
 
     interval = _interval;
-    principal = _principal - (_principal * _fee) / 100;
-    fee = _fee;
+    amount = _amount;
     domainSeparator = IGPv2Settlement(_settlementContract).domainSeparator();
     // Approve the vaut relayer to spend the sell token
     IERC20(_sellToken).safeApprove(address(IGPv2Settlement(_settlementContract).vaultRelayer()), type(uint256).max);
@@ -236,6 +229,6 @@ contract DCAOrder is IConditionalOrder, EIP1271Verifier, IDCAOrder {
   function slotSellAmount() public view returns (uint256 orderSellAmount) {
     // Execute at the specified frequency
     // Each order sellAmount is the balance of the order divided by the frequency
-    (, orderSellAmount) = SafeMath.tryDiv(principal, orderSlots().length);
+    (, orderSellAmount) = SafeMath.tryDiv(amount, orderSlots().length);
   }
 }

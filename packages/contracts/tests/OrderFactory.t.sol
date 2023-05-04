@@ -26,7 +26,7 @@ contract OrderFactoryTest is Test {
   uint256 public _interval;
   uint256 public _startTime;
   uint256 public _endTime;
-  uint256 public _principal;
+  uint256 public _amount;
   uint16 public _fee;
 
   function setUp() public {
@@ -47,8 +47,7 @@ contract OrderFactoryTest is Test {
       mastercopyStartTime,
       mastercopyEndTime,
       1,
-      address(mockSettlement),
-      5
+      address(mockSettlement)
     );
 
     sellToken.mint(address(this), 10000 ether);
@@ -59,7 +58,7 @@ contract OrderFactoryTest is Test {
 
     _startTime = block.timestamp + 1 hours;
     _endTime = _startTime + 1 days;
-    _principal = 10 ether;
+    _amount = 10 ether;
     _interval = 1;
     _fee = 5;
   }
@@ -73,26 +72,23 @@ contract OrderFactoryTest is Test {
     // Create the vault
     address order = factory.createOrderWithNonce(
       address(mastercopy),
-      abi.encodeWithSignature(
-        "initialize(address,address,address,address,uint256,uint256,uint256,uint256,address,uint16)",
-        _owner,
-        _receiver,
-        _sellToken,
-        _buyToken,
-        _principal,
-        _startTime,
-        _endTime,
-        _interval,
-        address(mockSettlement)
-      ),
+      _owner,
+      _receiver,
+      _sellToken,
+      _buyToken,
+      _amount,
+      _startTime,
+      _endTime,
+      _interval,
+      address(mockSettlement),
       1
     );
 
     // Balance has been transferred to the vault
-    assertEq(sellToken.balanceOf(order), _principal - (_principal * _fee) / 100);
+    assertEq(sellToken.balanceOf(order), _amount - (_amount * _fee) / 100);
 
     // Fee is left in the factory
-    assertEq(sellToken.balanceOf(address(factory)), (_principal * _fee) / 100);
+    assertEq(sellToken.balanceOf(address(factory)), (_amount * _fee) / 100);
   }
 
   function testSetProtocolFee() public {
@@ -121,30 +117,27 @@ contract OrderFactoryTest is Test {
     // Create the vault
     factory.createOrderWithNonce(
       address(mastercopy),
-      abi.encodeWithSignature(
-        "initialize(address,address,address,address,uint256,uint256,uint256,uint256,address,uint16)",
-        _owner,
-        _receiver,
-        _sellToken,
-        _buyToken,
-        _principal,
-        _startTime,
-        _endTime,
-        _interval,
-        address(mockSettlement)
-      ),
+      _owner,
+      _receiver,
+      _sellToken,
+      _buyToken,
+      _amount,
+      _startTime,
+      _endTime,
+      _interval,
+      address(mockSettlement),
       1
     );
 
     address[] memory tokens = new address[](1);
     tokens[0] = address(sellToken);
-    
+
     uint256 beforeBalance = sellToken.balanceOf(address(this));
     factory.withdrawTokens(tokens);
     uint256 afterBalance = sellToken.balanceOf(address(this));
 
     assertEq(afterBalance - beforeBalance, 500000000000000000);
-    assertEq(afterBalance - beforeBalance, (_principal * _fee) / 100);
+    assertEq(afterBalance - beforeBalance, (_amount * _fee) / 100);
 
     // Set caller to a different address
     cheatCodes.prank(address(1337));

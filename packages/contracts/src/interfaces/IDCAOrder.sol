@@ -8,11 +8,10 @@ interface IDCAOrder {
     address _receiver,
     address _sellToken,
     address _buyToken,
-    uint256 _principal,
+    uint256 _amount,
     uint256 _startTime,
     uint256 _endTime,
     uint256 _interval,
-    address _settlementContract,
-    uint16 _fee
+    address _settlementContract
   ) external returns (bool);
 }
