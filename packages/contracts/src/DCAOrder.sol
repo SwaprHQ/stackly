@@ -93,7 +93,7 @@ contract DCAOrder is IConditionalOrder, EIP1271Verifier, IDCAOrder {
     if (_interval == 0) {
       revert IntervalMustBeGreaterThanZero();
     }
-    // Start date must be in the future by at least 10 minutes
+    // Start date must be in the future by at least 3 minutes
     // solhint-disable-next-line not-rely-on-time
     if (_startTime <= block.timestamp + 3 minutes) {
       revert InvalidStartTime();
