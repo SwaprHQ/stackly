@@ -2,6 +2,7 @@
 pragma solidity 0.8.19;
 
 import {IERC20} from "oz/token/ERC20/IERC20.sol";
+import {SafeERC20} from "oz/token/ERC20/utils/SafeERC20.sol";
 import {IGPv2Settlement} from "./interfaces/IGPv2Settlement.sol";
 import {IConditionalOrder} from "./interfaces/IConditionalOrder.sol";
 import {IDCAOrder} from "./interfaces/IDCAOrder.sol";
@@ -26,6 +27,7 @@ error OrderExecutionTimeLessThanCurrentTime();
 
 contract DCAOrder is IConditionalOrder, EIP1271Verifier, IDCAOrder {
   using GPv2Order for GPv2Order.Data;
+  using SafeERC20 for IERC20;
 
   /// @dev The owner of the order. The owner can cancel the order.
   address public owner;
@@ -116,7 +118,7 @@ contract DCAOrder is IConditionalOrder, EIP1271Verifier, IDCAOrder {
     fee = _fee;
     domainSeparator = IGPv2Settlement(_settlementContract).domainSeparator();
     // Approve the vaut relayer to spend the sell token
-    IERC20(_sellToken).approve(address(IGPv2Settlement(_settlementContract).vaultRelayer()), type(uint256).max);
+    IERC20(_sellToken).safeApprove(address(IGPv2Settlement(_settlementContract).vaultRelayer()), type(uint256).max);
     emit ConditionalOrderCreated(address(this)); // Required by COW to watch this contract
     // Emit Initialized event for indexing
     emit Initialized(address(this));
@@ -131,7 +133,7 @@ contract DCAOrder is IConditionalOrder, EIP1271Verifier, IDCAOrder {
     cancelled = true;
     emit Cancelled(address(this));
     // Transfer funds back to owner
-    IERC20(sellToken).transfer(owner, IERC20(sellToken).balanceOf(address(this)));
+    IERC20(sellToken).safeTransfer(owner, IERC20(sellToken).balanceOf(address(this)));
   }
 
   // @dev If the `target`'s balance of `sellToken` is above the specified threshold, sell its entire balance
