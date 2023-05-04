@@ -5,7 +5,7 @@
 [submodule "packages/contracts/lib/openzeppelin-contracts"]
 	path = packages/contracts/lib/openzeppelin-contracts
 	url = https://github.com/OpenZeppelin/openzeppelin-contracts
-	branch = v4.8.1
+	branch = v4.8.3
 [submodule "packages/contracts/lib/solmate"]
 	path = packages/contracts/lib/solmate
 	url = https://github.com/transmissions11/solmate

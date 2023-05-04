@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.17;
+pragma solidity 0.8.19;
 
 import {IERC20} from "oz/token/ERC20/IERC20.sol";
+import {SafeERC20} from "oz/token/ERC20/utils/SafeERC20.sol";
 import {IGPv2Settlement} from "./interfaces/IGPv2Settlement.sol";
 import {IConditionalOrder} from "./interfaces/IConditionalOrder.sol";
 import {IDCAOrder} from "./interfaces/IDCAOrder.sol";
@@ -22,11 +23,11 @@ error InvalidStartTime();
 error InvalidEndTime();
 error NotWithinStartAndEndTimes();
 error ZeroSellAmount();
-error OrderExecutionTimeGreaterThanEndTime();
 error OrderExecutionTimeLessThanCurrentTime();
 
 contract DCAOrder is IConditionalOrder, EIP1271Verifier, IDCAOrder {
   using GPv2Order for GPv2Order.Data;
+  using SafeERC20 for IERC20;
 
   /// @dev The owner of the order. The owner can cancel the order.
   address public owner;
@@ -87,7 +88,7 @@ contract DCAOrder is IConditionalOrder, EIP1271Verifier, IDCAOrder {
     if (_interval == 0) {
       revert IntervalMustBeGreaterThanZero();
     }
-    // Start date must be in the future by at least 10 minutes
+    // Start date must be in the future by at least 3 minutes
     // solhint-disable-next-line not-rely-on-time
     if (_startTime <= block.timestamp + 3 minutes) {
       revert InvalidStartTime();
@@ -102,12 +103,15 @@ contract DCAOrder is IConditionalOrder, EIP1271Verifier, IDCAOrder {
     sellToken = IERC20(_sellToken);
     buyToken = IERC20(_buyToken);
     startTime = _startTime;
-    endTime = _endTime;
+
+    // Adds interval time to make sure the last order has time to execute
+    endTime = _endTime + (interval * 3600);
+
     interval = _interval;
     amount = _amount;
     domainSeparator = IGPv2Settlement(_settlementContract).domainSeparator();
     // Approve the vaut relayer to spend the sell token
-    IERC20(_sellToken).approve(address(IGPv2Settlement(_settlementContract).vaultRelayer()), type(uint256).max);
+    IERC20(_sellToken).safeApprove(address(IGPv2Settlement(_settlementContract).vaultRelayer()), type(uint256).max);
     emit ConditionalOrderCreated(address(this)); // Required by COW to watch this contract
     // Emit Initialized event for indexing
     emit Initialized(address(this));
@@ -122,7 +126,7 @@ contract DCAOrder is IConditionalOrder, EIP1271Verifier, IDCAOrder {
     cancelled = true;
     emit Cancelled(address(this));
     // Transfer funds back to owner
-    IERC20(sellToken).transfer(owner, IERC20(sellToken).balanceOf(address(this)));
+    IERC20(sellToken).safeTransfer(owner, IERC20(sellToken).balanceOf(address(this)));
   }
 
   // @dev If the `target`'s balance of `sellToken` is above the specified threshold, sell its entire balance
@@ -142,10 +146,6 @@ contract DCAOrder is IConditionalOrder, EIP1271Verifier, IDCAOrder {
     // Cannot create order with zero sell amount
     if (orderSellAmount == 0) {
       revert ZeroSellAmount();
-    }
-    // Ensure that the order execution time is less than the end time
-    if (orderExecutionTime > endTime) {
-      revert OrderExecutionTimeGreaterThanEndTime();
     }
     // Create the order
     // ensures that orders queried shortly after one another result in the same hash (to avoid spamming the orderbook)

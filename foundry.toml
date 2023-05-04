@@ -4,7 +4,7 @@ test = 'packages/contracts/tests'
 libs = ['packages/contracts/lib']
 out = 'packages/contracts/out'
 optimizer = true
-solc_version = '0.8.17'
+solc_version = '0.8.19'
 
 [fmt]
 tab_width = 2
