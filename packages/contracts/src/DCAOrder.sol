@@ -92,7 +92,7 @@ contract DCAOrder is IConditionalOrder, EIP1271Verifier, IDCAOrder {
     if (_interval == 0) {
       revert IntervalMustBeGreaterThanZero();
     }
-    // Start date must be in the future by at least 10 minutes
+    // Start date must be in the future by at least 3 minutes
     // solhint-disable-next-line not-rely-on-time
     if (_startTime <= block.timestamp + 3 minutes) {
       revert InvalidStartTime();
@@ -107,7 +107,10 @@ contract DCAOrder is IConditionalOrder, EIP1271Verifier, IDCAOrder {
     sellToken = IERC20(_sellToken);
     buyToken = IERC20(_buyToken);
     startTime = _startTime;
-    endTime = _endTime;
+
+    // Adds interval time to make sure the last order has time to execute
+    endTime = _endTime + (interval * 3600);
+
     interval = _interval;
     principal = _principal - (_principal * _fee) / 100;
     fee = _fee;

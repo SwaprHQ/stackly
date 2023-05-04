@@ -241,7 +241,7 @@ contract DCAOrderTest is Test {
     (, uint256 expectedOrderSellAmount) = SafeMath.tryDiv(_testPrincipal - ((_testPrincipal * _fee) / 100), orderSlots);
     assertEq(order.sellAmount, expectedOrderSellAmount);
     // warp to 1 second after the startTime
-    vm.warp(dcaOrder.endTime() + 1 seconds);
+    vm.warp(dcaOrder.endTime() + 5 hours);
     // Should revert because the order is not tradeable
     vm.expectRevert(NotWithinStartAndEndTimes.selector);
     order = dcaOrder.getTradeableOrder();

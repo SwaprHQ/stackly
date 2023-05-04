@@ -60,9 +60,9 @@ contract OrderFactory is Ownable2Step {
   }
 
   /// @dev Set the protocol fee percent  
-  /// @param _fee The new protocol fee percent 0-100% (range: 0-10000)
+  /// @param _fee The new protocol fee percent 0-5% (range: 0-500)
   function setProtocolFee(uint16 _fee) external onlyOwner {
-      if (_fee > 10000) revert ForbiddenValue();
+      if (_fee > 500) revert ForbiddenValue();
       protocolFee = _fee;
   }
 
