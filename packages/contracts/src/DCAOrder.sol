@@ -22,7 +22,6 @@ error InvalidStartTime();
 error InvalidEndTime();
 error NotWithinStartAndEndTimes();
 error ZeroSellAmount();
-error OrderExecutionTimeGreaterThanEndTime();
 error OrderExecutionTimeLessThanCurrentTime();
 
 contract DCAOrder is IConditionalOrder, EIP1271Verifier, IDCAOrder {
@@ -149,10 +148,6 @@ contract DCAOrder is IConditionalOrder, EIP1271Verifier, IDCAOrder {
     // Cannot create order with zero sell amount
     if (orderSellAmount == 0) {
       revert ZeroSellAmount();
-    }
-    // Ensure that the order execution time is less than the end time
-    if (orderExecutionTime > endTime) {
-      revert OrderExecutionTimeGreaterThanEndTime();
     }
     // Create the order
     // ensures that orders queried shortly after one another result in the same hash (to avoid spamming the orderbook)
