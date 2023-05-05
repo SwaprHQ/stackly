@@ -54,6 +54,7 @@ export function CurrencyAmountInput({
           {currencyAmount.currency.symbol}
         </TokenButton>
         <NumberInput
+          placeholder="1000"
           disabled={disabled}
           value={inputAmount}
           onChange={(nextSellAmount) => {

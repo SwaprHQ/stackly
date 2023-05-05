@@ -19,5 +19,8 @@ export const StyledInput = styled.input<{ border?: boolean }>(
   &:disabled {
     color: #1010104d;
   }
+  &::placeholder {
+    color: #1010104d;
+  }
 `
 );
