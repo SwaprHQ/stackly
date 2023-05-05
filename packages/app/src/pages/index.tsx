@@ -63,9 +63,74 @@ export default function IndexPage() {
         </FlexContainer>
       </PageHeader>
       <CreateDCAVaultContainer />
+      <WhatIsDCA>
+        <WhatIsDCATitle>A new way to stack your crypto over time with DCA.</WhatIsDCATitle>
+        <WhatIsDCAPoint>
+          <WhatIsDCAPointTitle>Neutralizing Short-Term Volatility</WhatIsDCAPointTitle>
+          <WhatIsDCAPointDescription>
+            Stackly's dollar-cost averaging strategy neutralizes short-term volatility and reduces the need for market
+            timing, making it an ideal tool for investors who want to minimize risk while building wealth.
+          </WhatIsDCAPointDescription>
+        </WhatIsDCAPoint>
+        <WhatIsDCAPoint>
+          <WhatIsDCAPointTitle>Greater Control Over Investments</WhatIsDCAPointTitle>
+          <WhatIsDCAPointDescription>
+            With Stackly, you can choose the token you want to stack, the frequency of the stacks, and when to start and
+            end them, giving you greater control over your investments.
+          </WhatIsDCAPointDescription>
+        </WhatIsDCAPoint>
+      </WhatIsDCA>
     </PageLayout>
   );
 }
+
+const WhatIsDCA = styled.div`
+  max-width: 1000px;
+  margin: 8rem auto;
+  padding: 0 16px;
+
+  @media (min-width: 500px) {
+    margin: 10rem auto;
+  }
+`;
+
+const WhatIsDCAPoint = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 3rem;
+  border-top: 1px solid #e2e4e1;
+  padding-top: 32px;
+
+  @media (min-width: 768px) {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+`;
+
+const WhatIsDCAPointDescription = styled.p`
+  max-width: 480px;
+  color: #4d4f4c;
+`;
+const WhatIsDCAPointTitle = styled.h4`
+  font-size: 20px;
+  font-weight: 500;
+  margin-bottom: 1rem;
+`;
+
+const WhatIsDCATitle = styled.h3`
+  max-width: 600px;
+  font-weight: 600;
+  font-size: 32px;
+  line-height: 44px;
+  margin-bottom: 3rem;
+
+  @media (min-width: 500px) {
+    font-size: 40px;
+    line-height: 56px;
+    margin-bottom: 5rem;
+  }
+`;
+
 const FeaturePoint = styled.div`
   display: flex;
   align-items: center;
@@ -108,7 +173,7 @@ const PageHeaderSubSection = styled.div`
   gap: 1rem;
   margin-bottom: 1rem;
 
-  @media (min-width: 468px) {
+  @media (min-width: 500px) {
     margin-bottom: 2.5rem;
     flex-direction: row;
   }
