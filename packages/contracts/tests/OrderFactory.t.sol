@@ -138,7 +138,7 @@ contract OrderFactoryTest is Test {
     factory.withdrawTokens(tokens);
     uint256 afterBalance = sellToken.balanceOf(address(this));
 
-    assertEq(afterBalance - beforeBalance, 500000000000000000);
+    assertEq(afterBalance - beforeBalance, 5000000000000000);
     assertEq(afterBalance - beforeBalance, (_amount * _fee) / HUNDRED_PERCENT);
 
     // Set caller to a different address
