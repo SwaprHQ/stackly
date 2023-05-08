@@ -2,7 +2,6 @@ import styled from 'styled-components';
 import { FlexContainer } from '../components/Container';
 import { CreateDCAVaultContainer } from '../components/CreateDCAVaultContainer';
 import { PageLayout } from '../layout';
-import { ReactComponent as _HeaderSplash } from '../assets/svg/homepage-splash.svg';
 
 export default function IndexPage() {
   return (
@@ -73,7 +72,7 @@ export default function IndexPage() {
           </WhatIsDCAPointDescription>
         </WhatIsDCAPoint>
         <WhatIsDCAPoint>
-          <WhatIsDCAPointTitle>Greater Control Over Investments</WhatIsDCAPointTitle>
+          <WhatIsDCAPointTitle>Greater Control Over Your Crypto</WhatIsDCAPointTitle>
           <WhatIsDCAPointDescription>
             With Stackly, you can choose the token you want to stack, the frequency of the stacks, and when to start and
             end them, giving you greater control over your investments.
