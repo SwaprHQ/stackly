@@ -163,7 +163,7 @@ export function CreateDCAVaultContainer() {
       // Approve factory to spend sell token
       const approveFactoryTransaction = await sellTokenContract.approve(
         getOrderFactoryAddress(chainId),
-        constants.MaxUint256
+        sellTokenAmount.toRawAmount()
       );
 
       setModalData((prev) => ({
