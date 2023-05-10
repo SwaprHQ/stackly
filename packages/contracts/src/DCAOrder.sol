@@ -229,6 +229,17 @@ contract DCAOrder is IConditionalOrder, EIP1271Verifier, IDCAOrder {
   function slotSellAmount() public view returns (uint256 orderSellAmount) {
     // Execute at the specified frequency
     // Each order sellAmount is the balance of the order divided by the frequency
-    (, orderSellAmount) = SafeMath.tryDiv(amount, orderSlots().length);
+    // If the current slot is the last slot, the returned amount is the total sellToken balance
+    uint256[] memory slots = orderSlots();
+    // solhint-disable-next-line not-rely-on-time
+    uint256 currentTime = block.timestamp;
+
+    uint256 lastSlot = slots[slots.length - 1];
+
+    if (currentTime >= lastSlot && currentTime < endTime) {
+      orderSellAmount = sellToken.balanceOf(address(this));
+    } else {
+      (, orderSellAmount) = SafeMath.tryDiv(amount, slots.length);
+    }
   }
 }
