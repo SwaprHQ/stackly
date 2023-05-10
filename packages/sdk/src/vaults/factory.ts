@@ -87,7 +87,7 @@ interface CreateorderWithNonceInitializeParams {
   receiver: string;
   sellToken: string;
   buyToken: string;
-  principal: string;
+  amount: string;
   startTime: number;
   endTime: number;
   interval: number;
@@ -108,7 +108,7 @@ export async function createDCAOrderWithNonce(
     receiver,
     sellToken,
     buyToken,
-    principal,
+    amount,
     startTime,
     endTime,
     interval,
@@ -131,7 +131,7 @@ export async function createDCAOrderWithNonce(
     receiver,
     sellToken,
     buyToken,
-    principal,
+    amount,
     startTime,
     endTime,
     interval,

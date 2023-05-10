@@ -21,6 +21,11 @@
   },
   {
     "inputs": [],
+    "name": "MissingOwner",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "NotOwner",
     "type": "error"
   },
@@ -31,12 +36,7 @@
   },
   {
     "inputs": [],
-    "name": "OrderExecutionTimeGreaterThanEndTime",
-    "type": "error"
-  },
-  {
-    "inputs": [],
-    "name": "OrderExecutionTimeLessThanCurrentTime",
+    "name": "OrderCancelled",
     "type": "error"
   },
   {
@@ -123,6 +123,19 @@
   },
   {
     "inputs": [],
+    "name": "cancelled",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "currentSlot",
     "outputs": [
       {
@@ -132,19 +145,6 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "deposit",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -272,7 +272,7 @@
       },
       {
         "internalType": "uint256",
-        "name": "_principal",
+        "name": "_amount",
         "type": "uint256"
       },
       {
@@ -372,19 +372,6 @@
   },
   {
     "inputs": [],
-    "name": "principal",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
     "name": "receiver",
     "outputs": [
       {
@@ -404,6 +391,19 @@
         "internalType": "contract IERC20",
         "name": "",
         "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "slotSellAmount",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "orderSellAmount",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",

@@ -39,8 +39,8 @@ export type Order = {
   owner: Scalars['String'];
   sellToken: Token;
   buyToken: Token;
-  /**  Principal amount of the vault  */
-  principal: Scalars['Float'];
+  /**  Amount of the vault  */
+  amount: Scalars['Float'];
   /**  Start time of the vault  */
   startTime: Scalars['Int'];
   /**  End time of the vault  */
@@ -57,7 +57,7 @@ const OrderFragment = gql`
     id
     owner
     receiver
-    principal
+    amount
     sellToken {
       id
       decimals

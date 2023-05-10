@@ -1,5 +1,5 @@
 import dayjs, { Dayjs, isDayjs } from 'dayjs';
-import { BigNumber, constants } from 'ethers';
+import { BigNumber } from 'ethers';
 import { useEffect, useState } from 'react';
 import {
   USDC,
@@ -189,7 +189,7 @@ export function CreateDCAVaultContainer() {
       receiver: receiver ?? (account.address as string), // TODO: add receiver
       sellToken: sellTokenAmount.currency.address,
       buyToken: buyToken.address,
-      principal: sellTokenAmount.toRawAmount().toString(),
+      amount: sellTokenAmount.toRawAmount().toString(),
       // If startAt is 'now', set it to the current time plus 10 minutes into the future
       startTime:
         startAt === 'Now' || startAt.utc().unix() < dayjs().add(10, 'm').utc().unix()

@@ -1,5 +1,5 @@
 {
-  "name": "dca-subgraph",
+  "name": "stackly-subgraph",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -8,10 +8,10 @@
     "build": "npm run prepare:gnosis && graph build",
     "prepare:gnosis": "ts-node bin/build-subgraph.ts xdai && npm run codegen",
     "prepare:mainnet": "ts-node bin/build-subgraph.ts mainnet && npm run codegen",
-    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ 3acvc/dca-subgraph",
-    "create-local": "graph create --node http://localhost:8020/ 3acvc/dca-subgraph",
-    "remove-local": "graph remove --node http://localhost:8020/ 3acvc/dca-subgraph",
-    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 3acvc/dca-subgraph",
+    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ swapr/stackly",
+    "create-local": "graph create --node http://localhost:8020/ swapr/stackly",
+    "remove-local": "graph remove --node http://localhost:8020/ swapr/stackly",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 swapr/stackly",
     "test": "echo 'No tests yet, implement them'"
   },
   "devDependencies": {

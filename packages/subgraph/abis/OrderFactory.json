@@ -1,5 +1,10 @@
 [
   {
+    "inputs": [],
+    "name": "ForbiddenValue",
+    "type": "error"
+  },
+  {
     "anonymous": false,
     "inputs": [
       {
@@ -13,6 +18,51 @@
     "type": "event"
   },
   {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "previousOwner",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "OwnershipTransferStarted",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "previousOwner",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "OwnershipTransferred",
+    "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "acceptOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "address",
@@ -20,13 +70,53 @@
         "type": "address"
       },
       {
-        "internalType": "bytes",
-        "name": "initializer",
-        "type": "bytes"
+        "internalType": "address",
+        "name": "_owner",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_receiver",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_sellToken",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_buyToken",
+        "type": "address"
       },
       {
         "internalType": "uint256",
-        "name": "saltNonce",
+        "name": "_amount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_startTime",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_endTime",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_interval",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "_settlementContract",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_saltNonce",
         "type": "uint256"
       }
     ],
@@ -38,6 +128,91 @@
         "type": "address"
       }
     ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "owner",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "pendingOwner",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "protocolFee",
+    "outputs": [
+      {
+        "internalType": "uint16",
+        "name": "",
+        "type": "uint16"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "renounceOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint16",
+        "name": "_fee",
+        "type": "uint16"
+      }
+    ],
+    "name": "setProtocolFee",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "transferOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address[]",
+        "name": "tokens",
+        "type": "address[]"
+      }
+    ],
+    "name": "withdrawTokens",
+    "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   }

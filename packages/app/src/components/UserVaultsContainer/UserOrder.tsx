@@ -74,7 +74,7 @@ export function UserOrder({ order, type }: { order: SubgraphOrder; type: string 
             <h2>{order.id.slice(2, 8)}</h2>
           </OrderTitle>
           <div>
-            {fundsUsed.toFixed(2)} / {parseFloat(formatUnits(order.principal, order.sellToken.decimals)).toFixed(2)}{' '}
+            {fundsUsed.toFixed(2)} / {parseFloat(formatUnits(order.amount, order.sellToken.decimals)).toFixed(2)}{' '}
             {order.sellToken.symbol}
           </div>
           <div>
