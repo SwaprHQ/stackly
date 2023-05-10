@@ -199,8 +199,6 @@ export function CreateDCAVaultContainer() {
       interval: hourInterval,
     };
 
-    console.log('initParams', initParams);
-
     const createOrderTransaction = await createDCAOrderWithNonce(orderFactory, initParams);
 
     setModalData((prev) => ({
@@ -230,13 +228,6 @@ export function CreateDCAVaultContainer() {
       isOrderCreated: true,
     }));
   };
-
-  /*
-   * @TODO: uncomment if there's use for this
-  // Calculate the number of buy orders
-  const buyOrders = Math.ceil(endAt.diff(startAt, 'hours') / hourInterval);
-  const buyAmountPerOrder = sellTokenAmount.div(buyOrders === 0 ? 1 : buyOrders);
-  */
 
   return (
     <Container>
@@ -296,7 +287,7 @@ export function CreateDCAVaultContainer() {
                   <label>Starting</label>
                   <DateTimeInput
                     onChange={(value) => {
-                      if (value.utc().unix() <= dayjs().utc().unix()) {
+                      if (!value.isValid() || value.utc().unix() <= dayjs().utc().unix()) {
                         setStartAt('Now');
                       } else {
                         setStartAt(value);
@@ -310,7 +301,7 @@ export function CreateDCAVaultContainer() {
                   <label>Until</label>
                   <DateTimeInput
                     onChange={(value) => {
-                      if (value.utc().unix() <= dayjs().utc().unix()) {
+                      if (!value.isValid() || value.utc().unix() <= dayjs().utc().unix()) {
                         setEndAt(dayjs().add(30, 'm'));
                       } else {
                         setEndAt(value);
@@ -335,14 +326,6 @@ export function CreateDCAVaultContainer() {
                   )}
                 </FormButtonGroup>
               </form>
-              {/* buyAmountPerOrder.greaterThan(0) && (
-                <OrderInfo>
-                  <p>
-                    Buying {buyAmountPerOrder.toFixed(2)} {sellTokenAmount.currency.symbol} worth of {buyToken.symbol}{' '}
-                    every {frequencyInterval} for {buyOrders} times
-                  </p>
-                </OrderInfo>
-              ) */}
               {createVaultError && (
                 <div>
                   <p>{createVaultError.message}</p>

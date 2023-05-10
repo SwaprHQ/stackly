@@ -25,6 +25,7 @@ export function DateTimeInput({ disabled, value, onChange }: DateTimeInputProps)
   const handleFocus = () => {
     if (ref.current) ref.current.focus();
   };
+  console.log('inputValue', inputValue, value);
   return (
     <StyledInputShadowWrapper>
       <HiddenInput $hide={valueIsNow}>
@@ -32,10 +33,11 @@ export function DateTimeInput({ disabled, value, onChange }: DateTimeInputProps)
           ref={ref}
           type="datetime-local"
           onChange={(event: React.FocusEvent<HTMLInputElement>) => setInputValue(event.target.value)}
-          value={inputValue}
+          value={valueIsNow ? '' : inputValue}
           // For some reason, `min/max` values require the same format as `value`,
           // but they don't need to be in the user's timezone
           min={dayjs().format('YYYY-MM-DDTHH:mm')}
+          max={dayjs().add(1000, 'y').format('YYYY-MM-DDTHH:mm')}
           // The `pattern` is not used at all in `datetime-local` input, but is in place
           // to enforce it when it isn't supported. In that case it's rendered as a regular `text` input
           pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}"
