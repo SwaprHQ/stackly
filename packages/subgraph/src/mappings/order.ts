@@ -1,5 +1,5 @@
 import { Address } from '@graphprotocol/graph-ts';
-import { Token, DCAOrder  } from '../../generated/schema';
+import { Token, DCAOrder } from '../../generated/schema';
 import { ERC20 as ERC20Contract } from '../../generated/templates/DCAOrder/ERC20';
 import { Initialized, Cancelled, DCAOrder as DCAOrderContract } from '../../generated/templates/DCAOrder/DCAOrder';
 
@@ -18,16 +18,15 @@ export function createOrReturnTokenEntity(contractAddress: Address): Token {
   return token;
 }
 
-
 export function handleDCAOrderInitialized(event: Initialized): void {
   const orderContract = DCAOrderContract.bind(event.params.order);
   const order = new DCAOrder(event.params.order.toHex());
   order.createdAt = event.block.timestamp;
-  order.owner =orderContract.owner();
+  order.owner = orderContract.owner();
   order.sellToken = createOrReturnTokenEntity(orderContract.sellToken()).id;
   order.buyToken = createOrReturnTokenEntity(orderContract.buyToken()).id;
   order.receiver = orderContract.receiver();
-  order.principal = orderContract.principal();
+  order.amount = orderContract.amount();
   order.endTime = orderContract.endTime().toI32();
   order.startTime = orderContract.startTime().toI32();
   order.orderSlots = orderContract.orderSlots();
