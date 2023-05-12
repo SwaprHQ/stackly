@@ -200,23 +200,17 @@ contract DCAOrder is IConditionalOrder, EIP1271Verifier, IDCAOrder {
   function currentSlot() public view returns (uint256 slot) {
     uint256[] memory slots = orderSlots();
 
-    // If the current time is between the last slot and the end time, return the last slot time
+    // If the current time is between the last slot and the end time, return the last slot
     // solhint-disable-next-line not-rely-on-time
     if (block.timestamp >= slots[slots.length - 1] && block.timestamp < endTime) {
       return slots[slots.length - 1];
     }
 
-    for (uint256 i = 0; i < slots.length; i++) {
-      uint256 slotEndTime = endTime;
-
-      // If the slot is not the last slot, set the end time to the next slot
-      if (i < slots.length - 1) {
-        slotEndTime = slots[i + 1];
-      }
-
-      // If the current time is between the slot start time and the end time, return the current slot time
+    // No need to reach the last slot, the last slot returns in the previous condition
+    for (uint256 i = 0; i < slots.length - 1; i++) {
+      // If the current time is between the slot start time and the next slot start time, return the current slot
       // solhint-disable-next-line not-rely-on-time
-      if (block.timestamp >= slots[i] && block.timestamp < slotEndTime) {
+      if (block.timestamp >= slots[i] && block.timestamp < slots[i + 1]) {
         slot = slots[i];
         break;
       }
