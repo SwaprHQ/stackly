@@ -199,18 +199,14 @@ contract DCAOrder is IConditionalOrder, EIP1271Verifier, IDCAOrder {
   /// @dev a slot is consider current if the current time is greater than the slot time and less than the next slot time (if it exists)
   function currentSlot() public view returns (uint256 slot) {
     uint256[] memory slots = orderSlots();
+
+    // If the current time is between the last slot and the end time, return the last slot time
     // solhint-disable-next-line not-rely-on-time
-    uint256 currentTime = block.timestamp;
-
-    // If the current time is between the last slot and the end time, return the last slot
-    uint256 lastSlot = slots[slots.length - 1];
-
-    if (currentTime >= lastSlot && currentTime < endTime) {
-      return lastSlot;
+    if (block.timestamp >= slots[slots.length - 1] && block.timestamp < endTime) {
+      return slots[slots.length - 1];
     }
 
     for (uint256 i = 0; i < slots.length; i++) {
-      uint256 slotStartTime = slots[i];
       uint256 slotEndTime = endTime;
 
       // If the slot is not the last slot, set the end time to the next slot
@@ -218,7 +214,9 @@ contract DCAOrder is IConditionalOrder, EIP1271Verifier, IDCAOrder {
         slotEndTime = slots[i + 1];
       }
 
-      if (currentTime >= slotStartTime && currentTime < slotEndTime) {
+      // If the current time is between the slot start time and the end time, return the current slot time
+      // solhint-disable-next-line not-rely-on-time
+      if (block.timestamp >= slots[i] && block.timestamp < slotEndTime) {
         slot = slots[i];
         break;
       }
@@ -231,12 +229,9 @@ contract DCAOrder is IConditionalOrder, EIP1271Verifier, IDCAOrder {
     // Each order sellAmount is the balance of the order divided by the frequency
     // If the current slot is the last slot, the returned amount is the total sellToken balance
     uint256[] memory slots = orderSlots();
+
     // solhint-disable-next-line not-rely-on-time
-    uint256 currentTime = block.timestamp;
-
-    uint256 lastSlot = slots[slots.length - 1];
-
-    if (currentTime >= lastSlot && currentTime < endTime) {
+    if (block.timestamp >= slots[slots.length - 1] && block.timestamp < endTime) {
       orderSellAmount = sellToken.balanceOf(address(this));
     } else {
       (, orderSellAmount) = SafeMath.tryDiv(amount, slots.length);
