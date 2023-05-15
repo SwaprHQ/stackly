@@ -64,16 +64,33 @@ function getInitialBuyTokenValue(chain?: ReturnType<typeof useNetwork>['chain'])
   return chain && chain.id && !chain.unsupported ? WETH[chain.id as ChainId] : WETH[ChainId.ETHEREUM];
 }
 
+export function getFrequencyIntervalToEndDatetime(startAt: Dayjs | 'Now', interval: DCAFrequencyInterval) {
+  let startDate = startAt as Dayjs;
+  if (startAt === 'Now') startDate = dayjs();
+
+  switch (interval) {
+    case DCAFrequencyInterval.HOUR:
+      return startDate.add(48, 'h');
+    case DCAFrequencyInterval.DAY:
+      return startDate.add(30, 'd');
+    case DCAFrequencyInterval.WEEK:
+      return startDate.add(8, 'w');
+    case DCAFrequencyInterval.MONTH:
+      return startDate.add(3, 'm');
+    default:
+      return startDate.add(48, 'h');
+  }
+}
+
 export function CreateDCAVaultContainer() {
   const account = useAccount();
   const { chain, chains } = useNetwork();
   const { openModal, setModalData } = useModal<VaultCreateAndDepositStepsModalProps>();
   const { data: signer } = useSigner();
   const [validationError, setValidationError] = useState<Error | null>(null);
-  const [startAt, setStartAt] = useState<Dayjs | 'Now'>('Now');
-  const [endAt, setEndAt] = useState<Dayjs>(dayjs().add(7, 'd')); // 7 days from now
-  const [hourInterval, setHourInterval] = useState<number>(1);
   const [frequencyInterval, setFrequencyInterval] = useState<DCAFrequencyInterval>(DCAFrequencyInterval.HOUR);
+  const [startAt, setStartAt] = useState<Dayjs | 'Now'>('Now');
+  const [endAt, setEndAt] = useState<Dayjs>(getFrequencyIntervalToEndDatetime(startAt, frequencyInterval)); // 7 days from now
   const [sellTokenAmount, setSellTokenAmount] = useState<Amount<Currency>>(getInitialSellTokenAmountValue(chain));
   const { balance: userSellTokenBalance } = useCurrencyBalance(account.address, sellTokenAmount.currency);
   const [buyToken, setBuyToken] = useState<Currency>(getInitialBuyTokenValue(chain));
@@ -85,6 +102,10 @@ export function CreateDCAVaultContainer() {
     setSellTokenAmount(getInitialSellTokenAmountValue(chain));
     setBuyToken(getInitialBuyTokenValue(chain));
   }, [signer, chain]);
+
+  useEffect(() => {
+    setEndAt(getFrequencyIntervalToEndDatetime(startAt, frequencyInterval));
+  }, [frequencyInterval, startAt]);
 
   // Update allowance when account or sell token changes
   useEffect(() => {
@@ -196,7 +217,7 @@ export function CreateDCAVaultContainer() {
           ? dayjs().add(10, 'm').utc().unix()
           : startAt.utc().unix(),
       endTime: endAt.utc().unix(),
-      interval: hourInterval,
+      interval: getFrequencyIntervalInHours(frequencyInterval),
     };
 
     const createOrderTransaction = await createDCAOrderWithNonce(orderFactory, initParams);
@@ -276,9 +297,7 @@ export function CreateDCAVaultContainer() {
                       disabled={!isNetworkSupported}
                       value={frequencyInterval}
                       onChange={(nextFrequencyInterval) => {
-                        const nextHourInterval = getFrequencyIntervalInHours(nextFrequencyInterval);
                         setFrequencyInterval(nextFrequencyInterval);
-                        setHourInterval(nextHourInterval);
                       }}
                     />
                   </FormGroup>
@@ -302,7 +321,7 @@ export function CreateDCAVaultContainer() {
                   <DateTimeInput
                     onChange={(value) => {
                       if (!value.isValid() || value.utc().unix() <= dayjs().utc().unix()) {
-                        setEndAt(dayjs().add(30, 'm'));
+                        setEndAt(getFrequencyIntervalToEndDatetime(startAt, frequencyInterval));
                       } else {
                         setEndAt(value);
                       }
