@@ -73,13 +73,6 @@ export function UserOrdersContainer() {
 
     return userOrders.reduce(
       (acc, order) => {
-        console.log({
-          cancelledAt: order.cancelledAt,
-          endTime: order.endTime,
-          now,
-          'order.endTime < now': order.endTime < now,
-        });
-
         // A finished order is either cancelled or the end time has passed
         if (order.cancelledAt !== null) {
           acc[1].push(order);
@@ -94,8 +87,6 @@ export function UserOrdersContainer() {
       [[], []] as [SubgraphOrder[], SubgraphOrder[]]
     );
   }, [userOrders]);
-
-  console.log({ activeOrders, finishedOrders });
 
   if (!account.isConnected) {
     return (

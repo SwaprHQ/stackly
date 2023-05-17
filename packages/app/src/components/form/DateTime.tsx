@@ -25,7 +25,7 @@ export function DateTimeInput({ disabled, value, onChange }: DateTimeInputProps)
   const handleFocus = () => {
     if (ref.current) ref.current.focus();
   };
-  console.log('inputValue', inputValue, value);
+
   return (
     <StyledInputShadowWrapper>
       <HiddenInput $hide={valueIsNow}>

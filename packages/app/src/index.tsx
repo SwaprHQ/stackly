@@ -12,6 +12,7 @@ import { ListsUpdater } from './state/lists/updater';
 import { MulticallUpdater } from './state/multicall/updater';
 import store from './state';
 import { Modal as WaitingListModal } from './module/waiting-list/Modal';
+import { AnalyticsProvider } from './analytics';
 
 const router = createHashRouter([
   {
@@ -44,14 +45,16 @@ const isPreLaunch = process.env.REACT_APP_RELEASE_STAGE !== 'beta';
 
 root.render(
   <React.StrictMode>
-    <StateProvider store={store}>
-      <WalletProvider>
-        <ModalProvider>
-          <Updaters />
-          {isPreLaunch && <WaitingListModal />}
-          <RouterProvider router={router} />
-        </ModalProvider>
-      </WalletProvider>
-    </StateProvider>
+    <AnalyticsProvider>
+      <StateProvider store={store}>
+        <WalletProvider>
+          <ModalProvider>
+            <Updaters />
+            {isPreLaunch && <WaitingListModal />}
+            <RouterProvider router={router} />
+          </ModalProvider>
+        </WalletProvider>
+      </StateProvider>
+    </AnalyticsProvider>
   </React.StrictMode>
 );

@@ -4,8 +4,12 @@ import { ModalBackdrop, ModalHeader, ModalInnerWrapper, ModalOutterWrapper } fro
 import { Button } from '../../ui/components/Button';
 import { ReactComponent as DiscordLogo } from '../../assets/svg/discord-mark-black.svg';
 import styled from 'styled-components';
+import { useSimpleAnalyticsEvent } from '../../hooks/useSimpleAnalyticsEvent';
+import { DISCORD_BUTTON_CLICK } from '../../analytics';
 
 export const Modal = () => {
+  const trackEvent = useSimpleAnalyticsEvent();
+
   return (
     <Overlay>
       <ModalBackdrop>
@@ -23,7 +27,12 @@ export const Modal = () => {
                 <br />
                 Join the waitlist via our Discord.
               </Paragraph>
-              <ButtonLink as="a" href="https://discord.gg/aypsC8nrkP" target="_blank">
+              <ButtonLink
+                as="a"
+                href="https://discord.gg/aypsC8nrkP"
+                target="_blank"
+                onClick={() => trackEvent(DISCORD_BUTTON_CLICK)}
+              >
                 <Flex>
                   Go to Discord <DiscordLogo height="14px" />
                 </Flex>
