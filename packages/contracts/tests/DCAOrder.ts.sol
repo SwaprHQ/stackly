@@ -54,7 +54,6 @@ contract DCAOrderTest is Test {
     vm.expectEmit(true, true, false, true, address(dcaOrder));
     emit Initialized(address(dcaOrder));
 
-    sellToken.approve(address(dcaOrder), type(uint256).max);
     dcaOrder.initialize(
       _owner, _receiver, _sellToken, _buyToken, _amount, _startTime, _endTime, _interval, address(mockSettlement)
     );
@@ -133,7 +132,6 @@ contract DCAOrderTest is Test {
   }
 
   function testSlots() public {
-    sellToken.approve(address(dcaOrder), type(uint256).max);
     dcaOrder.initialize(
       _owner, _receiver, _sellToken, _buyToken, _amount, _startTime, _endTime, _interval, address(mockSettlement)
     );
@@ -152,22 +150,27 @@ contract DCAOrderTest is Test {
   }
 
   function testCanCancelOrder() public {
-    // Approve the dcaOrder to spend the sellToken
-    sellToken.approve(address(dcaOrder), type(uint256).max);
+    sellToken.transfer(address(dcaOrder), _amount);
+    // different clean address
+    address newCleanOwner = address(0x10);
+
     dcaOrder.initialize(
-      _owner, _receiver, _sellToken, _buyToken, _amount, _startTime, _endTime, _interval, address(mockSettlement)
+      newCleanOwner, _receiver, _sellToken, _buyToken, _amount, _startTime, _endTime, _interval, address(mockSettlement)
     );
+    assertEq(sellToken.balanceOf(address(dcaOrder)), _amount);
+    assertEq(sellToken.balanceOf(newCleanOwner), 0);
 
     vm.expectEmit(true, true, false, true, address(dcaOrder));
     emit Cancelled(address(dcaOrder));
 
+    vm.prank(newCleanOwner);
     dcaOrder.cancel();
     // Balance should be 0
     assertEq(sellToken.balanceOf(address(dcaOrder)), 0);
+    assertEq(sellToken.balanceOf(newCleanOwner), _amount);
   }
 
   function testCannotCancelOrderIfNotOwner() public {
-    sellToken.approve(address(dcaOrder), type(uint256).max);
     dcaOrder.initialize(
       _owner, _receiver, _sellToken, _buyToken, _amount, _startTime, _endTime, _interval, address(mockSettlement)
     );
@@ -178,7 +181,6 @@ contract DCAOrderTest is Test {
 
   /// @dev add fuzzing to test the current slot
   function testCurrentSlot() public {
-    sellToken.approve(address(dcaOrder), type(uint256).max);
     dcaOrder.initialize(
       _owner, _receiver, _sellToken, _buyToken, _amount, _startTime, _endTime, _interval, address(mockSettlement)
     );
@@ -213,8 +215,6 @@ contract DCAOrderTest is Test {
 
   /// @dev add fuzzing to test the current slot
   function testGetTradeableOrder() public {
-    sellToken.approve(address(dcaOrder), type(uint256).max);
-
     uint256 _testAmount = 30 ether;
 
     dcaOrder.initialize(
@@ -245,7 +245,7 @@ contract DCAOrderTest is Test {
 
     (, uint256 expectedOrderSellAmount) = SafeMath.tryDiv(_testAmount, orderSlots);
     assertEq(order.sellAmount, expectedOrderSellAmount);
-    // warp to 1 second after the startTime
+    // warp to 5 hours after the endTime
     vm.warp(dcaOrder.endTime() + 5 hours);
     // Should revert because the order is not tradeable
     vm.expectRevert(NotWithinStartAndEndTimes.selector);
@@ -253,8 +253,6 @@ contract DCAOrderTest is Test {
   }
 
   function testGetTradeableOrder_OrderCancelled() public {
-    sellToken.approve(address(dcaOrder), type(uint256).max);
-
     uint256 _testPrincipal = 30 ether;
 
     dcaOrder.initialize(
@@ -269,8 +267,6 @@ contract DCAOrderTest is Test {
   }
 
   function testGetTradeableOrder_ZeroSellAmount() public {
-    sellToken.approve(address(dcaOrder), type(uint256).max);
-
     uint256 _testPrincipal = 0 ether;
 
     dcaOrder.initialize(
@@ -285,7 +281,6 @@ contract DCAOrderTest is Test {
   function testHourlyOverWeeksDCAOrders() public {
     _endTime = _startTime + 6 weeks;
 
-    sellToken.approve(address(dcaOrder), type(uint256).max);
     dcaOrder.initialize(
       _owner, _receiver, _sellToken, _buyToken, _amount, _startTime, _endTime, _interval, address(mockSettlement)
     );
@@ -296,7 +291,6 @@ contract DCAOrderTest is Test {
 
   function testDailyOverWeeksDCAOrders() public {
     _endTime = _startTime + 6 weeks;
-    sellToken.approve(address(dcaOrder), type(uint256).max);
     dcaOrder.initialize(
       _owner,
       _receiver,
@@ -315,7 +309,6 @@ contract DCAOrderTest is Test {
 
   function testEveryThreeDaysInWeeksDCAOrders() public {
     _endTime = _startTime + 12 weeks;
-    sellToken.approve(address(dcaOrder), type(uint256).max);
     dcaOrder.initialize(
       _owner,
       _receiver,
@@ -330,5 +323,35 @@ contract DCAOrderTest is Test {
     // in a 12 week period where buys are every 3 days, there should be 12 * 7 / 3 = 28 slots
     uint256[] memory slots = dcaOrder.orderSlots();
     assertEq(slots.length, 28);
+  }
+
+  /// @dev add fuzzing to test the current slot
+  function testOrderLeftover() public {
+    // big amount for testing edge cases where there is some leftover
+    uint256 _testAmount = 31.434343536565656434 ether;
+    sellToken.transfer(address(dcaOrder), _testAmount);
+
+    dcaOrder.initialize(
+      _owner, _receiver, _sellToken, _buyToken, _testAmount, _startTime, _endTime, _interval, address(mockSettlement)
+    );
+
+    uint256 orderSlotsLength = dcaOrder.orderSlots().length;
+    // warp to the startTime of the order
+    for (uint256 i = 0; i < orderSlotsLength; i++) {
+      vm.warp(dcaOrder.startTime() + i * 1 hours);
+
+      uint256 balanceBeforeTransfer = sellToken.balanceOf(address(dcaOrder));
+
+      GPv2Order.Data memory order = dcaOrder.getTradeableOrder();
+      vm.prank(address(dcaOrder));
+      // fake token transfer
+      sellToken.transfer(address(0x10), order.sellAmount);
+
+      (, uint256 expectedOrderSellAmount) = SafeMath.tryDiv(_testAmount, orderSlotsLength);
+
+      if (i == orderSlotsLength - 1) assertEq(order.sellAmount, balanceBeforeTransfer);
+      else assertEq(order.sellAmount, expectedOrderSellAmount);
+    }
+    assertEq(sellToken.balanceOf(address(dcaOrder)), 0);
   }
 }
