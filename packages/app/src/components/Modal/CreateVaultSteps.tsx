@@ -11,6 +11,7 @@ import { ContractReceipt, ContractTransaction } from 'ethers';
 import { ChainId } from 'dca-sdk';
 import styled from 'styled-components';
 import { Check, X } from 'react-feather';
+import { getExplorerLink } from '../../utils';
 
 export enum CreateVaultAndDepositStep {
   APPROVE_FACTORY,
@@ -45,7 +46,7 @@ export function CreateVaultStepsModal() {
     throw new Error('No data provided to modal. Expected vault data.');
   }
 
-  const { createOrderReceipt, stepsCompleted } = data;
+  const { createOrderReceipt, stepsCompleted, approveFactoryTransaction, createOrderTransaction, chainId } = data;
 
   const isApprovingFactory = stepsCompleted.includes(CreateVaultAndDepositStep.APPROVE_FACTORY);
 
@@ -59,13 +60,13 @@ export function CreateVaultStepsModal() {
 
   // This can be used in the future
 
-  // const approveFactoryTransactionLink = approveFactoryTransaction
-  //   ? getExplorerLink(chainId, approveFactoryTransaction.hash, 'transaction')
-  //   : undefined;
+  const approveFactoryTransactionLink = approveFactoryTransaction
+    ? getExplorerLink(chainId, approveFactoryTransaction.hash, 'transaction')
+    : undefined;
 
-  // const createOrderTransactionLink = createOrderTransaction
-  //   ? getExplorerLink(chainId, createOrderTransaction.hash, 'transaction')
-  //   : undefined;
+  const createOrderTransactionLink = createOrderTransaction
+    ? getExplorerLink(chainId, createOrderTransaction.hash, 'transaction')
+    : undefined;
 
   return (
     <ModalBackdrop onClick={closeModal}>
@@ -109,12 +110,44 @@ export function CreateVaultStepsModal() {
                 <RejectedText>Create Order Failed</RejectedText>
               </Message>
             )}
+            {(approveFactoryTransactionLink || createOrderTransactionLink) && (
+              <>
+                <Border />
+                <TransactionsRow>
+                  {approveFactoryTransactionLink && (
+                    <Transaction href={approveFactoryTransactionLink}>Approval transaction</Transaction>
+                  )}
+                  {createOrderTransactionLink && (
+                    <Transaction href={createOrderTransactionLink}>Order transaction</Transaction>
+                  )}
+                </TransactionsRow>
+              </>
+            )}
           </ModalContent>
         </ModalInnerWrapper>
       </ModalOutterWrapper>
     </ModalBackdrop>
   );
 }
+const TransactionsRow = styled.div`
+  display: flex;
+  margin: 28px auto;
+  width: 100%;
+  justify-content: space-evenly;
+`;
+
+const Transaction = styled.a`
+  width: fit-content;
+  text-decoration: none;
+  color: #000;
+  font-weight: 700;
+  text-decoration: underline;
+`;
+
+const Border = styled.hr`
+  width: 100%;
+  border-top: 2px solid #000;
+`;
 
 const Text = styled.p`
   font-weight: 700;
