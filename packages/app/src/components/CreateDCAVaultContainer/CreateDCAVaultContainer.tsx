@@ -100,7 +100,7 @@ export function CreateDCAVaultContainer() {
     } catch (e) {
       console.error(e);
     }
-  }, [signer, account.address, sellTokenAmount.currency.address, chain]);
+  }, [signer, account.address, sellTokenAmount.currency.address, chain, sellTokenAmount]);
 
   // Validate the user has enough balance
   useEffect(() => {
@@ -145,7 +145,7 @@ export function CreateDCAVaultContainer() {
     // Open the modal with initial required data
     openModal(Modal.VaultCreateAndDepositSteps, {
       chainId,
-      stepsCompleted: [],
+      stepsCompleted: [CreateVaultAndDepositStep.APPROVE_FACTORY],
       tokenSymbol: sellTokenAmount.currency.symbol as string,
       tokenDepositAmount: parseFloat(sellTokenAmount.toFixed(3)),
     });
@@ -156,28 +156,36 @@ export function CreateDCAVaultContainer() {
     if (allowance && allowance.gt(sellTokenAmount.toRawAmount())) {
       setModalData((prev) => ({
         ...prev,
-        stepsCompleted: [CreateVaultAndDepositStep.APPROVE_FACTORY],
+        stepsCompleted: [CreateVaultAndDepositStep.CREATE_ORDER],
         approveFactoryReceipt: {} as any,
       }));
     } else {
-      // Approve factory to spend sell token
-      const approveFactoryTransaction = await sellTokenContract.approve(
-        getOrderFactoryAddress(chainId),
-        sellTokenAmount.toRawAmount()
-      );
+      try {
+        // Approve factory to spend sell token
+        const approveFactoryTransaction = await sellTokenContract.approve(
+          getOrderFactoryAddress(chainId),
+          sellTokenAmount.toRawAmount()
+        );
 
-      setModalData((prev) => ({
-        ...prev,
-        approveFactoryTransaction,
-      }));
+        setModalData((prev) => ({
+          ...prev,
+          approveFactoryTransaction,
+        }));
 
-      const approveFactoryReceipt = await approveFactoryTransaction.wait();
+        const approveFactoryReceipt = await approveFactoryTransaction.wait();
 
-      setModalData((prev) => ({
-        ...prev,
-        stepsCompleted: [CreateVaultAndDepositStep.APPROVE_FACTORY],
-        approveFactoryReceipt,
-      }));
+        setModalData((prev) => ({
+          ...prev,
+          stepsCompleted: [CreateVaultAndDepositStep.CREATE_ORDER],
+          approveFactoryReceipt,
+        }));
+      } catch (e) {
+        setModalData((prev) => ({
+          ...prev,
+          stepsCompleted: [CreateVaultAndDepositStep.REJECT_APPROVE_FACTORY],
+        }));
+        return;
+      }
     }
     // Create a new vault if one doesn't exist
     const orderFactory = getOrderFactory(getOrderFactoryAddress(chainId), signer);
@@ -199,34 +207,41 @@ export function CreateDCAVaultContainer() {
       interval: hourInterval,
     };
 
-    const createOrderTransaction = await createDCAOrderWithNonce(orderFactory, initParams);
+    try {
+      const createOrderTransaction = await createDCAOrderWithNonce(orderFactory, initParams);
 
-    setModalData((prev) => ({
-      ...prev,
-      createOrderTransaction,
-    }));
+      setModalData((prev) => ({
+        ...prev,
+        createOrderTransaction,
+      }));
 
-    const createOrderReceipt = await createOrderTransaction.wait();
+      const createOrderReceipt = await createOrderTransaction.wait();
 
-    if (!createOrderReceipt.status) {
-      setCreateVaultError(new Error('Could not create vault'));
-      return;
+      if (!createOrderReceipt.status) {
+        setCreateVaultError(new Error('Could not create vault'));
+        return;
+      }
+
+      orderProxy = getorderAddressFromTransactionReceipt(createOrderReceipt);
+
+      if (!orderProxy) {
+        setCreateVaultError(new Error('Could not create vault'));
+        return;
+      }
+
+      setModalData((prev) => ({
+        ...prev,
+        stepsCompleted: [CreateVaultAndDepositStep.CREATE_ORDER],
+        createOrderReceipt,
+        orderProxy,
+        isOrderCreated: true,
+      }));
+    } catch (e) {
+      setModalData((prev) => ({
+        ...prev,
+        stepsCompleted: [CreateVaultAndDepositStep.REJECT_CREATE_ORDER],
+      }));
     }
-
-    orderProxy = getorderAddressFromTransactionReceipt(createOrderReceipt);
-
-    if (!orderProxy) {
-      setCreateVaultError(new Error('Could not create vault'));
-      return;
-    }
-
-    setModalData((prev) => ({
-      ...prev,
-      stepsCompleted: [...prev.stepsCompleted, CreateVaultAndDepositStep.CREATE_ORDER],
-      createOrderReceipt,
-      orderProxy,
-      isOrderCreated: true,
-    }));
   };
 
   return (
