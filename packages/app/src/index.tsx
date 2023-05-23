@@ -11,7 +11,7 @@ import { UserUpdater } from './state/user/updater';
 import { ListsUpdater } from './state/lists/updater';
 import { MulticallUpdater } from './state/multicall/updater';
 import store from './state';
-import { Modal as WaitingListModal } from './module/waiting-list/Modal';
+import { LaunchModal } from './module/waiting-list/Modal';
 
 const router = createHashRouter([
   {
@@ -48,7 +48,7 @@ root.render(
       <WalletProvider>
         <ModalProvider>
           <Updaters />
-          {isPreLaunch && <WaitingListModal />}
+          {isPreLaunch && <LaunchModal />}
           <RouterProvider router={router} />
         </ModalProvider>
       </WalletProvider>

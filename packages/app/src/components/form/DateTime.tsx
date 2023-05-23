@@ -58,6 +58,7 @@ export function DateTimeInput({ disabled, value, onChange }: DateTimeInputProps)
         onClick={handleClick}
         onFocus={handleFocus}
         hidden={!valueIsNow}
+        readOnly
       />
     </StyledInputShadowWrapper>
   );
