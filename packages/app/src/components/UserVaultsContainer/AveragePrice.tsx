@@ -2,7 +2,7 @@ import { formatUnits } from '@ethersproject/units';
 import { useEffect, useState } from 'react';
 import { useNetwork } from 'wagmi';
 
-import type { OrderMetaData } from '@cowprotocol/cow-sdk';// Should probably use the COW SDK instance
+import type { OrderMetaData } from '@cowprotocol/cow-sdk'; // Should probably use the COW SDK instance
 import { ChainId } from 'dca-sdk';
 import { SubgraphOrder } from './types';
 
@@ -17,10 +17,7 @@ const COW_API_BASE_URL: Readonly<Record<ChainId, string>> = {
  * @param chainId The chain id
  * @returns
  */
-export async function getCOWOrders(
-  userAddress: string,
-  chainId: number
-): Promise<OrderMetaData[]> {
+export async function getCOWOrders(userAddress: string, chainId: number): Promise<OrderMetaData[]> {
   userAddress = userAddress.toLowerCase();
   const fetchURL = `${COW_API_BASE_URL[chainId as ChainId]}/account/${userAddress}/orders/?limit=500`;
   return fetch(fetchURL).then((res) => res.json() as Promise<OrderMetaData[]>);
@@ -32,24 +29,18 @@ export async function getCOWOrders(
  * @param cowOrders the COW orders array
  * @returns the average price as a float
  */
-export function calculateAveragePrice(
-  order: SubgraphOrder,
-  cowOrders: OrderMetaData[]
-) {
+export function calculateAveragePrice(order: SubgraphOrder, cowOrders: OrderMetaData[]) {
   const executionPriceList = cowOrders.map((cowOrder) => {
+    if (cowOrder.executedBuyAmount === '0') return 0;
+
     return (
-      parseFloat(
-        formatUnits(cowOrder.executedSellAmount, order.sellToken.decimals)
-      ) /
-      parseFloat(
-        formatUnits(cowOrder.executedBuyAmount, order.buyToken.decimals)
-      )
+      parseFloat(formatUnits(cowOrder.executedSellAmount, order.sellToken.decimals)) /
+      parseFloat(formatUnits(cowOrder.executedBuyAmount, order.buyToken.decimals))
     );
   });
 
   // Reduce to the average price
-  const nextAveragePrice =
-    executionPriceList.reduce((a, b) => a + b) / cowOrders.length;
+  const nextAveragePrice = executionPriceList.reduce((a, b) => a + b) / cowOrders.length;
 
   return nextAveragePrice;
 }
@@ -86,8 +77,7 @@ export function AveragePrice({ order }: { order: SubgraphOrder }) {
 
   return (
     <>
-      {averagePrice.toFixed(2)} {order.buyToken.symbol} /{' '}
-      {order.sellToken.symbol}
+      {averagePrice.toFixed(2)} {order.buyToken.symbol} / {order.sellToken.symbol}
     </>
   );
 }
