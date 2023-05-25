@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.8;
+pragma solidity ^0.8.20;
 
 interface IGPv2Settlement {
   /// @dev Sets a presignature for the specified order UID.
