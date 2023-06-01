@@ -1,13 +1,4 @@
-import {
-  Amount,
-  ChainId,
-  Currency,
-  Ether,
-  getERC20Contract,
-  NativeCurrency,
-  Token,
-  xDAI,
-} from 'dca-sdk';
+import { Amount, ChainId, Currency, Ether, getERC20Contract, NativeCurrency, Token, xDAI } from 'dca-sdk';
 import { useEffect, useMemo, useState } from 'react';
 import { useNetwork, useProvider } from 'wagmi';
 
@@ -26,10 +17,7 @@ export default function useNativeCurrency(): NativeCurrency | Token {
   return useMemo(() => nativeOnChain(chainId), [chainId]);
 }
 
-export function useCurrencyBalance(
-  userAddress: string | undefined,
-  token: Currency | undefined
-) {
+export function useCurrencyBalance(userAddress: string | undefined, token: Currency | undefined) {
   const provider = useProvider();
   const [loading, setLoading] = useState(true);
   const [balance, setBalance] = useState<Amount<Currency> | undefined>();
@@ -50,8 +38,6 @@ export function useCurrencyBalance(
           setBalance(Amount.fromRawAmount(token, balance));
         })
         .catch((error) => {
-
-          console.log('Error getting the balance', error);
           setError(error);
           setBalance(undefined);
         })
@@ -69,6 +55,3 @@ export function useCurrencyBalance(
     error,
   };
 }
-
-
-

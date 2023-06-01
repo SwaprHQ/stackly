@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.17;
+pragma solidity ^0.8.20;
 
 import "forge-std/Test.sol";
 
@@ -12,6 +12,8 @@ import {DCAOrder, NotOwner, NotWithinStartAndEndTimes} from "../src/DCAOrder.sol
 import {IConditionalOrder} from "../src/interfaces/IConditionalOrder.sol";
 
 contract DCAOrderTest is Test {
+  using GPv2Order for GPv2Order.Data;
+
   MockSettlement public mockSettlement;
   DCAOrder public dcaOrder;
   ERC20Mintable public sellToken;
@@ -353,5 +355,19 @@ contract DCAOrderTest is Test {
       else assertEq(order.sellAmount, expectedOrderSellAmount);
     }
     assertEq(sellToken.balanceOf(address(dcaOrder)), 0);
+  }
+
+  function testisValidSignature() public {
+    dcaOrder.initialize(
+      _owner, _receiver, _sellToken, _buyToken, _amount, _startTime, _endTime, _interval, address(mockSettlement)
+    );
+    
+    // Advances block.timestamp by n seconds
+    skip(3601);
+
+    bytes32 orderDigest = dcaOrder.getTradeableOrder().hash(dcaOrder.domainSeparator());
+    bytes memory encodedOrder = abi.encode(dcaOrder.getTradeableOrder());
+    bytes4 output = dcaOrder.isValidSignature(orderDigest, encodedOrder);
+    assertTrue(output == 0x1626ba7e);
   }
 }

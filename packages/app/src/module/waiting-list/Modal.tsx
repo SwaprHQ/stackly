@@ -6,6 +6,8 @@ import { ReactComponent as DiscordLogo } from '../../assets/svg/discord-mark-bla
 import styled from 'styled-components';
 import { ReactNode } from 'react';
 import { useDisconnect } from 'wagmi';
+import { DISCORD_BUTTON_CLICK } from '../../analytics';
+import { useSimpleAnalyticsEvent } from '../../hooks/useSimpleAnalyticsEvent';
 
 interface IModal {
   children: ReactNode;
@@ -13,6 +15,7 @@ interface IModal {
 }
 
 export const Modal = ({ children, title }: IModal) => {
+  const trackEvent = useSimpleAnalyticsEvent();
   return (
     <Overlay>
       <ModalBackdrop>
@@ -23,7 +26,12 @@ export const Modal = ({ children, title }: IModal) => {
             </ModalHeader>
             <ModalContent>
               {children}
-              <ButtonLink as="a" href="https://discord.gg/aypsC8nrkP" target="_blank">
+              <ButtonLink
+                as="a"
+                href="https://discord.gg/aypsC8nrkP"
+                target="_blank"
+                onClick={() => trackEvent(DISCORD_BUTTON_CLICK)}
+              >
                 <Flex>
                   Go to Discord <DiscordLogo height="14px" />
                 </Flex>
