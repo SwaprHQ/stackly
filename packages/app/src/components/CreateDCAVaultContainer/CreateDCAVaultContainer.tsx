@@ -153,7 +153,7 @@ export function CreateDCAVaultContainer() {
     const sellTokenContract = getERC20Contract(sellTokenAmount.currency.address, signer);
 
     // Skip to next step if allowance is sufficient
-    if (allowance && allowance.gt(sellTokenAmount.toRawAmount())) {
+    if (allowance && allowance.gte(sellTokenAmount.toRawAmount())) {
       setModalData((prev) => ({
         ...prev,
         stepsCompleted: [CreateVaultAndDepositStep.CREATE_ORDER],
