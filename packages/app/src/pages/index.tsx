@@ -2,6 +2,8 @@ import styled from 'styled-components';
 import { FlexContainer } from '../components/Container';
 import { CreateDCAVaultContainer } from '../components/CreateDCAVaultContainer';
 import { PageLayout } from '../layout';
+import { ReactNode, useState } from 'react';
+import { ChevronDown, ChevronUp } from 'react-feather';
 
 export default function IndexPage() {
   return (
@@ -62,7 +64,7 @@ export default function IndexPage() {
         </FlexContainer>
       </PageHeader>
       <CreateDCAVaultContainer />
-      <WhatIsDCA>
+      <Section>
         <WhatIsDCATitle>A new way to stack your crypto over time with DCA.</WhatIsDCATitle>
         <WhatIsDCAPoint>
           <WhatIsDCAPointTitle>Neutralizing Short-Term Volatility</WhatIsDCAPointTitle>
@@ -78,12 +80,67 @@ export default function IndexPage() {
             end them, giving you greater control over your investments.
           </WhatIsDCAPointDescription>
         </WhatIsDCAPoint>
-      </WhatIsDCA>
+      </Section>
+      <Section>
+        <Flex>
+          <FAQTitle>Frequent Asked Questions</FAQTitle>
+          <FAQColumn>
+            <Accordion title="What is Stackly?">
+              Stackly is a simple non-custodial DCA based tool that uses CoW protocol to place recurring swaps. This
+              will be self-custodial and will be a simple approach to cost averaging. The user will have the possibility
+              to choose different stack frequencies.
+            </Accordion>
+            <Accordion title="How does Stackly work?">
+              1. Choose the token and amount you want to swap from.
+              <br />
+              2. Choose the token you want to stack.
+              <br />
+              3. Choose the frequency you want to swap.
+              <br />
+              4. Choose the start date and end date Confirm the order.
+            </Accordion>
+            <Accordion title="What is DCA and why should one use it?">
+              Dollar-cost averaging is a tool an investor can use to build savings and wealth over a long period. DCA
+              removes the need to time the market and helps you build a portfolio distributed over a period of time.
+              This helps neutralize the short term market volatility, the need to time the market and helps the user to
+              build a portfolio distributed over a period of time. Basically, it neutralizes short term volatility and
+              doesn't worry about timing the market.
+            </Accordion>
+            <Accordion title="How can I cancel my stacks?">
+              You can always go to “Your Stacks” page and cancel any active stacks. Once canceled, the remaining amount
+              that is in the vault will be transferred to the wallet that created the stack.
+            </Accordion>
+          </FAQColumn>
+        </Flex>
+      </Section>
     </PageLayout>
   );
 }
 
-const WhatIsDCA = styled.div`
+const Accordion = ({ title, children }: { title: string; children: ReactNode }) => {
+  const [isActive, setIsActive] = useState(false);
+
+  return (
+    <AccordionColumn>
+      <AccordionTitle onClick={() => setIsActive(!isActive)}>
+        <div>{title}</div>
+        <div>{isActive ? <ChevronUp /> : <ChevronDown />}</div>
+      </AccordionTitle>
+      {isActive && <AccordionContent>{children}</AccordionContent>}
+    </AccordionColumn>
+  );
+};
+
+const Flex = styled.div`
+  display: flex;
+  flex-direction: column;
+
+  @media (min-width: 500px) {
+    flex-direction: row;
+  }
+`;
+
+const Section = styled.div`
   max-width: 1000px;
   margin: 8rem auto;
   padding: 0 16px;
@@ -109,25 +166,12 @@ const WhatIsDCAPoint = styled.div`
 const WhatIsDCAPointDescription = styled.p`
   max-width: 480px;
   color: #4d4f4c;
+  line-height: 24px;
 `;
 const WhatIsDCAPointTitle = styled.h4`
   font-size: 20px;
   font-weight: 500;
   margin-bottom: 1rem;
-`;
-
-const WhatIsDCATitle = styled.h3`
-  max-width: 600px;
-  font-weight: 600;
-  font-size: 32px;
-  line-height: 44px;
-  margin-bottom: 3rem;
-
-  @media (min-width: 500px) {
-    font-size: 40px;
-    line-height: 56px;
-    margin-bottom: 5rem;
-  }
 `;
 
 const FeaturePoint = styled.div`
@@ -200,5 +244,59 @@ const FeaturesPointText = styled.p`
   @media (min-width: 768px) {
     font-size: 16px;
     line-height: 19px;
+  }
+`;
+
+const WhatIsDCATitle = styled.h3`
+  max-width: 600px;
+  font-weight: 600;
+  font-size: 28px;
+  line-height: 40px;
+  margin-bottom: 3rem;
+
+  @media (min-width: 500px) {
+    margin-bottom: 5rem;
+  }
+`;
+
+const AccordionColumn = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid #e2e4e1;
+  margin-bottom: 1rem;
+`;
+
+const FAQColumn = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+
+  @media (min-width: 500px) {
+    margin-left: 8rem;
+  }
+`;
+
+const AccordionTitle = styled(WhatIsDCAPointTitle)`
+  display: flex;
+  justify-content: space-between;
+  cursor: pointer;
+`;
+
+const AccordionContent = styled.p`
+  margin-bottom: 1rem;
+  color: #4d4f4c;
+  max-width: 650px;
+  line-height: 24px;
+`;
+
+const FAQTitle = styled.h3`
+  white-space: nowrap;
+  font-size: 28px;
+  line-height: 28px;
+  margin-bottom: 5rem;
+
+  @media (min-width: 500px) {
+    margin-bottom: 0rem;
   }
 `;
