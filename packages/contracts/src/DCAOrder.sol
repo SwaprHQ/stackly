@@ -199,7 +199,7 @@ contract DCAOrder is IConditionalOrder, EIP1271Verifier, IDCAOrder {
 
     // If the current time is between the last slot and the end time, return the last slot
     // solhint-disable-next-line not-rely-on-time
-    if (block.timestamp >= slots[slots.length - 1] && block.timestamp < endTime) {
+    if (block.timestamp >= slots[slots.length - 1] && block.timestamp <= endTime) {
       return slots[slots.length - 1];
     }
 
