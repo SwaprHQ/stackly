@@ -103,10 +103,7 @@ contract DCAOrder is IConditionalOrder, EIP1271Verifier, IDCAOrder {
     sellToken = IERC20(_sellToken);
     buyToken = IERC20(_buyToken);
     startTime = _startTime;
-
-    // Adds interval time to make sure the last order has time to execute
-    endTime = _endTime + (interval * 3600);
-
+    endTime = _endTime;
     interval = _interval;
     amount = _amount;
     domainSeparator = IGPv2Settlement(_settlementContract).domainSeparator();
