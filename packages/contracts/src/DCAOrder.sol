@@ -224,6 +224,8 @@ contract DCAOrder is IConditionalOrder, EIP1271Verifier, IDCAOrder {
     // solhint-disable-next-line not-rely-on-time
     if (block.timestamp >= slots[slots.length - 1] && block.timestamp < endTime) {
       orderSellAmount = sellToken.balanceOf(address(this));
+    } else if (block.timestamp > endTime) {
+      return 0;
     } else {
       (, orderSellAmount) = SafeMath.tryDiv(amount, slots.length);
     }
