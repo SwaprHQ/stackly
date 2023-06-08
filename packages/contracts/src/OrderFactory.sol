@@ -64,7 +64,7 @@ contract OrderFactory is Ownable2Step {
     uint256 feeAmount = (_amount * protocolFee) / HUNDRED_PERCENT;
     uint256 amountWithoutFees = _amount - feeAmount;
 
-    bytes memory initliazier = abi.encodeWithSignature(
+    bytes memory initializer = abi.encodeWithSignature(
       "initialize(address,address,address,address,uint256,uint256,uint256,uint256,address)",
       _owner,
       _receiver,
@@ -78,7 +78,7 @@ contract OrderFactory is Ownable2Step {
     );
 
     // Deploy a new order
-    order = createProxy(_singleton, initliazier, _saltNonce);
+    order = createProxy(_singleton, initializer, _saltNonce);
 
     emit OrderCreated(order);
 
