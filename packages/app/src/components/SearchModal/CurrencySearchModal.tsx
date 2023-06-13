@@ -1,7 +1,6 @@
-import { Currency, Token } from 'dca-sdk';
+import { Currency } from 'dca-sdk';
 import { memo, useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { useUserAddedTokens } from '../../state/user/hooks';
 import {
   ModalBackdrop,
   ModalContent as ModalContentBase,
@@ -10,7 +9,6 @@ import {
   ModalOutterWrapper,
   ModalTitle,
 } from '../Modal/styles';
-import { TokenSafety } from '../TokenSafety';
 import { CurrencySearch } from './CurrencySearch';
 
 export interface TokenSafetyProps {
@@ -51,7 +49,6 @@ export const CurrencySearchModal = memo(function CurrencySearchModal({
 }: CurrencySearchModalProps) {
   const [modalView, setModalView] = useState<CurrencyModalView>(CurrencyModalView.search);
   const lastOpen = isOpen;
-  const userAddedTokens = useUserAddedTokens();
 
   useEffect(() => {
     if (isOpen && !lastOpen) {
@@ -59,24 +56,13 @@ export const CurrencySearchModal = memo(function CurrencySearchModal({
     }
   }, [isOpen, lastOpen]);
 
-  const showTokenSafetySpeedbump = (token: Token) => {
-    setWarningToken(token);
-    setModalView(CurrencyModalView.tokenSafety);
-  };
-
   const handleCurrencySelect = useCallback(
-    (currency: Currency, hasWarning?: boolean) => {
-      if (hasWarning && currency.isToken && !userAddedTokens.find((token) => token.equals(currency))) {
-        showTokenSafetySpeedbump(currency);
-      } else {
-        onCurrencySelect(currency);
-        onDismiss();
-      }
+    (currency: Currency) => {
+      onCurrencySelect(currency);
+      onDismiss();
     },
-    [onDismiss, onCurrencySelect, userAddedTokens]
+    [onDismiss, onCurrencySelect]
   );
-  // used for token safety
-  const [warningToken, setWarningToken] = useState<Token | undefined>();
 
   let content = null;
   switch (modalView) {
@@ -100,18 +86,6 @@ export const CurrencySearchModal = memo(function CurrencySearchModal({
           </ModalContent>
         </>
       );
-      break;
-    case CurrencyModalView.tokenSafety:
-      if (warningToken) {
-        content = (
-          <TokenSafety
-            tokenAddress={warningToken.address}
-            onContinue={() => handleCurrencySelect(warningToken)}
-            onCancel={() => setModalView(CurrencyModalView.search)}
-            showCancel={true}
-          />
-        );
-      }
       break;
   }
 
