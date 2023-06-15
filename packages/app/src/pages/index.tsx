@@ -4,6 +4,8 @@ import { CreateDCAVaultContainer } from '../components/CreateDCAVaultContainer';
 import { PageLayout } from '../layout';
 import { ReactNode, useState } from 'react';
 import { ChevronDown, ChevronUp } from 'react-feather';
+import { Card, CardInnerWrapper as _CardInnerWrapper } from '../components/Card';
+import { WhiteButton } from '../ui/components/Button';
 
 export default function IndexPage() {
   return (
@@ -16,6 +18,7 @@ export default function IndexPage() {
           </HeaderSplashDescription>
           <PageHeaderSubSection>
             <FeaturePoint>
+              {/* React icons FaCoins */}
               <svg
                 stroke="currentColor"
                 fill="currentColor"
@@ -30,6 +33,7 @@ export default function IndexPage() {
               <FeaturesPointText>Effortless DCA</FeaturesPointText>
             </FeaturePoint>
             <FeaturePoint>
+              {/* React icons BsIncognito */}
               <svg
                 stroke="currentColor"
                 fill="currentColor"
@@ -44,9 +48,10 @@ export default function IndexPage() {
                   d="m4.736 1.968-.892 3.269-.014.058C2.113 5.568 1 6.006 1 6.5 1 7.328 4.134 8 8 8s7-.672 7-1.5c0-.494-1.113-.932-2.83-1.205a1.032 1.032 0 0 0-.014-.058l-.892-3.27c-.146-.533-.698-.849-1.239-.734C9.411 1.363 8.62 1.5 8 1.5c-.62 0-1.411-.136-2.025-.267-.541-.115-1.093.2-1.239.735Zm.015 3.867a.25.25 0 0 1 .274-.224c.9.092 1.91.143 2.975.143a29.58 29.58 0 0 0 2.975-.143.25.25 0 0 1 .05.498c-.918.093-1.944.145-3.025.145s-2.107-.052-3.025-.145a.25.25 0 0 1-.224-.274ZM3.5 10h2a.5.5 0 0 1 .5.5v1a1.5 1.5 0 0 1-3 0v-1a.5.5 0 0 1 .5-.5Zm-1.5.5c0-.175.03-.344.085-.5H2a.5.5 0 0 1 0-1h3.5a1.5 1.5 0 0 1 1.488 1.312 3.5 3.5 0 0 1 2.024 0A1.5 1.5 0 0 1 10.5 9H14a.5.5 0 0 1 0 1h-.085c.055.156.085.325.085.5v1a2.5 2.5 0 0 1-5 0v-.14l-.21-.07a2.5 2.5 0 0 0-1.58 0l-.21.07v.14a2.5 2.5 0 0 1-5 0v-1Zm8.5-.5h2a.5.5 0 0 1 .5.5v1a1.5 1.5 0 0 1-3 0v-1a.5.5 0 0 1 .5-.5Z"
                 ></path>
               </svg>
-              <FeaturesPointText>NO KYC</FeaturesPointText>
+              <FeaturesPointText>Self Custodial</FeaturesPointText>
             </FeaturePoint>
             <FeaturePoint>
+              {/* React icons GiPalmTree */}
               <svg
                 stroke="currentColor"
                 fill="currentColor"
@@ -82,7 +87,7 @@ export default function IndexPage() {
         </WhatIsDCAPoint>
       </Section>
       <Section>
-        <Flex>
+        <FAQWrapper>
           <FAQTitle>Frequent Asked Questions</FAQTitle>
           <FAQColumn>
             <Accordion title="What is Stackly?">
@@ -111,8 +116,36 @@ export default function IndexPage() {
               that is in the vault will be transferred to the wallet that created the stack.
             </Accordion>
           </FAQColumn>
-        </Flex>
+        </FAQWrapper>
       </Section>
+      <FooterCard>
+        <CardInnerWrapper>
+          <FooterText>Join our awesome community</FooterText>
+          <FooterButtons>
+            <LinkButton as="a" href="https://discord.gg/QFkNsjTkzD" target="_blank">
+              {/* React icons FaDiscord */}
+              <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 640 512">
+                <path d="M524.531,69.836a1.5,1.5,0,0,0-.764-.7A485.065,485.065,0,0,0,404.081,32.03a1.816,1.816,0,0,0-1.923.91,337.461,337.461,0,0,0-14.9,30.6,447.848,447.848,0,0,0-134.426,0,309.541,309.541,0,0,0-15.135-30.6,1.89,1.89,0,0,0-1.924-.91A483.689,483.689,0,0,0,116.085,69.137a1.712,1.712,0,0,0-.788.676C39.068,183.651,18.186,294.69,28.43,404.354a2.016,2.016,0,0,0,.765,1.375A487.666,487.666,0,0,0,176.02,479.918a1.9,1.9,0,0,0,2.063-.676A348.2,348.2,0,0,0,208.12,430.4a1.86,1.86,0,0,0-1.019-2.588,321.173,321.173,0,0,1-45.868-21.853,1.885,1.885,0,0,1-.185-3.126c3.082-2.309,6.166-4.711,9.109-7.137a1.819,1.819,0,0,1,1.9-.256c96.229,43.917,200.41,43.917,295.5,0a1.812,1.812,0,0,1,1.924.233c2.944,2.426,6.027,4.851,9.132,7.16a1.884,1.884,0,0,1-.162,3.126,301.407,301.407,0,0,1-45.89,21.83,1.875,1.875,0,0,0-1,2.611,391.055,391.055,0,0,0,30.014,48.815,1.864,1.864,0,0,0,2.063.7A486.048,486.048,0,0,0,610.7,405.729a1.882,1.882,0,0,0,.765-1.352C623.729,277.594,590.933,167.465,524.531,69.836ZM222.491,337.58c-28.972,0-52.844-26.587-52.844-59.239S193.056,219.1,222.491,219.1c29.665,0,53.306,26.82,52.843,59.239C275.334,310.993,251.924,337.58,222.491,337.58Zm195.38,0c-28.971,0-52.843-26.587-52.843-59.239S388.437,219.1,417.871,219.1c29.667,0,53.307,26.82,52.844,59.239C470.715,310.993,447.538,337.58,417.871,337.58Z" />
+              </svg>
+              <span>Discord</span>
+            </LinkButton>
+            <LinkButton as="a" href="https://twitter.com/Stacklydapp" target="_blank">
+              {/* React icons FaTwitter */}
+              <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512">
+                <path d="M459.37 151.716c.325 4.548.325 9.097.325 13.645 0 138.72-105.583 298.558-298.558 298.558-59.452 0-114.68-17.219-161.137-47.106 8.447.974 16.568 1.299 25.34 1.299 49.055 0 94.213-16.568 130.274-44.832-46.132-.975-84.792-31.188-98.112-72.772 6.498.974 12.995 1.624 19.818 1.624 9.421 0 18.843-1.3 27.614-3.573-48.081-9.747-84.143-51.98-84.143-102.985v-1.299c13.969 7.797 30.214 12.67 47.431 13.319-28.264-18.843-46.781-51.005-46.781-87.391 0-19.492 5.197-37.36 14.294-52.954 51.655 63.675 129.3 105.258 216.365 109.807-1.624-7.797-2.599-15.918-2.599-24.04 0-57.828 46.782-104.934 104.934-104.934 30.213 0 57.502 12.67 76.67 33.137 23.715-4.548 46.456-13.32 66.599-25.34-7.798 24.366-24.366 44.833-46.132 57.827 21.117-2.273 41.584-8.122 60.426-16.243-14.292 20.791-32.161 39.308-52.628 54.253z" />
+              </svg>
+              <span>Twitter</span>
+            </LinkButton>
+            <LinkButton as="a" href="https://t.me/Stackly" target="_blank">
+              {/* React icons FaTelegram */}
+              <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512">
+                <path d="M498.1 5.6c10.1 7 15.4 19.1 13.5 31.2l-64 416c-1.5 9.7-7.4 18.2-16 23s-18.9 5.4-28 1.6L284 427.7l-68.5 74.1c-8.9 9.7-22.9 12.9-35.2 8.1S160 493.2 160 480V396.4c0-4 1.5-7.8 4.2-10.7L331.8 202.8c5.8-6.3 5.6-16-.4-22s-15.7-6.4-22-.7L106 360.8 17.7 316.6C7.1 311.3 .3 300.7 0 288.9s5.9-22.8 16.1-28.7l448-256c10.7-6.1 23.9-5.5 34 1.4z" />
+              </svg>
+              <span>Telegram</span>
+            </LinkButton>
+          </FooterButtons>
+        </CardInnerWrapper>
+      </FooterCard>
     </PageLayout>
   );
 }
@@ -130,15 +163,6 @@ const Accordion = ({ title, children }: { title: string; children: ReactNode }) 
     </AccordionColumn>
   );
 };
-
-const Flex = styled.div`
-  display: flex;
-  flex-direction: column;
-
-  @media (min-width: 500px) {
-    flex-direction: row;
-  }
-`;
 
 const Section = styled.div`
   max-width: 1000px;
@@ -208,17 +232,17 @@ const HeaderSplashDescription = styled.p`
 
 const PageHeaderSubSection = styled.div`
   width: 100%;
-  max-width: 508px;
+  max-width: 600px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  flex-direction: column;
+  justify-content: center;
   gap: 1rem;
   margin-bottom: 1rem;
+  flex-wrap: wrap;
 
-  @media (min-width: 500px) {
+  @media (min-width: 540px) {
     margin-bottom: 2.5rem;
-    flex-direction: row;
+    justify-content: space-between;
   }
 
   @media (min-width: 768px) {
@@ -236,6 +260,7 @@ const PageHeaderSubSection = styled.div`
 
 const FeaturesPointText = styled.p`
   margin-left: 12px;
+  text-wrap: nowrap;
 
   font-weight: 600;
   font-size: 14px;
@@ -298,5 +323,84 @@ const FAQTitle = styled.h3`
 
   @media (min-width: 500px) {
     margin-bottom: 0rem;
+  }
+`;
+
+const FAQWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+
+  @media (min-width: 500px) {
+    flex-direction: row;
+  }
+`;
+
+const FooterButtons = styled.div`
+  display: flex;
+  flex-direction: column;
+  & > *:not(:first-child) {
+    margin-top: 8px;
+  }
+
+  @media (min-width: 768px) {
+    flex-direction: row;
+    & > *:not(:first-child) {
+      margin-top: 0px;
+    }
+  }
+`;
+
+const FooterText = styled.span`
+  font-weight: 600;
+  font-size: 24px;
+  text-align: center;
+
+  @media (min-width: 768px) {
+    text-align: start;
+  }
+`;
+
+const LinkButton = styled(WhiteButton)`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 200px;
+  padding: 6px 10px;
+  margin-left: 10px;
+  text-wrap: nowrap;
+  cursor: pointer;
+  text-decoration: none;
+
+  & > *:not(:first-child) {
+    margin-left: 8px;
+  }
+
+  @media (min-width: 768px) {
+    min-width: min-content;
+  }
+`;
+
+const CardInnerWrapper = styled(_CardInnerWrapper)`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  & > *:not(:first-child) {
+    margin-top: 24px;
+  }
+
+  @media (min-width: 768px) {
+    flex-direction: row;
+    & > *:not(:first-child) {
+      margin-top: 0px;
+    }
+  }
+`;
+
+const FooterCard = styled(Card)`
+  max-width: 1000px;
+  margin: 10rem 24px;
+
+  @media (min-width: 768px) {
+    margin: 10rem auto;
   }
 `;
