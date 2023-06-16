@@ -361,7 +361,7 @@ contract DCAOrderTest is Test {
     dcaOrder.initialize(
       _owner, _receiver, _sellToken, _buyToken, _amount, _startTime, _endTime, _interval, address(mockSettlement)
     );
-    
+
     // Advances block.timestamp by n seconds
     skip(3601);
 
