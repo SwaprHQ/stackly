@@ -13,6 +13,8 @@ import { MulticallUpdater } from './state/multicall/updater';
 import store from './state';
 import { Modal as WaitingListModal } from './module/waiting-list/Modal';
 import { AnalyticsProvider } from './analytics';
+import Feedback from 'feeder-react-feedback';
+import 'feeder-react-feedback/dist/feeder-react-feedback.css';
 
 const router = createHashRouter([
   {
@@ -43,6 +45,12 @@ function Updaters() {
 
 const isPreLaunch = process.env.REACT_APP_RELEASE_STAGE !== 'beta';
 
+const feedbackProps = {
+  projectId: process.env.REACT_APP_FEEDER_API_KEY || '648c61a821f83b000282cdf6',
+  email: true,
+  projectName: 'Stackly',
+};
+
 root.render(
   <React.StrictMode>
     <AnalyticsProvider>
@@ -51,6 +59,7 @@ root.render(
           <ModalProvider>
             <Updaters />
             {isPreLaunch && <WaitingListModal />}
+            <Feedback {...feedbackProps} />
             <RouterProvider router={router} />
           </ModalProvider>
         </WalletProvider>
