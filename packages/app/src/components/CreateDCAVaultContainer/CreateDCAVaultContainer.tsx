@@ -13,6 +13,8 @@ import {
   getorderAddressFromTransactionReceipt,
   getERC20Contract,
   Currency,
+  getCOWProtocolSettlementAddress,
+  getDCAOrderSingletonAddress,
 } from 'dca-sdk';
 import { FormGroup } from '../form/FormGroup';
 import { FlexContainer, FormButtonGroup, InnerContainer } from './styled';
@@ -27,8 +29,63 @@ import { FrequencyIntervalSelect, getFrequencyIntervalInHours } from './Frequenc
 import { DateTimeInput } from '../form/DateTime';
 import { CurrencyAmountInput } from '../CurrencyAmountInput';
 import { CurrencyInput } from '../CurrencyAmountInput/CurrencyInput';
-import { Button } from '../../ui/components/Button/Button';
+import { Button, WhiteButton } from '../../ui/components/Button/Button';
 import { useCurrencyBalance } from '../../tokens/hooks';
+import { Sdk, TransactionRequest, Web3WalletProvider, randomPrivateKey } from 'etherspot';
+import { Web3Auth } from '@web3auth/modal';
+import { MetamaskAdapter } from '@web3auth/metamask-adapter';
+import Web3 from 'web3';
+import { CHAIN_NAMESPACES } from '@web3auth/base';
+import { retry } from '../../utils/retry';
+
+const metamaskAdapter = new MetamaskAdapter();
+
+//Initialize within your constructor
+const web3auth = new Web3Auth({
+  clientId: 'BP0JoR-e4jT9Cp6VnYSajms1Df6IOXA3fUGbIQS9kB-kYVONVZd4BwG9iKGhwIqIlRyTfrNk3flGvb1oO--F3sw', // Get your Client ID from Web3Auth Dashboard
+  chainConfig: {
+    chainNamespace: CHAIN_NAMESPACES.EIP155,
+    chainId: '0x64', // Please use 0x5 for Goerli Testnet,
+    rpcTarget: 'https://rpc.gnosischain.com/',
+  },
+});
+
+web3auth.configureAdapter(metamaskAdapter);
+
+async function createSDK(wallet: any) {
+  const sdk = new Sdk(wallet);
+
+  sdk.notifications$.subscribe((notification) => console.log('notification:', notification));
+
+  await sdk.computeContractAccount();
+
+  const { account } = sdk.state;
+
+  console.log('contract account:', account);
+
+  // top-up contract account (account.address)
+
+  // add transaction to gateway batch
+  // await sdk.batchExecuteAccountTransaction({
+  //   to: '0xEEb4801FBc9781EEF20801853C1Cb25faB8A7a3b',
+  //   value: 100, // 100 wei
+  // });
+
+  // console.log('gateway batch estimation:', await sdk.estimateGatewayBatch());
+
+  // console.log('submitted gateway batch:', await sdk.submitGatewayBatch());
+  return sdk;
+}
+
+async function connect() {
+  const web3authProvider = await web3auth.connect();
+
+  const web3 = new Web3(web3authProvider as any);
+  const web3provider = new Web3WalletProvider(web3.currentProvider as any);
+  // Refresh the web3 Injectable to validate the provider
+  await web3provider.refresh();
+  return createSDK(web3provider);
+}
 
 dayjs.extend(dayjsUTCPlugin);
 
@@ -97,6 +154,8 @@ export function CreateDCAVaultContainer() {
   const [createVaultError, setCreateVaultError] = useState<Error | null>(null);
   const [receiver] = useState<string | null>(null);
   const [allowance, setAllowance] = useState<BigNumber | null>(null);
+
+  const [sdk, setSDK] = useState<Sdk | null>(null);
   // Update initial values when chain changes
   useEffect(() => {
     setSellTokenAmount(getInitialSellTokenAmountValue(chain));
@@ -264,6 +323,119 @@ export function CreateDCAVaultContainer() {
       }));
     }
   };
+  const { data: walletClient, isError, isLoading } = useSigner();
+
+  useEffect(() => {
+    const initAA = async () => {
+      await web3auth.initModal();
+    };
+    initAA();
+  }, [walletClient]);
+
+  const createSDKInstance = async () => {
+    const sdkInstance = await connect();
+    console.log('sdkInstance', sdkInstance);
+    setSDK(sdkInstance);
+  };
+
+  const executeStack = async () => {
+    if (!sdk) return;
+
+    const contractAbi = [
+      'function createOrderWithNonce(address,address,address,address,address,uint256,uint256,uint256,uint256,address,uint256)',
+    ];
+    const orderContract = sdk.registerContract<{
+      encodeCreateOrderWithNonce: (
+        singleton: string,
+        owner: string,
+        receiver: string,
+        sellToken: string,
+        buyToken: string,
+        amount: string,
+        startTime: number,
+        endTime: number,
+        interval: number,
+        settlementContract: string,
+        nonce: number
+      ) => TransactionRequest;
+    }>('orderContract', contractAbi, getOrderFactoryAddress(ChainId.GNOSIS));
+
+    const initParams = {
+      nonce: dayjs().unix(),
+      // dca order params
+      owner: sdk.state.account.address,
+      receiver: sdk.state.account.address, // TODO: add receiver
+      sellToken: sellTokenAmount.currency.address,
+      buyToken: buyToken.address,
+      amount: sellTokenAmount.toRawAmount().toString(),
+      // If startAt is 'now', set it to the current time plus 10 minutes into the future
+      startTime:
+        startAt === 'Now' || startAt.utc().unix() < dayjs().add(10, 'm').utc().unix()
+          ? dayjs().add(10, 'm').utc().unix()
+          : startAt.utc().unix(),
+      endTime: endAt.utc().unix(),
+      interval: getFrequencyIntervalInHours(frequencyInterval),
+      settlementContract: getCOWProtocolSettlementAddress(ChainId.GNOSIS),
+      singleton: getDCAOrderSingletonAddress(ChainId.GNOSIS),
+    };
+
+    // amount type is defined based on the constract function parameter type
+    if (!orderContract.encodeCreateOrderWithNonce) return;
+
+    const orderTransactionRequest = orderContract.encodeCreateOrderWithNonce(
+      initParams.singleton,
+      initParams.owner,
+      initParams.receiver,
+      initParams.sellToken,
+      initParams.buyToken,
+      initParams.amount,
+      initParams.startTime,
+      initParams.endTime,
+      initParams.interval,
+      initParams.settlementContract,
+      initParams.nonce
+    );
+
+    const tokenContractAbi = ['function approve(address,uint256)'];
+    const tokenContract = sdk.registerContract<{
+      encodeApprove: (address: string, amount: string) => TransactionRequest;
+    }>('tokenContract', tokenContractAbi, sellTokenAmount.currency.address);
+
+    if (!tokenContract.encodeApprove) return;
+
+    const tokenTransactionRequest = tokenContract.encodeApprove(
+      getOrderFactoryAddress(ChainId.GNOSIS),
+      sellTokenAmount.toRawAmount().toString()
+    );
+
+    console.log('hello', orderTransactionRequest, tokenTransactionRequest);
+
+    if (orderTransactionRequest && tokenTransactionRequest) {
+      console.log('hello2');
+
+      await sdk
+        .batchExecuteAccountTransaction({
+          to: tokenTransactionRequest.to,
+          data: tokenTransactionRequest.data,
+        })
+        .catch(console.error);
+
+      await sdk
+        .batchExecuteAccountTransaction({
+          to: orderTransactionRequest.to,
+          data: orderTransactionRequest.data,
+        })
+        .catch(console.error);
+
+      const estimationResponse = await sdk.estimateGatewayBatch().catch(console.error);
+
+      console.log('ETHERSPOT Gas estimated at:', estimationResponse);
+
+      const submissionResponse = await sdk.submitGatewayBatch().catch(console.error);
+
+      console.log('ETHERSPOT Submission response:', submissionResponse);
+    }
+  };
 
   return (
     <Container>
@@ -345,19 +517,36 @@ export function CreateDCAVaultContainer() {
                     disabled={!isNetworkSupported}
                   />
                 </FormGroup>
+                {!!sdk && (
+                  <div>
+                    <p>{sdk.state.account.address}</p>
+                  </div>
+                )}
                 <FormButtonGroup>
                   {account.isConnected && isNetworkSupported ? (
-                    <Button
-                      type="button"
-                      onClick={onCreateOrderHandler}
-                      title="Create Order"
-                      disabled={validationError !== null}
-                    >
-                      {validationError !== null ? validationError.message : <>Stack</>}
-                    </Button>
+                    !sdk ? (
+                      <Button
+                        type="button"
+                        onClick={createSDKInstance}
+                        title="Create Order"
+                        disabled={validationError !== null}
+                      >
+                        {validationError !== null ? validationError.message : <>Connect to AA</>}
+                      </Button>
+                    ) : (
+                      <Button
+                        type="button"
+                        onClick={executeStack}
+                        title="Create Order"
+                        disabled={validationError !== null}
+                      >
+                        {validationError !== null ? validationError.message : <>Create Stack with AA</>}
+                      </Button>
+                    )
                   ) : (
                     <WalletConnectButton />
                   )}
+                  {/* <WhiteButton onClick={createSDKInstance}>Create account</WhiteButton> */}
                 </FormButtonGroup>
               </form>
               {createVaultError && (
