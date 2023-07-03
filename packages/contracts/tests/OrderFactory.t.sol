@@ -62,7 +62,7 @@ contract OrderFactoryTest is Test {
     _endTime = _startTime + 1 days;
     _amount = 10 ether;
     _interval = 1;
-    _fee = 5;
+    _fee = factory.protocolFee();
   }
 
   function testMastercopy() public {}
@@ -138,7 +138,7 @@ contract OrderFactoryTest is Test {
     factory.withdrawTokens(tokens);
     uint256 afterBalance = sellToken.balanceOf(address(this));
 
-    assertEq(afterBalance - beforeBalance, 5000000000000000);
+    assertEq(afterBalance - beforeBalance, 25000000000000000);
     assertEq(afterBalance - beforeBalance, (_amount * _fee) / HUNDRED_PERCENT);
 
     // Set caller to a different address
