@@ -3,6 +3,7 @@ pragma solidity 0.8.20;
 
 import "forge-std/Test.sol";
 import {ERC20Mintable} from "./common/ERC20Mintable.sol";
+import {ERC721Mintable} from "./common/ERC721Mintable.sol";
 import {MockSettlement} from "./common/MockSettlement.sol";
 
 import {DCAOrder, AlreadyInitialized} from "../src/DCAOrder.sol";
@@ -12,10 +13,13 @@ interface CheatCodes {
   function prank(address) external;
 }
 
+error NotWhitelisted();
+
 contract OrderFactoryTest is Test {
   MockSettlement public mockSettlement;
   DCAOrder public mastercopy;
   ERC20Mintable public sellToken;
+  ERC721Mintable public whitelistNFT;
   OrderFactory public factory;
   CheatCodes public cheatCodes;
 
@@ -34,8 +38,9 @@ contract OrderFactoryTest is Test {
   function setUp() public {
     mockSettlement = new MockSettlement();
     sellToken = new ERC20Mintable('Test Token', 'TEST');
+    whitelistNFT = new ERC721Mintable('Test NFT', 'TEST');
     mastercopy = new DCAOrder();
-    factory = new OrderFactory();
+    factory = new OrderFactory(address(whitelistNFT));
     cheatCodes = CheatCodes(HEVM_ADDRESS);
 
     uint256 mastercopyStartTime = block.timestamp + 1 days;
@@ -52,6 +57,7 @@ contract OrderFactoryTest is Test {
       address(mockSettlement)
     );
 
+    whitelistNFT.mint(address(this), 1);
     sellToken.mint(address(this), 10000 ether);
     _owner = address(this);
     _receiver = address(0x2);
@@ -64,8 +70,6 @@ contract OrderFactoryTest is Test {
     _interval = 1;
     _fee = factory.protocolFee();
   }
-
-  function testMastercopy() public {}
 
   function testCreateOrderWithNonce() public {
     // Approve the factory to spend the sell token
@@ -91,6 +95,47 @@ contract OrderFactoryTest is Test {
 
     // Fee is left in the factory
     assertEq(sellToken.balanceOf(address(factory)), (_amount * _fee) / HUNDRED_PERCENT);
+  }
+
+  function testCreateOrderWithNonceFailWhitelist() public {
+    // burn the whitelist NFT
+    whitelistNFT.burn(1);
+
+    assertEq(factory.whitelist(), true);
+
+    // Approve the factory to spend the sell token
+    sellToken.approve(address(factory), type(uint256).max);
+
+    vm.expectRevert(NotWhitelisted.selector);
+
+    // Create the vault
+    factory.createOrderWithNonce(
+      address(mastercopy),
+      address(1335),
+      _receiver,
+      _sellToken,
+      _buyToken,
+      _amount,
+      _startTime,
+      _endTime,
+      _interval,
+      address(mockSettlement),
+      1
+    );
+  }
+  
+  function testCreateOrderWithNonceDisabledWhitelist() public {
+    // Burn whitelist NFT
+    whitelistNFT.burn(1);
+
+    // Disable whitelist
+    factory.toggleWhitelist();
+
+    // Check whitelist was disabled
+    assertEq(factory.whitelist(), false);
+
+    // Create a stack
+    testCreateOrderWithNonce();
   }
 
   function testSetProtocolFee() public {
@@ -147,5 +192,19 @@ contract OrderFactoryTest is Test {
     // Expect a revert because caller is not owner
     vm.expectRevert(bytes("Ownable: caller is not the owner"));
     factory.withdrawTokens(tokens);
+  }
+
+  function testToggleWhitelist() public {
+    assertEq(factory.whitelist(), true);
+    factory.toggleWhitelist();
+    assertEq(factory.whitelist(), false);
+    factory.toggleWhitelist();
+    assertEq(factory.whitelist(), true);
+
+    // Set caller to a different address
+    cheatCodes.prank(address(1335));
+
+    vm.expectRevert(bytes("Ownable: caller is not the owner"));
+    factory.toggleWhitelist();
   }
 }

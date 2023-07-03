@@ -3,18 +3,26 @@ pragma solidity 0.8.20;
 
 import {Clones} from "oz/proxy/Clones.sol";
 import {IERC20} from "oz/token/ERC20/IERC20.sol";
+import {IERC721} from "oz/token/ERC721/IERC721.sol";
 import {Ownable2Step} from "oz/access/Ownable2Step.sol";
 import {SafeERC20} from "oz/token/ERC20/utils/SafeERC20.sol";
 
 error ForbiddenValue();
+error NotWhitelisted();
 
 contract OrderFactory is Ownable2Step {
   using SafeERC20 for IERC20;
 
   uint16 private constant HUNDRED_PERCENT = 10000;
   uint16 public protocolFee = 25; // default 0.25% (range: 0-500 / 0-5%)
+  IERC721 public whitelistNFT;
+  bool public whitelist = true;
 
   event OrderCreated(address indexed order);
+
+  constructor(address _whitelistNFT) {
+    whitelistNFT = IERC721(_whitelistNFT);
+  }
 
   /// @dev Allows to create a new proxy contract and execute a message call to the new proxy within one transaction.
   /// @param _singleton Address of singleton contract. Must be deployed at the time of execution.
@@ -61,6 +69,10 @@ contract OrderFactory is Ownable2Step {
     address _settlementContract,
     uint256 _saltNonce
   ) public returns (address order) {
+    if (whitelist && whitelistNFT.balanceOf(msg.sender) == 0) {
+      revert NotWhitelisted();
+    }
+
     uint256 feeAmount = (_amount * protocolFee) / HUNDRED_PERCENT;
     uint256 amountWithoutFees = _amount - feeAmount;
 
@@ -102,5 +114,10 @@ contract OrderFactory is Ownable2Step {
     for (uint256 i = 0; i < tokens.length; i++) {
       IERC20(tokens[i]).safeTransfer(owner(), IERC20(tokens[i]).balanceOf(address(this)));
     }
+  }
+
+  /// @dev Enable/disable NFT whitelisting
+  function toggleWhitelist() external onlyOwner {
+    whitelist = !whitelist;
   }
 }
