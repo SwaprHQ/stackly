@@ -1,0 +1,20 @@
+[profile.default]
+src = 'src'
+test = 'tests'
+libs = ['lib']
+out = 'out'
+optimizer = true
+solc_version = '0.8.20'
+evm_version = 'london'
+eth_rpc_url = 'https://rpc.gnosischain.com'
+
+[rpc_endpoints]
+ethereum = "${ETHEREUM_RPC_URL}"
+gnosis = "${GNOSIS_RPC_URL}"
+
+[etherscan]
+ethereum = { key = "${ETHERSCAN_API_KEY}" }
+gnosis = { key = "${GNOSISSCAN_API_KEY}" }
+
+[fmt]
+tab_width = 2

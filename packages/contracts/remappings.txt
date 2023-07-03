@@ -1,0 +1,7 @@
+ds-test/=lib/forge-std/lib/ds-test/src/
+forge-std/=lib/forge-std/src/
+oz/=lib/openzeppelin-contracts/contracts/
+src/=src/
+tests/=tests/
+solmate/=lib/solmate/src
+date/=lib/BokkyPooBahsDateTimeLibrary/contracts
