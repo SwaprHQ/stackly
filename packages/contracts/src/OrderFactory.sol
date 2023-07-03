@@ -12,7 +12,7 @@ contract OrderFactory is Ownable2Step {
   using SafeERC20 for IERC20;
 
   uint16 private constant HUNDRED_PERCENT = 10000;
-  uint16 public protocolFee = 5; // default 0.05% (range: 0-500 / 0-5%)
+  uint16 public protocolFee = 25; // default 0.25% (range: 0-500 / 0-5%)
 
   event OrderCreated(address indexed order);
 
