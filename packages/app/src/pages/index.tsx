@@ -111,6 +111,10 @@ export default function IndexPage() {
               build a portfolio distributed over a period of time. Basically, it neutralizes short term volatility and
               doesn't worry about timing the market.
             </Accordion>
+            <Accordion title="Does Stackly have any fees?">
+              Stackly has a 0.5% fees on the stack amount. During the initial beta period for the wallets that are part
+              of the allowlist, there is a 50% fee discount and charges 0.25% fee on the initial stack amount.
+            </Accordion>
             <Accordion title="How can I cancel my stacks?">
               You can always go to “Your Stacks” page and cancel any active stacks. Once canceled, the remaining amount
               that is in the vault will be transferred to the wallet that created the stack.
