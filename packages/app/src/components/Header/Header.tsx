@@ -6,6 +6,7 @@ import { WalletConnectButton } from './ConnectButton';
 import { ReactComponent as StacklyLogo } from '../../assets/svg/stackly-logo.svg';
 import { ReactComponent as Burger } from './burger.svg';
 import { Container } from '../Container';
+import { ArrowUpRight } from 'react-feather';
 
 export const HEADER_HEIGHT = '88px'; // 4px * 22
 export const TOGGLE_BUTTON_SIZE = '64px';
@@ -23,6 +24,10 @@ function NavMenuItems() {
       <Nav>
         <Link to="/">Create a Stack</Link>
         <Link to="/orders">Your Stacks</Link>
+        <ExternalLink target="_blank" href="https://stackly.gitbook.io/stackly/">
+          <span>Docs</span>
+          <ArrowUpRight />
+        </ExternalLink>
       </Nav>
       <WalletConnectButtonContainer>
         <WalletConnectButton />
@@ -51,6 +56,17 @@ export function Header() {
     </HeaderFrame>
   );
 }
+
+const ExternalLink = styled.a`
+  && {
+    display: flex;
+    align-items: center;
+
+    & > *:not(:last-child) {
+      margin-right: 4px;
+    }
+  }
+`;
 
 const SidebarToggle = styled.button`
   display: block;
