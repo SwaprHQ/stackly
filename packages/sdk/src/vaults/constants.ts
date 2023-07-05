@@ -6,7 +6,7 @@ import { ChainId } from '../constants';
  */
 export const ORDER_FACTORY_ADDRESS_LIST: Record<ChainId, string> = {
   [ChainId.ETHEREUM]: AddressZero,
-  [ChainId.GNOSIS]: '0xE70a70FDfbADBF701b0901EaB0b1BD1e551a8f19',
+  [ChainId.GNOSIS]: '0x45B91Da2834010751b17F1eadE0a5a7B64233add',
 };
 
 /**
@@ -14,7 +14,7 @@ export const ORDER_FACTORY_ADDRESS_LIST: Record<ChainId, string> = {
  */
 export const DCAORDER_SINGLETON_ADDRESS_LIST: Record<ChainId, string> = {
   [ChainId.ETHEREUM]: AddressZero,
-  [ChainId.GNOSIS]: '0x0662adf21545cEE0868Da70c8f12a2936553976e',
+  [ChainId.GNOSIS]: '0xb8B01eAD81DCF4E95C700DEA4D4fB90fc8099696',
 };
 
 /**
@@ -22,7 +22,7 @@ export const DCAORDER_SINGLETON_ADDRESS_LIST: Record<ChainId, string> = {
  */
 export const NFT_WHITELIST_ADDRESS_LIST: Record<ChainId, string> = {
   [ChainId.ETHEREUM]: AddressZero,
-  [ChainId.GNOSIS]: '0xDb31bC580dd2d65eAC04B74d19c9626d2C42e552',
+  [ChainId.GNOSIS]: '0x610a4F6f4A9fDf5c715d60a65758d2fd9B6Ee138',
 };
 
 /**

@@ -3,10 +3,7 @@ import type { Provider } from '@ethersproject/abstract-provider';
 import type { Signer } from '@ethersproject/abstract-signer';
 
 import { ChainId } from '../constants';
-import {
-  StacklyWhitelist,
-  StacklyWhitelist__factory,
-} from '../generated/contracts';
+import { StacklyWhitelist, StacklyWhitelist__factory } from '../generated/contracts';
 
 /**
  *
@@ -39,7 +36,7 @@ export async function nftWhitelistMint(stacklyWhitelist: StacklyWhitelist) {
     throw new Error(`Chain id ${chainId} is not supported`);
   }
 
-  return await stacklyWhitelist.mint();
+  return await stacklyWhitelist.getBetaAccess();
 }
 
 /**
@@ -74,4 +71,21 @@ export async function nftWhitelistTotalSupply(stacklyWhitelist: StacklyWhitelist
   }
 
   return await stacklyWhitelist.totalSupply();
+}
+
+/**
+ * Returns the Whitelist NFT balance
+ * @param stacklyWhitelist The whitelist contract
+ * @param address Address to get the balance from
+ * @returns
+ */
+export async function nftWhitelistMaxSupply(stacklyWhitelist: StacklyWhitelist) {
+  const rawChainId = (await stacklyWhitelist.provider.getNetwork().then((n) => n.chainId)) as number;
+  const chainId = rawChainId as ChainId;
+
+  if (chainId !== ChainId.ETHEREUM && chainId !== ChainId.GNOSIS) {
+    throw new Error(`Chain id ${chainId} is not supported`);
+  }
+
+  return await stacklyWhitelist.maxSupply();
 }
