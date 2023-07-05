@@ -6,7 +6,7 @@ import { ChainId } from '../constants';
  */
 export const ORDER_FACTORY_ADDRESS_LIST: Record<ChainId, string> = {
   [ChainId.ETHEREUM]: AddressZero,
-  [ChainId.GNOSIS]: '0x40CF89E715F1fA37799fC3a17681a4C6a7bdfdd0',
+  [ChainId.GNOSIS]: '0xE70a70FDfbADBF701b0901EaB0b1BD1e551a8f19',
 };
 
 /**
@@ -14,7 +14,15 @@ export const ORDER_FACTORY_ADDRESS_LIST: Record<ChainId, string> = {
  */
 export const DCAORDER_SINGLETON_ADDRESS_LIST: Record<ChainId, string> = {
   [ChainId.ETHEREUM]: AddressZero,
-  [ChainId.GNOSIS]: '0x521aC6dA724aD873977d3d0b5d7B4a52E1dC52b7',
+  [ChainId.GNOSIS]: '0x0662adf21545cEE0868Da70c8f12a2936553976e',
+};
+
+/**
+ * DCA Order singleton/mastercopy address list
+ */
+export const NFT_WHITELIST_ADDRESS_LIST: Record<ChainId, string> = {
+  [ChainId.ETHEREUM]: AddressZero,
+  [ChainId.GNOSIS]: '0xDb31bC580dd2d65eAC04B74d19c9626d2C42e552',
 };
 
 /**
@@ -53,6 +61,20 @@ export function getDCAOrderSingletonAddress(chainId: ChainId): string {
   const address = DCAORDER_SINGLETON_ADDRESS_LIST[chainId];
   if (address === AddressZero) {
     throw new Error(`DCAOrder singleton is not deployed on chain ${chainId}`);
+  }
+
+  return address;
+}
+
+/**
+ * Gets the address of the order singleton for a given chain id
+ * @param chainId The chain id
+ * @returns
+ */
+export function getNftWhitelistAddress(chainId: ChainId): string {
+  const address = NFT_WHITELIST_ADDRESS_LIST[chainId];
+  if (address === AddressZero) {
+    throw new Error(`NFT Whitelist is not deployed on chain ${chainId}`);
   }
 
   return address;
