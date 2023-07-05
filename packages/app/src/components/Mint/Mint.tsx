@@ -13,40 +13,41 @@ import styled from 'styled-components';
 import { Container, ContainerTitle } from '../Container';
 import { Link } from 'react-router-dom';
 import { waitForTransaction } from '@wagmi/core';
+import { nftWhitelistMaxSupply } from 'dca-sdk';
 
 export function Mint() {
   const { chain } = useNetwork();
   const { data: signer } = useSigner();
   const account = useAccount();
 
-  const [mintedAmount, setMintedAmount] = useState<string>('0');
+  const [mintedAmount, setMintedAmount] = useState<string>('-');
+  const [maxSupply, setMaxSupply] = useState<string>('-');
   const [isNFTHolder, setIsNFTHolder] = useState<boolean>(false);
   const [isLoading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | undefined>();
 
   useEffect(() => {
-    const fetchMinted = async () => {
-      if (!signer || !chain) {
+    const fetchData = async () => {
+      if (!signer || !chain || !account.address) {
         return;
       }
 
       const nftWhitelist = getWhitelist(getNftWhitelistAddress(chain.id), signer);
-      const mintedAmount = await nftWhitelistTotalSupply(nftWhitelist);
-      setMintedAmount(mintedAmount.toString());
+
+      Promise.all([
+        nftWhitelistTotalSupply(nftWhitelist),
+        nftWhitelistMaxSupply(nftWhitelist),
+        nftWhitelistBalanceOf(nftWhitelist, account.address),
+      ])
+        .then(([newMintedAmount, newMaxSupply, newBalance]) => {
+          setMintedAmount(newMintedAmount.toString());
+          setMaxSupply(newMaxSupply.toString());
+          setIsNFTHolder(newBalance.gt(0));
+        })
+        .catch(console.error);
     };
 
-    const isNftHolder = async () => {
-      if (!signer || !account.address || !chain) {
-        return;
-      }
-
-      const nftWhitelist = getWhitelist(getNftWhitelistAddress(chain.id), signer);
-      const amount = await nftWhitelistBalanceOf(nftWhitelist, account.address);
-      setIsNFTHolder(amount.gt(0));
-    };
-
-    isNftHolder();
-    fetchMinted();
+    fetchData();
   }, [account.address, chain, signer]);
 
   const mint = async () => {
@@ -60,12 +61,11 @@ export function Mint() {
       const tx = await nftWhitelistMint(nftWhitelist);
 
       await waitForTransaction({
-        confirmations: 5,
+        confirmations: 2,
         hash: tx.hash as `0x${string}`,
       });
 
       setError(undefined);
-      setLoading(false);
 
       if (account.address) {
         const nftWhitelist = getWhitelist(getNftWhitelistAddress(chain.id), signer);
@@ -76,6 +76,7 @@ export function Mint() {
       if (e.code === 'ACTION_REJECTED') setError('Minting rejected.');
       else setError('Oops! Something went wrong.');
     }
+    setLoading(false);
   };
 
   if (!account.isConnected) {
@@ -92,10 +93,12 @@ export function Mint() {
         <img alt={'Stackly Beta Badge'} src={'https://ipfs.io/ipfs/QmZdgaXjCr36Kys6mBRMuKG5tipKAhhazCcbxKYBKvaqdD'} />
       </ImageContainer>
 
+      <Text>{`${mintedAmount}/${maxSupply} NFTs minted so far.`}</Text>
+
       {!isNFTHolder ? (
         <ButtonContainer>
-          <Button type="button" title="Mint free Stackly Beta NFT" onClick={mint}>
-            {isLoading ? 'Minting...' : 'Mint free Stackly Beta NFT'}
+          <Button type="button" title="Mint free Beta NFT" onClick={mint}>
+            {isLoading ? 'Minting...' : 'Mint free Beta NFT'}
           </Button>
         </ButtonContainer>
       ) : (
@@ -107,7 +110,6 @@ export function Mint() {
       )}
 
       {isNFTHolder && <Text>Congratulations, you hold the Stackly Beta NFT!</Text>}
-      <Text>{mintedAmount.toString() + ' NFTs have been minted so far.'}</Text>
       {error && <Text> {error}</Text>}
 
       <ButtonContainer>
