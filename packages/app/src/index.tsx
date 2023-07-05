@@ -5,6 +5,7 @@ import './index.css';
 import { WalletProvider } from './wallet';
 import IndexPage from './pages';
 import OrdersPage from './pages/orders';
+import MintPage from './pages/mint';
 import { Provider as StateProvider } from 'react-redux';
 import { ModalProvider } from './modal/ModalProvider';
 import { UserUpdater } from './state/user/updater';
@@ -28,6 +29,10 @@ const router = createHashRouter([
   {
     path: '/orders',
     element: <OrdersPage />,
+  },
+  {
+    path: '/mint',
+    element: <MintPage />,
   },
 ]);
 
