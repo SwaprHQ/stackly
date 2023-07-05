@@ -6,10 +6,12 @@ import { ReactNode, useState } from 'react';
 import { ChevronDown, ChevronUp } from 'react-feather';
 import { Card, CardInnerWrapper as _CardInnerWrapper } from '../components/Card';
 import { WhiteButton } from '../ui/components/Button';
+import { Modal as WaitingListModal } from '../module/waiting-list/Modal';
 
 export default function IndexPage() {
   return (
     <PageLayout>
+      <WaitingListModal />
       <PageHeader>
         <FlexContainer>
           <HeaderSplash>Stack crypto over time</HeaderSplash>
