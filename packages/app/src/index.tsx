@@ -12,7 +12,6 @@ import { UserUpdater } from './state/user/updater';
 import { ListsUpdater } from './state/lists/updater';
 import { MulticallUpdater } from './state/multicall/updater';
 import store from './state';
-import { Modal as WaitingListModal } from './module/waiting-list/Modal';
 import { AnalyticsProvider } from './analytics';
 import Feedback from 'feeder-react-feedback';
 import 'feeder-react-feedback/dist/feeder-react-feedback.css';
@@ -48,8 +47,6 @@ function Updaters() {
   );
 }
 
-const isPreLaunch = process.env.REACT_APP_RELEASE_STAGE !== 'beta';
-
 const feedbackProps = {
   projectId: process.env.REACT_APP_FEEDER_API_KEY || '648c61a821f83b000282cdf6',
   email: true,
@@ -63,7 +60,6 @@ root.render(
         <WalletProvider>
           <ModalProvider>
             <Updaters />
-            {isPreLaunch && <WaitingListModal />}
             <Feedback {...feedbackProps} />
             <RouterProvider router={router} />
           </ModalProvider>

@@ -94,8 +94,8 @@ export function Mint() {
 
       {!isNFTHolder ? (
         <ButtonContainer>
-          <Button type="button" title="Mint Stackly Beta NFT" onClick={mint}>
-            {isLoading ? 'Minting...' : 'Mint Stackly Beta NFT'}
+          <Button type="button" title="Mint free Stackly Beta NFT" onClick={mint}>
+            {isLoading ? 'Minting...' : 'Mint free Stackly Beta NFT'}
           </Button>
         </ButtonContainer>
       ) : (
