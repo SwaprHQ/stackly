@@ -15,8 +15,8 @@
     "test": "echo 'No tests yet, implement them'"
   },
   "devDependencies": {
-    "@graphprotocol/graph-cli": "0.45.2",
-    "@graphprotocol/graph-ts": "0.29.1",
+    "@graphprotocol/graph-cli": "0.51.2",
+    "@graphprotocol/graph-ts": "0.31.0",
     "@types/node": "^18.11.18",
     "ts-node": "^10.8.2",
     "yaml": "^2.2.1"
