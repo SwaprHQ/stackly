@@ -27,7 +27,7 @@ export const COW_SETTLEMENT_ADDRESS_LIST: Record<ChainId, string> = {
 
 export const SUBGRAPH_ENDPOINT_LIST: Readonly<Record<string, string>> = {
   [ChainId.ETHEREUM]: '',
-  [ChainId.GNOSIS]: 'https://api.thegraph.com/subgraphs/name/swaprhq/stackly',
+  [ChainId.GNOSIS]: 'https://api.thegraph.com/subgraphs/name/nelsongaldeman/stackly',
 };
 
 /**
