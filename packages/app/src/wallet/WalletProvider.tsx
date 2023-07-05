@@ -2,7 +2,6 @@ import { PropsWithChildren } from 'react';
 import { configureChains, createClient, WagmiConfig } from 'wagmi';
 import { CoinbaseWalletConnector } from 'wagmi/connectors/coinbaseWallet';
 import { MetaMaskConnector } from 'wagmi/connectors/metaMask';
-import { WalletConnectConnector } from 'wagmi/connectors/walletConnect';
 import { InjectedConnector } from 'wagmi/connectors/injected';
 import { chains } from './chains';
 import { providers } from './providers';
@@ -18,12 +17,6 @@ export const wagmiClient = createClient({
       chains,
       options: {
         appName: 'Stacks',
-      },
-    }),
-    new WalletConnectConnector({
-      chains,
-      options: {
-        chainId: 1,
       },
     }),
     new InjectedConnector({
