@@ -16,17 +16,20 @@ export function VaultCardContainer({ order }: { order: SubgraphOrder }) {
 
   const { openModal } = useModal<CancelOrderModalProps>();
   const { data: signer } = useSigner();
-  const { isLoading: isLoadingVaultBalance, data: vaultBalance } =
-    useContractRead<readonly Fragment[], 'balanceOf', BigNumber>({
-      abi: getERC20Interface().fragments,
-      address: order.sellToken.id,
-      functionName: 'balanceOf',
-      enabled: !!signer,
-      watch: true,
-      cacheTime: 30_000,
-      staleTime: 30_000,
-      args: [order.id],
-    });
+  const { isLoading: isLoadingVaultBalance, data: vaultBalance } = useContractRead<
+    readonly Fragment[],
+    'balanceOf',
+    BigNumber
+  >({
+    abi: getERC20Interface().fragments,
+    address: order.sellToken.id as `0x${string}`,
+    functionName: 'balanceOf',
+    enabled: !!signer,
+    watch: true,
+    cacheTime: 30_000,
+    staleTime: 30_000,
+    args: [order.id],
+  });
 
   useEffect(() => {
     if (!signer) {
@@ -38,19 +41,13 @@ export function VaultCardContainer({ order }: { order: SubgraphOrder }) {
     <VaultCardOuterWrapper>
       <VaultCard>
         <CardInnerWrapper>
-          <OrderTitle
-            href={getExplorerLink(chain?.id || 1, order.id, 'address')}
-            target="_blank"
-            rel="noreferrer"
-          >
+          <OrderTitle href={getExplorerLink(chain?.id || 1, order.id, 'address')} target="_blank" rel="noreferrer">
             <h2>{order.id.slice(2, 8)}</h2>
           </OrderTitle>
           <Text>
             {isLoadingVaultBalance || vaultBalance === undefined
               ? 'Loading...'
-              : `${formatUnits(vaultBalance, order.sellToken.decimals)} ${
-                  order.sellToken.symbol
-                }`}
+              : `${formatUnits(vaultBalance, order.sellToken.decimals)} ${order.sellToken.symbol}`}
           </Text>
           <Text>{order.orderSlots.length} Stacks</Text>
         </CardInnerWrapper>

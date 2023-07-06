@@ -1,6 +1,6 @@
 {
   "name": "dca-app",
-  "version": "0.1.0",
+  "version": "0.2.1",
   "private": true,
   "dependencies": {
     "@cowprotocol/cow-sdk": "1.0.2-RC.0",
@@ -22,10 +22,11 @@
     "@uniswap/redux-multicall": "^1.1.8",
     "@uniswap/token-lists": "1.0.0-beta.31",
     "@uniswap/widgets": "^2.34.0",
-    "@wagmi/core": "^0.7.9",
+    "@wagmi/core": "^0.10.10",
     "@walletconnect/ethereum-provider": "^2.1.4",
     "chrono-node": "^2.5.0",
     "cids": "^1.1.9",
+    "crypto-browserify": "^3.12.0",
     "dayjs": "^1.11.7",
     "dca-sdk": "workspace:*",
     "ethers": "^5.7.2",
@@ -57,7 +58,7 @@
     "styled-components": "^5.3.6",
     "typescript": "^4.9.3",
     "url": "^0.11.0",
-    "wagmi": "^0.8.10"
+    "wagmi": "^0.12.16"
   },
   "scripts": {
     "start": "GENERATE_SOURCEMAP=false react-app-rewired start --config-overrides ./config-overrides.js",

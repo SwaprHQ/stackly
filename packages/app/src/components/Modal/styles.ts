@@ -35,14 +35,16 @@ export const ModalInnerWrapper = styled(Card)`
   overflow: hidden;
 `;
 
-export const ModalContent = styled(ModalSection)<{ minHeight?: string }>(props => `
+export const ModalContent = styled(ModalSection)<{ minHeight?: string }>(
+  (props) => `
   padding: 24px;
   align-items: center;
   width: 100%;
   position: relative;
   overflow: hidden;
   min-height: ${props.minHeight || 'auto'};
-`);
+`
+);
 
 export const ModalContentWithNoPadding = styled(ModalContent)`
   padding: 0;
@@ -60,14 +62,15 @@ export const ModalBackdrop = styled.div`
   background: rgba(0, 0, 0, 0);
   backdrop-filter: blur(6px);
   overflow-y: hidden;
-  z-index: 1002;
+  z-index: 80;
   /** Inner layout */
   display: flex;
   align-items: center;
   justify-content: center;
 `;
 
-export const ModalOutterWrapper = styled.div<{ maxWidth?: string }>(  props => `
+export const ModalOutterWrapper = styled.div<{ maxWidth?: string }>(
+  (props) => `
   position: relative;
   width: 100%;
   max-width: ${props.maxWidth || '400px'};
@@ -77,8 +80,8 @@ export const ModalOutterWrapper = styled.div<{ maxWidth?: string }>(  props => `
   align-items: center;
   justify-content: center;
   gap: 12px;
-`);
-
+`
+);
 
 /**
  * Step component
@@ -107,11 +110,7 @@ export const Step = styled.a<{
   }
 
   ${props.isBusy ? '/* background: #ffc900; &:hover { background: #ffc900; } */' : ''}
-  ${
-    props.isSuccess
-      ? '/* background: #1dff72; &:hover { background: #1dff72; } */'
-      : ''
-  }
+  ${props.isSuccess ? '/* background: #1dff72; &:hover { background: #1dff72; } */' : ''}
   `
 );
 
