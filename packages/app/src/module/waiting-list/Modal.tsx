@@ -40,6 +40,8 @@ export const Modal = () => {
     return <></>;
   }
 
+  const discordLink = process.env.REACT_APP_DISCORD_WAITLIST_LINK;
+
   return (
     <Overlay>
       <ModalBackdrop>
@@ -57,12 +59,7 @@ export const Modal = () => {
                 <br />
                 Mint your free NFT via our Discord.
               </Paragraph>
-              <ButtonLink
-                as="a"
-                href="https://discord.gg/aypsC8nrkP"
-                target="_blank"
-                onClick={() => trackEvent(DISCORD_BUTTON_CLICK)}
-              >
+              <ButtonLink as="a" href={discordLink} target="_blank" onClick={() => trackEvent(DISCORD_BUTTON_CLICK)}>
                 <Flex>
                   Go to Discord <DiscordLogo height="14px" />
                 </Flex>
