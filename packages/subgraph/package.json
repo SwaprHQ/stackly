@@ -3,15 +3,15 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "auth": "graph auth https://api.thegraph.com/deploy/",
-    "codegen": "graph codegen",
-    "build": "npm run prepare:gnosis && graph build",
+    "auth": "npx graph auth https://api.thegraph.com/deploy/",
+    "codegen": "npx graph codegen",
+    "build": "npm run prepare:gnosis && npx graph build",
     "prepare:gnosis": "ts-node bin/build-subgraph.ts xdai && npm run codegen",
     "prepare:mainnet": "ts-node bin/build-subgraph.ts mainnet && npm run codegen",
-    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ swapr/stackly",
-    "create-local": "graph create --node http://localhost:8020/ swapr/stackly",
-    "remove-local": "graph remove --node http://localhost:8020/ swapr/stackly",
-    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 swapr/stackly",
+    "deploy": "npx graph deploy --node https://api.thegraph.com/deploy/ swaprhq/stackly",
+    "create-local": "npx graph create --node http://localhost:8020/ swaprhq/stackly",
+    "remove-local": "npx graph remove --node http://localhost:8020/ swaprhq/stackly",
+    "deploy-local": "npx graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 swaprhq/stackly",
     "test": "echo 'No tests yet, implement them'"
   },
   "devDependencies": {
