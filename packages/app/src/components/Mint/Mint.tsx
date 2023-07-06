@@ -10,13 +10,15 @@ import {
   nftWhitelistTotalSupply,
 } from 'dca-sdk';
 import styled from 'styled-components';
-import { Container, ContainerTitle } from '../Container';
+import { Container } from '../Container';
 import { Link } from 'react-router-dom';
 import { waitForTransaction } from '@wagmi/core';
 import { nftWhitelistMaxSupply } from 'dca-sdk';
+import { Modal, useModal } from '../../modal';
 
 export function Mint() {
   const { chain } = useNetwork();
+  const { openModal } = useModal();
   const { data: signer } = useSigner();
   const account = useAccount();
 
@@ -31,6 +33,8 @@ export function Mint() {
       if (!signer || !chain || !account.address) {
         return;
       }
+
+      setError(undefined);
 
       const nftWhitelist = getWhitelist(getNftWhitelistAddress(chain.id), signer);
 
@@ -50,11 +54,20 @@ export function Mint() {
     fetchData();
   }, [account.address, chain, signer]);
 
+  useEffect(() => {
+    if (account.isDisconnected) {
+      setError(undefined);
+      setIsNFTHolder(false);
+    }
+  }, [account.isDisconnected]);
+
   const mint = async () => {
     if (!signer || !account.address || !chain) {
       return;
     }
+
     setLoading(true);
+    setError(undefined);
 
     const nftWhitelist = getWhitelist(getNftWhitelistAddress(chain.id), signer);
     try {
@@ -65,8 +78,6 @@ export function Mint() {
         hash: tx.hash as `0x${string}`,
       });
 
-      setError(undefined);
-
       if (account.address) {
         const nftWhitelist = getWhitelist(getNftWhitelistAddress(chain.id), signer);
         const amount = await nftWhitelistBalanceOf(nftWhitelist, account.address);
@@ -76,19 +87,13 @@ export function Mint() {
       if (e.code === 'ACTION_REJECTED') setError('Minting rejected.');
       else setError('Oops! Something went wrong.');
     }
+
     setLoading(false);
   };
 
-  if (!account.isConnected) {
-    return (
-      <Container>
-        <ContainerTitle>Connect your wallet</ContainerTitle>
-      </Container>
-    );
-  }
-
   return (
     <Container>
+      <BigText>Stackly Closed Beta NFT - Mint to get early access</BigText>
       <ImageContainer>
         <img
           width={300}
@@ -98,9 +103,15 @@ export function Mint() {
         />
       </ImageContainer>
 
-      <Text>{`${mintedAmount}/${maxSupply} NFTs minted so far.`}</Text>
+      {account.isConnected && <Text>{`${mintedAmount}/${maxSupply} NFTs minted so far.`}</Text>}
 
-      {!isNFTHolder ? (
+      {!account.isConnected ? (
+        <ButtonContainer>
+          <Button type="button" onClick={() => openModal(Modal.Wallet)} title="Connect Wallet">
+            Connect Wallet
+          </Button>
+        </ButtonContainer>
+      ) : !isNFTHolder ? (
         <ButtonContainer>
           <Button type="button" title="Mint NFT to access" onClick={mint}>
             {isLoading ? 'Minting...' : 'Mint NFT to access'}
@@ -115,7 +126,7 @@ export function Mint() {
       )}
 
       {isNFTHolder && <Text>Congratulations, you hold the Stackly Beta NFT!</Text>}
-      {error && <Text> {error}</Text>}
+      {error && <Text>{error}</Text>}
     </Container>
   );
 }
@@ -164,4 +175,8 @@ const LinkButton = styled(Button)`
   cursor: pointer;
   text-decoration: none;
   display: flex;
+`;
+
+const BigText = styled(Text)`
+  font-size: 22px;
 `;
