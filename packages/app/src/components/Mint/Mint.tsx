@@ -179,4 +179,5 @@ const LinkButton = styled(Button)`
 
 const BigText = styled(Text)`
   font-size: 22px;
+  text-wrap: wrap;
 `;
