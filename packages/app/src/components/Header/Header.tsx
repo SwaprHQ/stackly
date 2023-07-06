@@ -81,7 +81,7 @@ const SidebarToggle = styled.button`
   right: 10px;
   top: 10px;
   border-radius: 24px;
-  z-index: 1000;
+  z-index: 70;
   width: ${TOGGLE_BUTTON_SIZE};
   height: ${TOGGLE_BUTTON_SIZE};
   @media (min-width: ${DESKTOP_BREAKPOINT}) {
@@ -96,7 +96,7 @@ const SidebarToggleOverlay = styled.div`
   right: 0;
   bottom: 0;
   backdrop-filter: blur(6px);
-  z-index: 1047;
+  z-index: 71;
   @media (min-width: ${DESKTOP_BREAKPOINT}) {
     display: none;
   }
@@ -124,7 +124,7 @@ const Aside = styled.aside<{ isOpen: boolean }>(
   width: 300px;
   height: 100%;
   position: fixed;
-  z-index: 1048;
+  z-index: 72;
   top: 0;
   left: 0;
   border-right: 2px solid #000;
@@ -144,7 +144,7 @@ const HeaderNav = styled.nav`
   justify-content: space-between;
   gap: 16px;
   background: transparent;
-  z-index: 1000;
+  z-index: 70;
   position: relative;
   flex-direction: row;
   width: 100%;
