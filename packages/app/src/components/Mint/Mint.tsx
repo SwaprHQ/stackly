@@ -34,6 +34,8 @@ export function Mint() {
         return;
       }
 
+      setError(undefined);
+
       const nftWhitelist = getWhitelist(getNftWhitelistAddress(chain.id), signer);
 
       Promise.all([
@@ -51,6 +53,13 @@ export function Mint() {
 
     fetchData();
   }, [account.address, chain, signer]);
+
+  useEffect(() => {
+    if (account.isDisconnected) {
+      setError(undefined);
+      setIsNFTHolder(false);
+    }
+  }, [account.isDisconnected]);
 
   const mint = async () => {
     if (!signer || !account.address || !chain) {
