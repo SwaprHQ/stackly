@@ -14,9 +14,11 @@ import { Container, ContainerTitle } from '../Container';
 import { Link } from 'react-router-dom';
 import { waitForTransaction } from '@wagmi/core';
 import { nftWhitelistMaxSupply } from 'dca-sdk';
+import { Modal, useModal } from '../../modal';
 
 export function Mint() {
   const { chain } = useNetwork();
+  const { openModal } = useModal();
   const { data: signer } = useSigner();
   const account = useAccount();
 
@@ -79,16 +81,9 @@ export function Mint() {
     setLoading(false);
   };
 
-  if (!account.isConnected) {
-    return (
-      <Container>
-        <ContainerTitle>Connect your wallet</ContainerTitle>
-      </Container>
-    );
-  }
-
   return (
     <Container>
+      <Text>Stackly Closed Beta NFT - Mint to get early access</Text>
       <ImageContainer>
         <img
           width={300}
@@ -97,24 +92,32 @@ export function Mint() {
           src={'https://ipfs.io/ipfs/QmZdgaXjCr36Kys6mBRMuKG5tipKAhhazCcbxKYBKvaqdD'}
         />
       </ImageContainer>
+      
+      {account.isConnected && <Text>{`${mintedAmount}/${maxSupply} NFTs minted so far.`}</Text>}
 
-      <Text>{`${mintedAmount}/${maxSupply} NFTs minted so far.`}</Text>
-
-      {!isNFTHolder ? (
+      {!account.isConnected ? (
         <ButtonContainer>
-          <Button type="button" title="Mint NFT to access" onClick={mint}>
-            {isLoading ? 'Minting...' : 'Mint NFT to access'}
+          <Button type="button" onClick={() => openModal(Modal.Wallet)} title="Connect Wallet">
+            Connect Wallet
           </Button>
         </ButtonContainer>
       ) : (
-        <ButtonContainer>
-          <LinkButton as={Link} to="/" type="button" title="Create a stack">
-            Create a stack
-          </LinkButton>
-        </ButtonContainer>
+        (!isNFTHolder ? (
+          <ButtonContainer>
+            <Button type="button" title="Mint NFT to access" onClick={mint}>
+              {isLoading ? 'Minting...' : 'Mint NFT to access'}
+            </Button>
+          </ButtonContainer>
+        ) : (
+          <ButtonContainer>
+            <LinkButton as={Link} to="/" type="button" title="Create a stack">
+              Create a stack
+            </LinkButton>
+          </ButtonContainer>
+        ))
       )}
 
-      {isNFTHolder && <Text>Congratulations, you hold the Stackly Beta NFT!</Text>}
+      {(isNFTHolder && account.isConnected) && <Text>Congratulations, you hold the Stackly Beta NFT!</Text>}
       {error && <Text> {error}</Text>}
     </Container>
   );
