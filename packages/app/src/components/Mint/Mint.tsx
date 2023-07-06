@@ -8,13 +8,12 @@ import {
   nftWhitelistMint,
   nftWhitelistBalanceOf,
   nftWhitelistTotalSupply,
+  nftWhitelistMaxSupply,
   ChainId,
 } from 'dca-sdk';
 import styled from 'styled-components';
 import { Container } from '../Container';
 import { Link } from 'react-router-dom';
-import { waitForTransaction } from '@wagmi/core';
-import { nftWhitelistMaxSupply } from 'dca-sdk';
 import { Modal, useModal } from '../../modal';
 
 export function Mint() {
@@ -29,6 +28,7 @@ export function Mint() {
   const [isNFTHolder, setIsNFTHolder] = useState<boolean>(false);
   const [isLoading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | undefined>();
+  const [waitForMint, setWaitForMint] = useState(false);
 
   const isNetworkSupported = chains.find((c) => c.id === chain?.id);
 
@@ -79,26 +79,47 @@ export function Mint() {
 
     const nftWhitelist = getWhitelist(getNftWhitelistAddress(chain.id), signer);
     try {
-      const tx = await nftWhitelistMint(nftWhitelist);
-
-      await waitForTransaction({
-        confirmations: 5,
-        hash: tx.hash as `0x${string}`,
-      });
-
-      if (account.address) {
-        const nftWhitelist = getWhitelist(getNftWhitelistAddress(chain.id), signer);
-        const amount = await nftWhitelistBalanceOf(nftWhitelist, account.address);
-        setIsNFTHolder(amount.gt(0));
-      }
+      await nftWhitelistMint(nftWhitelist);
+      setWaitForMint(true);
     } catch (e: any) {
       console.error(e);
       if (e.code === 'ACTION_REJECTED') setError('Minting rejected.');
       else setError('Oops! Something went wrong.');
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout | null = null;
+    if (waitForMint) {
+      interval = setInterval(async () => {
+        if (!signer || !account.address || !chain) {
+          return;
+        }
+
+        const nftWhitelist = getWhitelist(getNftWhitelistAddress(chain.id), signer);
+        const amount = await nftWhitelistBalanceOf(nftWhitelist, account.address);
+        const totalMinted = await nftWhitelistTotalSupply(nftWhitelist);
+
+        if (amount.gt(0)) {
+          setMintedAmount(totalMinted.toString());
+          setIsNFTHolder(true);
+          setWaitForMint(false);
+          setLoading(false);
+        }
+      }, 2000);
+    } else {
+      if (interval !== null) {
+        clearInterval(interval);
+      }
     }
 
-    setLoading(false);
-  };
+    return () => {
+      if (interval !== null) {
+        clearInterval(interval);
+      }
+    };
+  }, [account.address, chain, signer, waitForMint]);
 
   return (
     <Container>
