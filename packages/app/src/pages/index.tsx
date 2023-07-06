@@ -16,7 +16,7 @@ export default function IndexPage() {
         <FlexContainer>
           <HeaderSplash>Stack crypto over time</HeaderSplash>
           <HeaderSplashDescription>
-            Stackly is a simple non-custodial DCA based tool that uses CoW protocol to place recurring swaps.
+            Stackly is a simple non-custodial DCA based tool that uses CoW Swap to place recurring swaps.
           </HeaderSplashDescription>
           <PageHeaderSubSection>
             <FeaturePoint>
@@ -121,6 +121,16 @@ export default function IndexPage() {
               You can always go to “Your Stacks” page and cancel any active stacks. Once canceled, the remaining amount
               that is in the vault will be transferred to the wallet that created the stack.
             </Accordion>
+            <Accordion title="Where is XDAI?">
+              Stackly only accepts wrapped tokens. You need to wrap XDAI and use WXDAI instead. Head over to{' '}
+              <ExternalLink
+                target="_blank"
+                href="https://swapr.eth.limo/#/swap?outputCurrency=0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d&typedValue=''&independentField='input'&chainId=100"
+              >
+                Swapr
+              </ExternalLink>{' '}
+              so you can wrap your XDAI and start stacking.
+            </Accordion>
           </FAQColumn>
         </FAQWrapper>
       </Section>
@@ -169,6 +179,10 @@ const Accordion = ({ title, children }: { title: string; children: ReactNode }) 
     </AccordionColumn>
   );
 };
+
+const ExternalLink = styled.a`
+  color: inherit;
+`;
 
 const Section = styled.div`
   max-width: 1000px;

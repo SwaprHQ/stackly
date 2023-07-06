@@ -8,7 +8,7 @@ import { chains } from './chains';
 import { providers } from './providers';
 
 const { provider } = configureChains(chains, providers);
-const walletConnectProjectId = process.env.WALLETCONNECT_PROJECT_ID ? process.env.WALLETCONNECT_PROJECT_ID : "fb4b8f5f1c8ebab0c0d3f1ae09c8c9e1";
+const walletConnectProjectId = process.env.REACT_APP_WALLETCONNECT_PROJECT_ID as string;
 
 // Set up client
 export const wagmiClient = createClient({
@@ -24,7 +24,7 @@ export const wagmiClient = createClient({
     new WalletConnectConnector({
       chains,
       options: {
-        projectId: walletConnectProjectId
+        projectId: walletConnectProjectId,
       },
     }),
     new InjectedConnector({
