@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { useAccount, useNetwork, useSigner } from 'wagmi';
+import { useAccount, useNetwork, useSigner, useSwitchNetwork } from 'wagmi';
 import { Button } from '../../ui/components/Button/Button';
 import {
   getWhitelist,
@@ -8,6 +8,7 @@ import {
   nftWhitelistMint,
   nftWhitelistBalanceOf,
   nftWhitelistTotalSupply,
+  ChainId,
 } from 'dca-sdk';
 import styled from 'styled-components';
 import { Container } from '../Container';
@@ -17,16 +18,19 @@ import { nftWhitelistMaxSupply } from 'dca-sdk';
 import { Modal, useModal } from '../../modal';
 
 export function Mint() {
-  const { chain } = useNetwork();
+  const { chain, chains } = useNetwork();
   const { openModal } = useModal();
   const { data: signer } = useSigner();
   const account = useAccount();
+  const { switchNetworkAsync } = useSwitchNetwork();
 
   const [mintedAmount, setMintedAmount] = useState<string>('-');
   const [maxSupply, setMaxSupply] = useState<string>('-');
   const [isNFTHolder, setIsNFTHolder] = useState<boolean>(false);
   const [isLoading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | undefined>();
+
+  const isNetworkSupported = chains.find((c) => c.id === chain?.id);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -35,6 +39,10 @@ export function Mint() {
       }
 
       setError(undefined);
+
+      if (!isNetworkSupported) {
+        setIsNFTHolder(false);
+      }
 
       const nftWhitelist = getWhitelist(getNftWhitelistAddress(chain.id), signer);
 
@@ -52,7 +60,7 @@ export function Mint() {
     };
 
     fetchData();
-  }, [account.address, chain, signer]);
+  }, [account.address, chain, isNetworkSupported, signer]);
 
   useEffect(() => {
     if (account.isDisconnected) {
@@ -84,6 +92,7 @@ export function Mint() {
         setIsNFTHolder(amount.gt(0));
       }
     } catch (e: any) {
+      console.error(e);
       if (e.code === 'ACTION_REJECTED') setError('Minting rejected.');
       else setError('Oops! Something went wrong.');
     }
@@ -103,27 +112,25 @@ export function Mint() {
         />
       </ImageContainer>
 
-      {account.isConnected && <Text>{`${mintedAmount}/${maxSupply} NFTs minted so far.`}</Text>}
+      {account.isConnected && isNetworkSupported && <Text>{`${mintedAmount}/${maxSupply} NFTs minted so far.`}</Text>}
 
-      {!account.isConnected ? (
-        <ButtonContainer>
+      <ButtonContainer>
+        {!account.isConnected ? (
           <Button type="button" onClick={() => openModal(Modal.Wallet)} title="Connect Wallet">
             Connect Wallet
           </Button>
-        </ButtonContainer>
-      ) : !isNFTHolder ? (
-        <ButtonContainer>
+        ) : !isNetworkSupported ? (
+          <Button onClick={() => switchNetworkAsync?.(ChainId.GNOSIS)}>Unsupported Network</Button>
+        ) : !isNFTHolder ? (
           <Button type="button" title="Mint NFT to access" onClick={mint}>
             {isLoading ? 'Minting...' : 'Mint NFT to access'}
           </Button>
-        </ButtonContainer>
-      ) : (
-        <ButtonContainer>
+        ) : (
           <LinkButton as={Link} to="/" type="button" title="Create a stack">
             Create a stack
           </LinkButton>
-        </ButtonContainer>
-      )}
+        )}
+      </ButtonContainer>
 
       {isNFTHolder && <Text>Congratulations, you hold the Stackly Beta NFT!</Text>}
       {error && <Text>{error}</Text>}
@@ -150,7 +157,8 @@ const ButtonContainer = styled.div`
 
 const Text = styled.p`
   margin-left: 12px;
-  text-wrap: nowrap;
+  text-wrap: wrap;
+  text-align: center;
 
   font-weight: 600;
   font-size: 14px;
