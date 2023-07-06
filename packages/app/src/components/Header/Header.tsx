@@ -8,7 +8,7 @@ import { ReactComponent as Burger } from './burger.svg';
 import { Container } from '../Container';
 import { ArrowUpRight } from 'react-feather';
 
-export const HEADER_HEIGHT = '88px'; // 4px * 22
+export const HEADER_HEIGHT = '0px'; // 4px * 22
 export const TOGGLE_BUTTON_SIZE = '64px';
 export const DESKTOP_BREAKPOINT = '768px';
 export const ASIDE_BACKGROUND_COLOR = '#fbf4e6';
