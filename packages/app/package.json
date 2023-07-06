@@ -26,6 +26,7 @@
     "@walletconnect/ethereum-provider": "^2.1.4",
     "chrono-node": "^2.5.0",
     "cids": "^1.1.9",
+    "crypto-browserify": "^3.12.0",
     "dayjs": "^1.11.7",
     "dca-sdk": "workspace:*",
     "ethers": "^5.7.2",
