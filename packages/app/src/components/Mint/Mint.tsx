@@ -10,7 +10,7 @@ import {
   nftWhitelistTotalSupply,
 } from 'dca-sdk';
 import styled from 'styled-components';
-import { Container, ContainerTitle } from '../Container';
+import { Container } from '../Container';
 import { Link } from 'react-router-dom';
 import { waitForTransaction } from '@wagmi/core';
 import { nftWhitelistMaxSupply } from 'dca-sdk';
@@ -83,7 +83,7 @@ export function Mint() {
 
   return (
     <Container>
-      <Text>Stackly Closed Beta NFT - Mint to get early access</Text>
+      <BigText>Stackly Closed Beta NFT - Mint to get early access</BigText>
       <ImageContainer>
         <img
           width={300}
@@ -167,4 +167,8 @@ const LinkButton = styled(Button)`
   cursor: pointer;
   text-decoration: none;
   display: flex;
+`;
+
+const BigText = styled(Text)`
+font-size: 22px;
 `;
