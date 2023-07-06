@@ -56,7 +56,9 @@ export function Mint() {
     if (!signer || !account.address || !chain) {
       return;
     }
+
     setLoading(true);
+    setError(undefined);
 
     const nftWhitelist = getWhitelist(getNftWhitelistAddress(chain.id), signer);
     try {
@@ -67,8 +69,6 @@ export function Mint() {
         hash: tx.hash as `0x${string}`,
       });
 
-      setError(undefined);
-
       if (account.address) {
         const nftWhitelist = getWhitelist(getNftWhitelistAddress(chain.id), signer);
         const amount = await nftWhitelistBalanceOf(nftWhitelist, account.address);
@@ -78,6 +78,7 @@ export function Mint() {
       if (e.code === 'ACTION_REJECTED') setError('Minting rejected.');
       else setError('Oops! Something went wrong.');
     }
+
     setLoading(false);
   };
 
@@ -92,7 +93,7 @@ export function Mint() {
           src={'https://ipfs.io/ipfs/QmZdgaXjCr36Kys6mBRMuKG5tipKAhhazCcbxKYBKvaqdD'}
         />
       </ImageContainer>
-      
+
       {account.isConnected && <Text>{`${mintedAmount}/${maxSupply} NFTs minted so far.`}</Text>}
 
       {!account.isConnected ? (
@@ -101,24 +102,22 @@ export function Mint() {
             Connect Wallet
           </Button>
         </ButtonContainer>
+      ) : !isNFTHolder ? (
+        <ButtonContainer>
+          <Button type="button" title="Mint NFT to access" onClick={mint}>
+            {isLoading ? 'Minting...' : 'Mint NFT to access'}
+          </Button>
+        </ButtonContainer>
       ) : (
-        (!isNFTHolder ? (
-          <ButtonContainer>
-            <Button type="button" title="Mint NFT to access" onClick={mint}>
-              {isLoading ? 'Minting...' : 'Mint NFT to access'}
-            </Button>
-          </ButtonContainer>
-        ) : (
-          <ButtonContainer>
-            <LinkButton as={Link} to="/" type="button" title="Create a stack">
-              Create a stack
-            </LinkButton>
-          </ButtonContainer>
-        ))
+        <ButtonContainer>
+          <LinkButton as={Link} to="/" type="button" title="Create a stack">
+            Create a stack
+          </LinkButton>
+        </ButtonContainer>
       )}
 
-      {(isNFTHolder && account.isConnected) && <Text>Congratulations, you hold the Stackly Beta NFT!</Text>}
-      {error && <Text> {error}</Text>}
+      {isNFTHolder && <Text>Congratulations, you hold the Stackly Beta NFT!</Text>}
+      {error && <Text>{error}</Text>}
     </Container>
   );
 }
@@ -170,5 +169,5 @@ const LinkButton = styled(Button)`
 `;
 
 const BigText = styled(Text)`
-font-size: 22px;
+  font-size: 22px;
 `;
