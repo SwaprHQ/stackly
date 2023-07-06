@@ -1,6 +1,6 @@
 {
   "name": "dca-app",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "private": true,
   "dependencies": {
     "@cowprotocol/cow-sdk": "1.0.2-RC.0",
