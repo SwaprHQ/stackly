@@ -19,7 +19,7 @@ export function VaultCardContainer({ order }: { order: SubgraphOrder }) {
   const { isLoading: isLoadingVaultBalance, data: vaultBalance } =
     useContractRead<readonly Fragment[], 'balanceOf', BigNumber>({
       abi: getERC20Interface().fragments,
-      address: order.sellToken.id,
+      //address: order.sellToken.id,
       functionName: 'balanceOf',
       enabled: !!signer,
       watch: true,

@@ -10,7 +10,8 @@ const gnosisChain: Chain = {
     symbol: 'xDAI',
   },
   rpcUrls: {
-    default: 'https://rpc.gnosischain.com/',
+    public: { http: ['https://rpc.gnosischain.com/'] },
+    default: { http: ['https://rpc.gnosischain.com/'] },
   },
   blockExplorers: {
     default: { name: 'Gnosis', url: 'https://gnosisscan.io' },
