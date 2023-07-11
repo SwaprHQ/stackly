@@ -74,14 +74,14 @@ export function UserOrder({ order, type }: { order: SubgraphOrder; type: string 
             <h2>{order.id.slice(2, 8)}</h2>
           </OrderTitle>
           <div>
-            {fundsUsed.toFixed(2)} / {parseFloat(formatUnits(order.amount, order.sellToken.decimals)).toFixed(2)}{' '}
+            {fundsUsed.toFixed(2)} / {parseFloat(formatUnits((+order.amount + +order.feeAmount).toString(), order.sellToken.decimals)).toFixed(2)}{' '}
             {order.sellToken.symbol}
           </div>
           <div>
             {averagePrice.toFixed(2)} {order.sellToken.symbol} / {order.buyToken.symbol}
           </div>
           <TotalBuyAmount>
-            {totalBuyAmount.toFixed(2)} {order.buyToken.symbol}
+            {totalBuyAmount.toFixed(4)} {order.buyToken.symbol}
           </TotalBuyAmount>
         </OrderHighlights>
         {showDetails && (
