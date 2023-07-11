@@ -28,6 +28,6 @@ const Content = styled.main`
   flex: 1; /* to fill the remaining space */
   margin: 0 auto;
   @media (min-width: 768px) {
-    padding-top: ${HEADER_HEIGHT}; /* to account for the fixed header */
+    padding-top: 0px;
   }
 `;
