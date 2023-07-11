@@ -18,6 +18,11 @@ export default function IndexPage() {
           <HeaderSplashDescription>
             Stackly is a simple non-custodial DCA based tool that uses CoW Swap to place recurring swaps.
           </HeaderSplashDescription>
+        </FlexContainer>
+      </PageHeader>
+      <CreateDCAVaultContainer />
+      <PageHeader>
+        <FlexContainer>
           <PageHeaderSubSection>
             <FeaturePoint>
               {/* React icons FaCoins */}
@@ -70,7 +75,6 @@ export default function IndexPage() {
           </PageHeaderSubSection>
         </FlexContainer>
       </PageHeader>
-      <CreateDCAVaultContainer />
       <Section>
         <WhatIsDCATitle>A new way to stack your crypto over time with DCA.</WhatIsDCATitle>
         <WhatIsDCAPoint>
@@ -186,11 +190,11 @@ const ExternalLink = styled.a`
 
 const Section = styled.div`
   max-width: 1000px;
-  margin: 8rem auto;
+  margin: 5rem auto;
   padding: 0 16px;
 
   @media (min-width: 500px) {
-    margin: 10rem auto;
+    margin: 5rem auto;
   }
 `;
 
@@ -229,13 +233,11 @@ const PageHeader = styled.header`
 
 const HeaderSplash = styled.h1`
   text-align: center;
-  font-size: 32px;
+  font-size: 28px;
   width: 100%;
-  margin-bottom: 1rem;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
 
-  @media (min-width: 768px) {
-    font-size: 59px;
-  }
 `;
 
 const HeaderSplashDescription = styled.p`
@@ -246,8 +248,6 @@ const HeaderSplashDescription = styled.p`
   line-height: 24px;
   text-align: center;
   color: #4d4f4c;
-
-  margin-bottom: 2.5rem;
 `;
 
 const PageHeaderSubSection = styled.div`
@@ -257,11 +257,12 @@ const PageHeaderSubSection = styled.div`
   align-items: center;
   justify-content: center;
   gap: 1rem;
-  margin-bottom: 1rem;
+  margin-top: 4rem;
+  margin-bottom: 0.5rem;
   flex-wrap: wrap;
 
   @media (min-width: 540px) {
-    margin-bottom: 2.5rem;
+    margin-bottom: 0.5rem;
     justify-content: space-between;
   }
 
@@ -300,7 +301,7 @@ const WhatIsDCATitle = styled.h3`
   margin-bottom: 3rem;
 
   @media (min-width: 500px) {
-    margin-bottom: 5rem;
+    margin-bottom: 2rem;
   }
 `;
 
@@ -418,9 +419,9 @@ const CardInnerWrapper = styled(_CardInnerWrapper)`
 
 const FooterCard = styled(Card)`
   max-width: 1000px;
-  margin: 10rem 24px;
+  margin: 4rem 24px;
 
   @media (min-width: 768px) {
-    margin: 10rem auto;
+    margin: 4rem auto;
   }
 `;
