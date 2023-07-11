@@ -36,7 +36,7 @@ export function UserOrder({ order, type }: { order: SubgraphOrder; type: string 
       chain?.id as ChainId
     ).then((cowOrders) => {
       // Funds used
-      const nextFundsUsed = cowOrders.reduce((acc, cowOrder) => {
+      const nextFundsUsed = parseFloat(formatUnits(order.feeAmount, order.sellToken.decimals)) + cowOrders.reduce((acc, cowOrder) => {
         return acc + parseFloat(formatUnits(cowOrder.executedSellAmount, order.sellToken.decimals));
       }, 0);
       const nextAveragePrice = calculateAveragePrice(order, cowOrders);
