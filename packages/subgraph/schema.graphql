@@ -43,6 +43,10 @@ type DCAOrder @entity {
   orderSlots: [BigInt!]
   "Initial DCA amount"
   amount: BigInt!
+  "Nominal amount of fees"
+  feeAmount: BigInt!
+  "% of total amount"
+  fee: BigInt!
   createdAt: BigInt!
   cancelledAt: BigInt
   "start time"
