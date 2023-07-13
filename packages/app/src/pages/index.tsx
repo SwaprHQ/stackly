@@ -131,6 +131,23 @@ export default function IndexPage() {
               </ExternalLink>{' '}
               so you can wrap your XDAI and start stacking.
             </Accordion>
+            <Accordion title="Is Stackly audited?">
+              Yes, Stackly contracts have been audited. Here you can read the {' '}
+              <ExternalLink
+                target="_blank"
+                href="https://ipfs.io/ipfs/QmUmmFkKvktZ14iA3237WuDrzNuhi4BMb4MoYMJHeFFbey"
+              >
+                full audit report
+              </ExternalLink>.{' '}
+              <br/><br/>
+              There is an active Security Bug Bounty, you can find more details {' '}
+              <ExternalLink
+                target="_blank"
+                href="https://app.hats.finance/bug-bounties/swapr-0x5dfc5451a739b4d94551195329bd37bcf8e4bf4a/scope"
+              >
+                here
+              </ExternalLink>.{' '}
+            </Accordion>
           </FAQColumn>
         </FAQWrapper>
       </Section>
