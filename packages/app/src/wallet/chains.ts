@@ -19,4 +19,23 @@ const gnosisChain: Chain = {
   testnet: false,
 };
 
-export const chains: Chain[] = [gnosisChain];
+const goerli: Chain = {
+  id: 5,
+  name: 'Goerli',
+  network: 'goerli',
+  nativeCurrency: {
+    decimals: 18,
+    name: 'goerliETH',
+    symbol: 'goerliETH',
+  },
+  rpcUrls: {
+    public: { http: ['https://rpc.ankr.com/eth_goerli/'] },
+    default: { http: ['https://rpc.ankr.com/eth_goerli'] },
+  },
+  blockExplorers: {
+    default: { name: 'Goerli', url: 'https://goerli.etherscan.io' },
+  },
+  testnet: true,
+};
+
+export const chains: Chain[] = [goerli, gnosisChain];

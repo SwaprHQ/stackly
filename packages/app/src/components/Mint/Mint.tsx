@@ -141,7 +141,7 @@ export function Mint() {
             Connect Wallet
           </Button>
         ) : !isNetworkSupported ? (
-          <Button onClick={() => switchNetworkAsync?.(ChainId.GNOSIS)}>Unsupported Network</Button>
+          <Button onClick={() => switchNetworkAsync?.(ChainId.GOERLI)}>Unsupported Network</Button>
         ) : !isNFTHolder ? (
           <Button type="button" title="Mint NFT to access" onClick={mint}>
             {isLoading ? 'Minting...' : 'Mint NFT to access'}

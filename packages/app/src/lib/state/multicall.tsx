@@ -20,6 +20,8 @@ function getBlocksPerFetchForChainId(chainId: number | undefined): number {
   switch (chainId) {
     case ChainId.GNOSIS:
       return 15;
+    case ChainId.GOERLI:
+      return 1;
     default:
       return 1;
   }

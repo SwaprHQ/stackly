@@ -32,6 +32,7 @@ type ChainCurrencyList = {
 const COMMON_BASES: ChainCurrencyList = {
   [ChainId.ETHEREUM]: [WETH[ChainId.ETHEREUM], USDC[ChainId.ETHEREUM], WBTC[ChainId.ETHEREUM], SWPR[ChainId.ETHEREUM]],
   [ChainId.GNOSIS]: [WETH[ChainId.GNOSIS], USDC[ChainId.GNOSIS], WBTC[ChainId.GNOSIS], SWPR[ChainId.GNOSIS]],
+  [ChainId.GOERLI]: [WETH[ChainId.GOERLI], USDC[ChainId.GOERLI]],
 };
 
 export function CommonBases({

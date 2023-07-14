@@ -41,7 +41,7 @@ function WalletConnectButton() {
 
   if (account.isConnected && !isNetworkSupported) {
     return (
-      <Button type="button" onClick={() => switchNetworkAsync?.(ChainId.GNOSIS)}>
+      <Button type="button" onClick={() => switchNetworkAsync?.(ChainId.GOERLI)}>
         Switch Network
       </Button>
     );

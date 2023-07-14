@@ -118,7 +118,7 @@ export async function createDCAOrderWithNonce(
   const rawChainId = (await orderFactory.provider.getNetwork().then((n) => n.chainId)) as number;
   const chainId = rawChainId as ChainId;
 
-  if (chainId !== ChainId.ETHEREUM && chainId !== ChainId.GNOSIS) {
+  if (chainId !== ChainId.ETHEREUM && chainId !== ChainId.GNOSIS && chainId !== ChainId.GOERLI) {
     throw new Error(`Chain id ${chainId} is not supported`);
   }
 

@@ -1,10 +1,12 @@
 // A list of tokens that are commonly used in the DXdao ecosystem
+import { AddressZero } from '@ethersproject/constants';
 import { ChainId } from '../constants';
 import { Token } from './token';
 
 export const USDC: Readonly<Record<ChainId, Token>> = {
   [ChainId.ETHEREUM]: new Token(ChainId.ETHEREUM, '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', 6, 'USDC'),
   [ChainId.GNOSIS]: new Token(ChainId.GNOSIS, '0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83', 6, 'USDC'),
+  [ChainId.GOERLI]: new Token(ChainId.GOERLI, '0x07865c6e87b9f70255377e024ace6630c1eaa37f', 6, 'USDC'),
 };
 
 export const SETH2 = new Token(ChainId.ETHEREUM, '0xFe2e637202056d30016725477c5da089Ab0A043A', 18, 'sETH2');
@@ -26,11 +28,19 @@ export const WETH: Readonly<Record<ChainId, Token>> = {
     'WETH',
     'Wrapped Ether'
   ),
+  [ChainId.GOERLI]: new Token(
+    ChainId.GOERLI,
+    '0xb4fbf271143f4fbf7b91a5ded31805e42b2208d6',
+    18,
+    'WETH',
+    'Wrapped Ether'
+  ),
 };
 
 export const SWPR: Readonly<Record<ChainId, Token>> = {
   [ChainId.ETHEREUM]: new Token(ChainId.ETHEREUM, '0x6cacdb97e3fc8136805a9e7c342d866ab77d0957', 18, 'SWPR'),
   [ChainId.GNOSIS]: new Token(ChainId.GNOSIS, '0x532801ed6f82fffd2dab70a19fc2d7b2772c4f4b', 18, 'SWPR'),
+  [ChainId.GOERLI]: new Token(ChainId.GOERLI, '0x532801ed6f82fffd2dab70a19fc2d7b2772c4f4b', 18, 'SWPR'),
 };
 
 export const WXDAI = new Token(
@@ -52,16 +62,19 @@ export const DAI = new Token(
 export const GNO: Record<ChainId, Token> = {
   [ChainId.ETHEREUM]: new Token(ChainId.ETHEREUM, '0x6810e776880c02933d47db1b9fc05908e5386b96', 18, 'GNO'),
   [ChainId.GNOSIS]: new Token(ChainId.GNOSIS, '0x9C58BAcC331c9aa871AFD802DB6379a98e80CEdb', 18, 'GNO'),
+  [ChainId.GOERLI]: new Token(ChainId.GOERLI, AddressZero, 18, 'GNO'),
 };
 
 export const WBTC: Record<ChainId, Token> = {
   [ChainId.ETHEREUM]: new Token(ChainId.ETHEREUM, '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599', 8, 'WBTC'),
   [ChainId.GNOSIS]: new Token(ChainId.GNOSIS, '0x8e5bbbb09ed1ebde8674cda39a0c169401db4252', 8, 'WBTC'),
+  [ChainId.GOERLI]: new Token(ChainId.GOERLI, AddressZero, 8, 'WBTC'),
 };
 
 export const DPI: Record<ChainId, Token> = {
   [ChainId.ETHEREUM]: new Token(ChainId.ETHEREUM, '0x1494ca1f11d487c2bbe4543e90080aeba4ba3c2b', 18, 'DPI'),
   [ChainId.GNOSIS]: new Token(ChainId.GNOSIS, '0xd3d47d5578e55c880505dc40648f7f9307c3e7a8', 18, 'DPI'),
+  [ChainId.GOERLI]: new Token(ChainId.GOERLI, AddressZero, 18, 'DPI'),
 };
 
 export const STETH = new Token(ChainId.ETHEREUM, '0xae7ab96520de3a18e5e111b5eaab095312d7fe84', 18, 'stETH');

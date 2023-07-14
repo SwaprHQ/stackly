@@ -5,8 +5,9 @@ import { ChainId } from '../constants';
  * Order factory address list
  */
 export const ORDER_FACTORY_ADDRESS_LIST: Record<ChainId, string> = {
-  [ChainId.ETHEREUM]: AddressZero,
+  [ChainId.ETHEREUM]: '',
   [ChainId.GNOSIS]: '0x45B91Da2834010751b17F1eadE0a5a7B64233add',
+  [ChainId.GOERLI]: '0x6123653C60FAF7576FD567C5f6c7b71e4a98f401',
 };
 
 /**
@@ -15,6 +16,7 @@ export const ORDER_FACTORY_ADDRESS_LIST: Record<ChainId, string> = {
 export const DCAORDER_SINGLETON_ADDRESS_LIST: Record<ChainId, string> = {
   [ChainId.ETHEREUM]: AddressZero,
   [ChainId.GNOSIS]: '0xb8B01eAD81DCF4E95C700DEA4D4fB90fc8099696',
+  [ChainId.GOERLI]: '0x95e05d6bc600e015ccac449e480e10a5f72b9d46',
 };
 
 /**
@@ -23,19 +25,22 @@ export const DCAORDER_SINGLETON_ADDRESS_LIST: Record<ChainId, string> = {
 export const NFT_WHITELIST_ADDRESS_LIST: Record<ChainId, string> = {
   [ChainId.ETHEREUM]: AddressZero,
   [ChainId.GNOSIS]: '0x610a4F6f4A9fDf5c715d60a65758d2fd9B6Ee138',
+  [ChainId.GOERLI]: AddressZero,
 };
 
 /**
  * COW's settlement address list
  */
 export const COW_SETTLEMENT_ADDRESS_LIST: Record<ChainId, string> = {
-  [ChainId.ETHEREUM]: '0xC92E8bdf79f0507f65a392b0ab4667716BFE0110',
+  [ChainId.ETHEREUM]: '0x9008D19f58AAbD9eD0D60971565AA8510560ab41',
   [ChainId.GNOSIS]: '0x9008D19f58AAbD9eD0D60971565AA8510560ab41',
+  [ChainId.GOERLI]: '0x9008D19f58AAbD9eD0D60971565AA8510560ab41',
 };
 
 export const SUBGRAPH_ENDPOINT_LIST: Readonly<Record<string, string>> = {
-  [ChainId.ETHEREUM]: '',
+  [ChainId.ETHEREUM]: 'https://api.thegraph.com/subgraphs/name/swaprhq/stackly-eth',
   [ChainId.GNOSIS]: 'https://api.thegraph.com/subgraphs/name/swaprhq/stackly',
+  [ChainId.GOERLI]: 'https://api.thegraph.com/subgraphs/name/swaprhq/stackly-goerli',
 };
 
 /**
@@ -89,6 +94,7 @@ export function getCOWProtocolSettlementAddress(chainId: ChainId): string {
   return {
     [ChainId.ETHEREUM]: '0x9008D19f58AAbD9eD0D60971565AA8510560ab41',
     [ChainId.GNOSIS]: '0x9008d19f58aabd9ed0d60971565aa8510560ab41',
+    [ChainId.GOERLI]: '0x9008d19f58aabd9ed0d60971565aa8510560ab41',
   }[chainId];
 }
 

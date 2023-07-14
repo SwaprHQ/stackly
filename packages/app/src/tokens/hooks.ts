@@ -5,6 +5,7 @@ import { useNetwork, useProvider } from 'wagmi';
 const _nativeCurrencyCache = {
   [ChainId.ETHEREUM]: Ether.onChain(ChainId.ETHEREUM),
   [ChainId.GNOSIS]: new xDAI(),
+  [ChainId.GOERLI]: Ether.onChain(ChainId.GOERLI),
 };
 
 function nativeOnChain(chainId: ChainId): NativeCurrency {

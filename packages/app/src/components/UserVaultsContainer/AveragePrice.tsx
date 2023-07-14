@@ -9,6 +9,7 @@ import { SubgraphOrder } from './types';
 const COW_API_BASE_URL: Readonly<Record<ChainId, string>> = {
   [ChainId.ETHEREUM]: `https://api.cow.fi/mainnet/api/v1`,
   [ChainId.GNOSIS]: `https://api.cow.fi/xdai/api/v1`,
+  [ChainId.GOERLI]: `https://api.cow.fi/goerli/api/v1`,
 };
 
 /**

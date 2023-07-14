@@ -32,7 +32,8 @@ export enum ExplorerDataType {
 }
 
 const ETHERSCAN_PREFIXES: { [chainId in ChainId | number]: string } = {
-  1: '',
+  [ChainId.ETHEREUM]: '',
+  [ChainId.GOERLI]: 'goerli.',
 };
 
 function getExplorerPrefix(chainId: ChainId) {

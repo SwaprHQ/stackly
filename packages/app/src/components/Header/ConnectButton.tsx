@@ -23,7 +23,7 @@ export function WalletConnectButton() {
       );
     } else {
       return (
-        <Button onClick={() => switchNetworkAsync?.(ChainId.GNOSIS)}>
+        <Button onClick={() => switchNetworkAsync?.(ChainId.GOERLI)}>
           Unsupported Network
         </Button>
       );

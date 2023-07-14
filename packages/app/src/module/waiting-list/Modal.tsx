@@ -20,6 +20,10 @@ export const Modal = () => {
 
   useEffect(() => {
     const getNFTHolder = async () => {
+      if (process.env.REACT_APP_WHITELIST_STATUS !== 'true') {
+        return;
+      }
+
       if (account.address && chain && signer) {
         const nftWhitelist = getWhitelist(getNftWhitelistAddress(chain.id), signer);
         const amount = await nftWhitelistBalanceOf(nftWhitelist, account.address);
@@ -36,12 +40,12 @@ export const Modal = () => {
     }
   }, [account.isConnected]);
 
-  if (!showModal) {
+  if (!showModal || process.env.REACT_APP_WHITELIST_STATUS !== 'true') {
     return <></>;
   }
 
   const discordLink = process.env.REACT_APP_DISCORD_WAITLIST_LINK;
-
+  
   return (
     <Overlay>
       <ModalBackdrop>
