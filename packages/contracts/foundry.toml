@@ -6,15 +6,15 @@ out = 'out'
 optimizer = true
 solc_version = '0.8.20'
 evm_version = 'london'
-eth_rpc_url = 'https://rpc.gnosischain.com'
+eth_rpc_url = 'https://eth.llamarpc.com'
 
 [rpc_endpoints]
 ethereum = "${ETHEREUM_RPC_URL}"
 gnosis = "${GNOSIS_RPC_URL}"
 
 [etherscan]
-ethereum = { key = "${ETHERSCAN_API_KEY}" }
-gnosis = { key = "${GNOSISSCAN_API_KEY}" }
+ethereum = { key = "${ETHERSCAN_API_KEY}", url = "api.etherscan.io/api" }
+gnosis = { key = "${GNOSISSCAN_API_KEY}", url = "api.gnosisscan.io/api" }
 
 [fmt]
 tab_width = 2
