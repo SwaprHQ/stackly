@@ -43,11 +43,15 @@ contract DCAOrder is IConditionalOrder, EIP1271Verifier, IDCAOrder {
   uint256 public endTime;
   /// @dev The frequency of the DCA order in hours
   uint256 public interval;
+  /// @dev Order slippage percentage | 0 = not set
+  uint8 public slippage;
   bytes32 public domainSeparator;
   /// @dev Indicates that the order has been cancelled.
   bool public cancelled;
   /// @dev The initial amount of the DCA order.
   uint256 public amount;
+  /// @dev OrderFactory address
+  address public factory;
 
   event Initialized(address indexed order);
   event Cancelled(address indexed order);
@@ -97,6 +101,10 @@ contract DCAOrder is IConditionalOrder, EIP1271Verifier, IDCAOrder {
     if (_endTime <= _startTime) {
       revert InvalidEndTime();
     }
+
+    // Set order factory address
+    factory = msg.sender;
+
     // Set all the properties
     owner = _owner;
     receiver = _receiver;
@@ -148,12 +156,23 @@ contract DCAOrder is IConditionalOrder, EIP1271Verifier, IDCAOrder {
     // ensures that orders queried shortly after one another result in the same hash (to avoid spamming the orderbook)
     // solhint-disable-next-line not-rely-on-time
     uint32 currentTimeBucket = ((uint32(orderExecutionTime) / 900) + 1) * 900;
+
+    int sellTokenPrice = factory.getPrice(sellToken, 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE);
+    int buyTokenPrice = factory.getPrice(buyToken, 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE);
+
+    uint256 minBuyAmount = 1; // 0 buy amount is not allowed
+
+    // If both got a price from Chainlink
+    if (sellTokenPrice != -1 && buyTokenPrice != -1) {
+      minBuyAmount = (orderSellAmount * uint256(buyTokenPrice) * (10000 - slippage)) / (uint256(sellTokenPrice) * 10000);
+    }
+
     return GPv2Order.Data(
       sellToken,
       buyToken,
       receiver, // The receiver
       orderSellAmount,
-      1, // 0 buy amount is not allowed
+      minBuyAmount,
       currentTimeBucket + 900, // between 15 and 30 miunte validity
       keccak256("DollarCostAveraging"),
       0,

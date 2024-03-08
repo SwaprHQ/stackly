@@ -27,5 +27,8 @@
     "commander": "^9.4.1",
     "eslint-config-custom": "workspace:*",
     "ganache": "^7.5.0"
+  },
+  "dependencies": {
+    "@chainlink/contracts": "^0.8.0"
   }
 }

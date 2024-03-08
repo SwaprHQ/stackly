@@ -4,6 +4,7 @@
     "ds-test/=packages/contracts/lib/forge-std/lib/ds-test/src/",
     "forge-std/=packages/contracts/lib/forge-std/src/",
     "oz/=packages/contracts/lib/openzeppelin-contracts/contracts/",
+    "cl/=packages/contracts/lib/chainlink/contracts/src/v0.8",
     "src/=packages/contracts/src/",
     "tests/=packages/contracts/tests/"
   ],

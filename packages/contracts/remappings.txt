@@ -5,3 +5,4 @@ src/=src/
 tests/=tests/
 solmate/=lib/solmate/src
 date/=lib/BokkyPooBahsDateTimeLibrary/contracts
+cl/=lib/chainlink/contracts/src/v0.8

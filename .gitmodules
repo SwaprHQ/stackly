@@ -12,3 +12,9 @@
 [submodule "packages/contracts/lib/BokkyPooBahsDateTimeLibrary"]
 	path = packages/contracts/lib/BokkyPooBahsDateTimeLibrary
 	url = https://github.com/bokkypoobah/BokkyPooBahsDateTimeLibrary
+[submodule "packages/contracts/lib/foundry-chainlink-toolkit"]
+	path = packages/contracts/lib/foundry-chainlink-toolkit
+	url = https://github.com/smartcontractkit/foundry-chainlink-toolkit
+[submodule "packages/contracts/lib/chainlink"]
+	path = packages/contracts/lib/chainlink
+	url = https://github.com/smartcontractkit/chainlink

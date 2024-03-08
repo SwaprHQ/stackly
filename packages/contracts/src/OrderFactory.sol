@@ -6,6 +6,8 @@ import {IERC20} from "oz/token/ERC20/IERC20.sol";
 import {IERC721} from "oz/token/ERC721/IERC721.sol";
 import {Ownable2Step} from "oz/access/Ownable2Step.sol";
 import {SafeERC20} from "oz/token/ERC20/utils/SafeERC20.sol";
+import {FeedRegistryInterface} from "cl/interfaces/FeedRegistryInterface.sol";
+import {Denominations} from "cl/Denominations.sol";
 
 error ForbiddenValue();
 error NotWhitelisted();
@@ -17,11 +19,13 @@ contract OrderFactory is Ownable2Step {
   uint16 public protocolFee = 25; // default 0.25% (range: 0-500 / 0-5%)
   IERC721 public whitelistNFT;
   bool public whitelist = true;
+  FeedRegistryInterface internal feedRegistry;
 
   event OrderCreated(address indexed order);
 
-  constructor(address _whitelistNFT) {
+  constructor(address _whitelistNFT, address _chainlinkFeedRegistry) {
     whitelistNFT = IERC721(_whitelistNFT);
+    feedRegistry = FeedRegistryInterface(_chainlinkFeedRegistry);
   }
 
   /// @dev Allows to create a new proxy contract and execute a message call to the new proxy within one transaction.
@@ -119,5 +123,21 @@ contract OrderFactory is Ownable2Step {
   /// @dev Enable/disable NFT whitelisting
   function toggleWhitelist() external onlyOwner {
     whitelist = !whitelist;
+  }
+
+  /// @dev Get asset price
+  /// @param base Token address you want to find it the price for
+  /// @param quote Price denomination asset address
+  function getPrice(address base, address quote) public returns (int) {
+    (bool success, bytes memory returnData) =
+      address(feedRegistry).call(
+        abi.encodePacked(feedRegistry.latestRoundData.selector, abi.encode(base, quote)
+      )
+    );
+    if (success) {
+      (,int price,,,) = abi.decode(returnData,(uint80,int,uint,uint,uint80));
+      return price;
+    }
+    return -1;
   }
 }
