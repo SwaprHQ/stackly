@@ -49,7 +49,7 @@ contract DCAOrder is IConditionalOrder, EIP1271Verifier, IDCAOrder {
   /// @dev The initial amount of the DCA order.
   uint256 public amount;
 
-  uint256[] orderSlots;
+  uint256[] orders;
 
   event Initialized(address indexed order);
   event Cancelled(address indexed order);
@@ -183,16 +183,9 @@ contract DCAOrder is IConditionalOrder, EIP1271Verifier, IDCAOrder {
   }
 
   /// @dev get the total number of orders that will be executed between the start and end time
-  // function orderSlots() public view returns (uint256[] memory slots) {
-  //   uint256 total = Math.ceilDiv(BokkyPooBahsDateTimeLibrary.diffHours(startTime, endTime), interval);
-  //   slots = new uint256[](total);
-  //   // Create execution orders
-  //   for (uint256 i = 0; i < total; i++) {
-  //     uint256 orderExecutionTime = startTime + (i * interval * 1 hours);
-  //     slots[i] = orderExecutionTime;
-  //   }
-  //   return slots;
-  // }
+  function orderSlots() public view returns (uint256[] memory slots) {
+    return orders;
+  }
 
   /// @dev store the total number of orders that will be executed between the start and end time
   function storeSlots() external {
@@ -203,13 +196,13 @@ contract DCAOrder is IConditionalOrder, EIP1271Verifier, IDCAOrder {
       uint256 orderExecutionTime = startTime + (i * interval * 1 hours);
       slots[i] = orderExecutionTime;
     }
-    orderSlots = slots;
+    orders = slots;
   }
 
   /// @dev returns the current slot based on the slots array
   /// @dev a slot is consider current if the current time is greater than the slot time and less than the next slot time (if it exists)
   function currentSlot() public view returns (uint256 slot) {
-    uint256[] memory slots = orderSlots;
+    uint256[] memory slots = orderSlots();
 
     // If the current time is between the last slot and the end time, return the last slot
     // solhint-disable-next-line not-rely-on-time
@@ -233,7 +226,7 @@ contract DCAOrder is IConditionalOrder, EIP1271Verifier, IDCAOrder {
     // Execute at the specified frequency
     // Each order sellAmount is the balance of the order divided by the frequency
     // If the current slot is the last slot, the returned amount is the total sellToken balance
-    uint256[] memory slots = orderSlots;
+    uint256[] memory slots = orderSlots();
 
     // solhint-disable-next-line not-rely-on-time
     if (block.timestamp >= slots[slots.length - 1] && block.timestamp < endTime) {
