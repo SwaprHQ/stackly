@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.20;
 
+
+import "forge-std/console.sol";
 import {IERC20} from "oz/token/ERC20/IERC20.sol";
 import {SafeERC20} from "oz/token/ERC20/utils/SafeERC20.sol";
 import {IGPv2Settlement} from "./interfaces/IGPv2Settlement.sol";
@@ -196,20 +198,19 @@ contract DCAOrder is IConditionalOrder, EIP1271Verifier, IDCAOrder {
   /// @dev returns the current slot based on the slots array
   /// @dev a slot is consider current if the current time is greater than the slot time and less than the next slot time (if it exists)
   function currentSlot() public view returns (uint256 slot) {
+    uint256 _startTime = startTime;
     uint256 currentTime = block.timestamp;
     uint256 intervalTimestamp = interval * 1 hours;
-    uint256 nextSlotTime;
 
     // Calculate the next time slot based on the current time
-    if (currentTime <= startTime) {
-      nextSlotTime = startTime;
-    } else {
-      uint256 slotsElapsed = (currentTime - startTime) / intervalTimestamp;
-      nextSlotTime = startTime + ((slotsElapsed + 1) * intervalTimestamp);
-      // If the next slot time is beyond the end time, return 0 indicating no further time slots
-      if (nextSlotTime > endTime) {
-        return 0;
-      }
+    if (currentTime < _startTime) {
+      return 0;
+    }
+
+    uint256 nextSlotTime = _startTime + (((currentTime - _startTime) / intervalTimestamp) * intervalTimestamp);
+    // If the curernt time is beyond the end time, return 0 indicating no further time slots
+    if (currentTime > endTime) {
+      return 0;
     }
 
     return nextSlotTime;
