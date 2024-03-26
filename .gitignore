@@ -58,7 +58,4 @@ out
 dist
 generated
 
-# subgraph
-subgraph.yaml
-
 bin
