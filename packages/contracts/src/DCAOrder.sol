@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.20;
 
-
-import "forge-std/console.sol";
 import {IERC20} from "oz/token/ERC20/IERC20.sol";
 import {SafeERC20} from "oz/token/ERC20/utils/SafeERC20.sol";
 import {IGPv2Settlement} from "./interfaces/IGPv2Settlement.sol";
@@ -237,7 +235,7 @@ contract DCAOrder is IConditionalOrder, EIP1271Verifier, IDCAOrder {
     if (block.timestamp >= _endTime) {
       return 0;
     }
-    
+
     // amount divided by total amount of orders
     (, orderSellAmount) = SafeMath.tryDiv(amount, (Math.ceilDiv(BokkyPooBahsDateTimeLibrary.diffHours(startTime, _endTime), interval)));
   }
