@@ -30,21 +30,28 @@ export function handleDCAOrderInitialized(event: Initialized): void {
   order.buyToken = createOrReturnTokenEntity(orderContract.buyToken()).id;
   order.receiver = orderContract.receiver();
 
-  let protocolFee : BigInt = BigInt.fromI32(0);
-  let orderFactoryAddress: Address = (event.transaction.to !== null ? event.transaction.to : Address.fromString("0x0"))!;
-  
+  let protocolFee: BigInt = BigInt.fromI32(0);
+  let orderSlots;
+  let orderFactoryAddress: Address = (
+    event.transaction.to !== null ? event.transaction.to : Address.fromString('0x0')
+  )!;
+
   const factory = OrderFactory.bind(orderFactoryAddress);
   let tryProtocolFee = factory.try_protocolFee();
+  let tryOrderSlots = factory.try_orderSlots();
   if (!tryProtocolFee.reverted) {
     protocolFee = BigInt.fromI32(tryProtocolFee.value);
+  }
+  if (!tryOrderSlots.reverted) {
+    orderSlots = BigInt.fromI32(tryOrderSlots.value);
   }
 
   order.amount = orderContract.amount();
   order.fee = protocolFee;
-  order.feeAmount = (order.amount.times(protocolFee)).div(HUNDRED_PERCENT.minus(protocolFee));
+  order.feeAmount = order.amount.times(protocolFee).div(HUNDRED_PERCENT.minus(protocolFee));
   order.endTime = orderContract.endTime().toI32();
   order.startTime = orderContract.startTime().toI32();
-  order.orderSlots = orderContract.orderSlots();
+  order.orderSlots = orderSlots;
   order.interval = orderContract.interval();
   order.save();
 }
