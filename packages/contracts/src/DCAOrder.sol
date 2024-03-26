@@ -109,6 +109,10 @@ contract DCAOrder is IConditionalOrder, EIP1271Verifier, IDCAOrder {
     interval = _interval;
     amount = _amount;
     domainSeparator = IGPv2Settlement(_settlementContract).domainSeparator();
+
+    // stores the total amount of orders that are being created
+    storeSlots();
+
     // Approve the vaut relayer to spend the sell token
     IERC20(_sellToken).safeApprove(address(IGPv2Settlement(_settlementContract).vaultRelayer()), type(uint256).max);
     emit ConditionalOrderCreated(address(this)); // Required by COW to watch this contract
@@ -188,7 +192,7 @@ contract DCAOrder is IConditionalOrder, EIP1271Verifier, IDCAOrder {
   }
 
   /// @dev store the total number of orders that will be executed between the start and end time
-  function storeSlots() external {
+  function storeSlots() public {
     uint256 total = Math.ceilDiv(BokkyPooBahsDateTimeLibrary.diffHours(startTime, endTime), interval);
     uint256[] memory slots = new uint256[](total);
     // Create execution orders
