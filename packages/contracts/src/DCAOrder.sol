@@ -198,20 +198,19 @@ contract DCAOrder is IConditionalOrder, EIP1271Verifier, IDCAOrder {
   function currentSlot() public view returns (uint256 slot) {
     uint256 _startTime = startTime;
     uint256 currentTime = block.timestamp;
-    uint256 intervalTimestamp = interval * 1 hours;
 
     // Calculate the next time slot based on the current time
     if (currentTime < _startTime) {
       return 0;
     }
 
-    uint256 nextSlotTime = _startTime + (((currentTime - _startTime) / intervalTimestamp) * intervalTimestamp);
     // If the curernt time is beyond the end time, return 0 indicating no further time slots
     if (currentTime > endTime) {
       return 0;
     }
-
-    return nextSlotTime;
+    
+    uint256 intervalTimestamp = interval * 1 hours;
+    return _startTime + (((currentTime - _startTime) / intervalTimestamp) * intervalTimestamp);
   }
 
   /// @dev Checks if the current timestamp corresponds to the last time slot within the specified interval.
