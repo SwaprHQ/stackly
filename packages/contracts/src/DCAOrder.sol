@@ -107,6 +107,7 @@ contract DCAOrder is IConditionalOrder, EIP1271Verifier, IDCAOrder {
     interval = _interval;
     amount = _amount;
     domainSeparator = IGPv2Settlement(_settlementContract).domainSeparator();
+
     // Approve the vaut relayer to spend the sell token
     IERC20(_sellToken).safeApprove(address(IGPv2Settlement(_settlementContract).vaultRelayer()), type(uint256).max);
     emit ConditionalOrderCreated(address(this)); // Required by COW to watch this contract
@@ -180,7 +181,7 @@ contract DCAOrder is IConditionalOrder, EIP1271Verifier, IDCAOrder {
     return GPv2EIP1271.MAGICVALUE;
   }
 
-  /// @dev the total number of orders that will be executed between the start and end time
+  /// @dev get the total number of orders that will be executed between the start and end time
   function orderSlots() public view returns (uint256[] memory slots) {
     uint256 total = Math.ceilDiv(BokkyPooBahsDateTimeLibrary.diffHours(startTime, endTime), interval);
     slots = new uint256[](total);
@@ -195,23 +196,28 @@ contract DCAOrder is IConditionalOrder, EIP1271Verifier, IDCAOrder {
   /// @dev returns the current slot based on the slots array
   /// @dev a slot is consider current if the current time is greater than the slot time and less than the next slot time (if it exists)
   function currentSlot() public view returns (uint256 slot) {
-    uint256[] memory slots = orderSlots();
+    uint256 _startTime = startTime;
+    uint256 currentTime = block.timestamp;
 
-    // If the current time is between the last slot and the end time, return the last slot
-    // solhint-disable-next-line not-rely-on-time
-    if (block.timestamp >= slots[slots.length - 1] && block.timestamp <= endTime) {
-      return slots[slots.length - 1];
+    // Calculate the next time slot based on the current time
+    if (currentTime < _startTime) {
+      return 0;
     }
 
-    // No need to reach the last slot, the last slot returns in the previous condition
-    for (uint256 i = 0; i < slots.length - 1; i++) {
-      // If the current time is between the slot start time and the next slot start time, return the current slot
-      // solhint-disable-next-line not-rely-on-time
-      if (block.timestamp >= slots[i] && block.timestamp < slots[i + 1]) {
-        slot = slots[i];
-        break;
-      }
+    // If the curernt time is beyond the end time, return 0 indicating no further time slots
+    if (currentTime > endTime) {
+      return 0;
     }
+    
+    uint256 intervalTimestamp = interval * 1 hours;
+    return _startTime + (((currentTime - _startTime) / intervalTimestamp) * intervalTimestamp);
+  }
+
+  /// @dev Checks if the current timestamp corresponds to the last time slot within the specified interval.
+  /// @return bool True if the current timestamp corresponds to the last time slot, otherwise false.
+  function isLastSlot() public view returns (bool) {
+    uint256 intervalTimestamp = interval * 1 hours;
+    return ((startTime + ((((block.timestamp - startTime) / intervalTimestamp) + 1) * intervalTimestamp)) + intervalTimestamp) > endTime;
   }
 
   /// @dev returns the sell amount for the each slot
@@ -219,15 +225,17 @@ contract DCAOrder is IConditionalOrder, EIP1271Verifier, IDCAOrder {
     // Execute at the specified frequency
     // Each order sellAmount is the balance of the order divided by the frequency
     // If the current slot is the last slot, the returned amount is the total sellToken balance
-    uint256[] memory slots = orderSlots();
-
+    uint256 _endTime = endTime;
     // solhint-disable-next-line not-rely-on-time
-    if (block.timestamp >= slots[slots.length - 1] && block.timestamp < endTime) {
-      orderSellAmount = sellToken.balanceOf(address(this));
-    } else if (block.timestamp >= endTime) {
-      return 0;
-    } else {
-      (, orderSellAmount) = SafeMath.tryDiv(amount, slots.length);
+    if (isLastSlot()) {
+      return sellToken.balanceOf(address(this));
     }
+    
+    if (block.timestamp >= _endTime) {
+      return 0;
+    }
+
+    // amount divided by total amount of orders
+    (, orderSellAmount) = SafeMath.tryDiv(amount, (Math.ceilDiv(BokkyPooBahsDateTimeLibrary.diffHours(startTime, _endTime), interval)));
   }
 }

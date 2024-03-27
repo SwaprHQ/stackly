@@ -2,8 +2,8 @@
 pragma solidity ^0.8.20;
 
 import "forge-std/Script.sol";
-import "./DCAOrder.sol";
-import "./OrderFactory.sol";
+import "../src/DCAOrder.sol";
+import "../src/OrderFactory.sol";
 
 contract Deploy is Script {
     address whitelistNFT = vm.envAddress("WHITELIST_NFT_ADDRESS");

@@ -206,6 +206,9 @@ contract DCAOrderTest is Test {
     // warp to 15 hours after the startTime
     vm.warp(dcaOrder.startTime() + 15 hours);
     assertEq(dcaOrder.currentSlot(), _startTime + 15 hours);
+    // warp to 15 hours after the startTime, add a couple more seconds
+    vm.warp(dcaOrder.startTime() + 15 hours + 5 seconds);
+    assertEq(dcaOrder.currentSlot(), _startTime + 15 hours);
     // warp to the endTime of the order
     vm.warp(dcaOrder.endTime() - 0.5 hours);
     assertEq(dcaOrder.currentSlot(), _endTime - 1 hours);
