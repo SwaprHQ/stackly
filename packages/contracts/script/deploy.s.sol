@@ -12,7 +12,7 @@ contract Deploy is Script {
         vm.startBroadcast(deployerPrivateKey);
 
         new DCAOrder();
-        //new OrderFactory(whitelistNFT);
+        new OrderFactory(whitelistNFT);
 
         vm.stopBroadcast();
     }
